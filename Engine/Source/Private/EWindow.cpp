@@ -1,4 +1,6 @@
 #include "EWindow.h"
+#include "Graphics/EGraphicsEngine.h"
+#include "Debug/EDebug.h"
 
 // External Libs
 #include <SDL/SDL.h>
@@ -8,7 +10,7 @@ EWindow::EWindow()
 	m_sdlWindow = nullptr;
 	m_shouldClose = false;
 
-	std::cout << "Window created." << std::endl;
+	EDebug::Log("Window created.");
 }
 
 EWindow::~EWindow()
@@ -17,7 +19,7 @@ EWindow::~EWindow()
 	if (m_sdlWindow)
 		SDL_DestroyWindow(m_sdlWindow);
 
-	std::cout << "Window destroyed." << std::endl;
+	EDebug::Log("Window destroyed.");
 }
 
 bool EWindow::CreateWindow(const ESWindowParams& params)
@@ -49,13 +51,33 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 		m_params.h,
 		windowFlags
 	);
-	
+
 	// Check if SDL window was created
 	if (!m_sdlWindow) {
-		std::cout << "SDL failed to create window: " << SDL_GetError() << std::endl;
+		EDebug::Log(
+			"SDL failed to create window: " + std::string(SDL_GetError()), 
+			LT_ERROR);
 		CloseWindow();
 		return false;
 	}
 
+	// Create the graphics engine objects
+	m_graphicsEngine = std::make_unique<EGraphicsEngine>();
+
+	// Initialise the graphics engine and test if it failed
+	if (!m_graphicsEngine->InitEngine(m_sdlWindow, m_params.vsync)) {
+		EDebug::Log("Window failed to initialise Graphics Engine.", LT_ERROR);
+		m_graphicsEngine = nullptr;
+		return false;
+	}
+
 	return true;
+}
+
+void EWindow::Render()
+{
+	// Render the graphics engine if exists
+	if (m_graphicsEngine) {
+		m_graphicsEngine->Render(m_sdlWindow);
+	}
 }

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+class EGraphicsEngine;
+
 struct ESWindowParams {
 	// Default constructor
 	ESWindowParams() {
@@ -53,6 +55,9 @@ public:
 	// Check if the window has been set to closed
 	bool IsPendingClose() const { return m_shouldClose; }
 
+	// Render the graphics engine to the window
+	void Render();
+
 private:
 	// A ref to the window in SDL
 	SDL_Window* m_sdlWindow;
@@ -62,4 +67,7 @@ private:
 
 	// Determine if the window should close
 	bool m_shouldClose;
+
+	// Store the graphics engine
+	std::unique_ptr<EGraphicsEngine> m_graphicsEngine;
 };

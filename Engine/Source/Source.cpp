@@ -52,6 +52,9 @@ int main(int argc, char* argv[]) {
 			if (e.type == SDL_QUIT)
 				m_window->CloseWindow();
 		}
+
+		// Render the window
+		m_window->Render();
 	}
 
 	// Cleanup the engine
