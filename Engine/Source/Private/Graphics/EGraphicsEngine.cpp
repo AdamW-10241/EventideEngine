@@ -67,24 +67,49 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Create a DEBUG mesh
 	m_mesh = std::make_unique<EMesh>();
 
-	vertexData.resize(3);
-	// Vertex 1
+	vertexData.resize(7);
+	// Vertex 1 TL
 	vertexData[0].m_position[0] = 0.0f;
 	vertexData[0].m_position[1] = 0.5f;
 	vertexData[0].m_position[2] = 0.0f;
-	// Vertex 2
-	vertexData[1].m_position[0] = -0.5f;
+	// Vertex 2 BL
+	vertexData[1].m_position[0] = 0.0f;
 	vertexData[1].m_position[1] = -0.5f;
 	vertexData[1].m_position[2] = 0.0f;
-	// Vertex 3
+	// Vertex 3 BR
 	vertexData[2].m_position[0] = 0.5f;
 	vertexData[2].m_position[1] = -0.5f;
 	vertexData[2].m_position[2] = 0.0f;
+	// Vertex 4 TR
+	vertexData[3].m_position[0] = 0.5f;
+	vertexData[3].m_position[1] = 0.5f;
+	vertexData[3].m_position[2] = 0.0f;
 
-	indexData.resize(3);
-	indexData[0] = 0; // Vertex 1
-	indexData[1] = 1; // Vertex 2
-	indexData[2] = 2; // Vertex 3
+	// Vertex 5 L
+	vertexData[4].m_position[0] = -0.75f;
+	vertexData[4].m_position[1] = 0.0f;
+	vertexData[4].m_position[2] = 0.0f;
+	// Vertex 6 R
+	vertexData[5].m_position[0] = -0.25f;
+	vertexData[5].m_position[1] = 0.0f;
+	vertexData[5].m_position[2] = 0.0f;
+	// Vertex 7 T
+	vertexData[6].m_position[0] = -0.5f;
+	vertexData[6].m_position[1] = sqrtf(3.0f) / 2.0f;
+	vertexData[6].m_position[2] = 0.0f;
+
+	indexData.resize(9);
+	// Square
+	indexData[0] = 0; // Vertex 1 TL
+	indexData[1] = 1; // Vertex 2 BL
+	indexData[2] = 2; // Vertex 3 BR
+	indexData[3] = 0; // Vertex 4 TL
+	indexData[4] = 3; // Vertex 5 TR
+	indexData[5] = 2; // Vertex 6 BR
+	// Triangle
+	indexData[6] = 4; // Vertex 7 L
+	indexData[7] = 5; // Vertex 8 R
+	indexData[8] = 6; // Vertex 9 T
 
 	// Create the mesh and test if it failed
 	if (!m_mesh->CreateMesh(vertexData, indexData)) {
@@ -100,7 +125,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	// Set a background color
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.15f, 0.15f, 0.25f, 1.0f);
 
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT);
