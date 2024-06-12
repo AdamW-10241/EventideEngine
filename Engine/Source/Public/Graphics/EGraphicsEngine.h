@@ -5,6 +5,7 @@ typedef void* SDL_GLContext;
 struct SDL_Window;
 class EMesh;
 class EShaderProgram;
+struct ESTransform;
 
 class EGraphicsEngine {
 public:
@@ -16,6 +17,10 @@ public:
 
 	// Render the graphics engine
 	void Render(SDL_Window* sdlWindow);
+
+private:
+	// Rotate and bounce mesh around space
+	void RotateAndBounce(static ESTransform& transform, static float& rotationSpeed, static float& moveAmountX, static float& moveAmountY);
 
 private:
 	// Storing memory location for OpenGL context
