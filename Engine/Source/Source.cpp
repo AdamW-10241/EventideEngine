@@ -18,13 +18,26 @@ bool Initialise() {
 		return false;
 	}
 
+	// Tell SDL that we will be rendering in OpenGL version 460 or 4.60
+	// 4 is the major version
+	// .60 is the minor version
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+	// Make sure compativbility mode is run for an OpenGL version not in SDL
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	// Set the bit depth for each colour
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+
 	// Creating the window object
 	m_window = std::make_unique<EWindow>();
 
 	// Creating an SDL window
 	if (!m_window->CreateWindow({ "Game Window", 
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		1280, 720 })) {
+		720, 720 })) {
 		return false;
 	}
 

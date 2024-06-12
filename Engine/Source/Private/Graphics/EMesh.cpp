@@ -1,5 +1,6 @@
 #include "Graphics/EMesh.h"
 #include "Debug/EDebug.h"
+#include "Graphics/EShaderProgram.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -84,6 +85,7 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 		GL_STATIC_DRAW
 	);
 
+	// Position
 	// Pass out the vertex data in seperate formats
 	glEnableVertexAttribArray(0);
 
@@ -94,7 +96,21 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 		GL_FLOAT, // The type of data to store
 		GL_FALSE, // Should we normalise the values (generally no)
 		sizeof(ESVertexData), // How big is each data array in a VertexData
-		nullptr // How many numbers to skip
+		nullptr // How many numbers to skip in bytes
+	);
+
+	// Color
+	// Pass out the vertex data in seperate formats
+	glEnableVertexAttribArray(1);
+
+	// Set the position of that data to the 1 index of the attribute array
+	glVertexAttribPointer(
+		1, // Location to store the data in the attribute array
+		3, // How many numbers to pass into the attributen array index
+		GL_FLOAT, // The type of data to store
+		GL_FALSE, // Should we normalise the values (generally no)
+		sizeof(ESVertexData), // How big is each data array in a VertexData
+		(void*)(sizeof(float) * 3) // How many numbers to skip in bytes
 	);
 
 	// Common practise to clear the VAO from the GPU
@@ -103,8 +119,14 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	return true;
 }
 
-void EMesh::Render()
+void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform)
 {
+	// Activate shader
+	shader->Activate();
+
+	// Update the transform of the mesh based on the model transform
+	shader->SetModelTransform(transform);
+	
 	// Binding this mesh as the active VAO
 	glBindVertexArray(m_vao);
 

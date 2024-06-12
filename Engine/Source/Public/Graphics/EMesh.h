@@ -5,6 +5,9 @@
 #include <vector>
 #include <cstdint>
 
+class EShaderProgram;
+struct ESTransform;
+
 struct ESVertexData {
 	float m_position[3] = { 0.0f, 0.0f, 0.0f };
 	float m_color[3] = { 1.0f, 1.0f, 1.0f };
@@ -22,7 +25,7 @@ public:
 		const std::vector<uint32_t>& indices);
 
 	// Draw the mesh to the renderer
-	void Render();
+	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform);
 
 private:
 	// Store the vertices

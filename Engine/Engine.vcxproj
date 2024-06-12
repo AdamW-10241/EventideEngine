@@ -101,6 +101,7 @@
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
+    <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
     <ClCompile Include="Source\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +109,8 @@
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
+    <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
+    <ClInclude Include="Source\Public\Math\ESTransform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

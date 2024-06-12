@@ -1,16 +1,24 @@
 #include "Graphics/EGraphicsEngine.h"
 #include "Debug/EDebug.h"
 #include "Graphics/EMesh.h"
+#include "Graphics/EShaderProgram.h"
+#include "Math/ESTransform.h"
 
 // External Libs
 #include <GLEW/glew.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
 
-std::vector<ESVertexData> vertexData;
-std::vector<uint32_t> indexData;
+#include <string>
+
+std::vector<ESVertexData> vertexData1;
+std::vector<uint32_t> indexData1;
+
+std::vector<ESVertexData> vertexData2;
+std::vector<uint32_t> indexData2;
 // Test mesh for debug
-std::unique_ptr<EMesh> m_mesh;
+std::unique_ptr<EMesh> m_mesh1;
+std::unique_ptr<EMesh> m_mesh2;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -61,59 +69,109 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		return false;
 	}
 
+	m_shader = std::make_shared<EShaderProgram>();
+
+	// Attempt to init shader and test if failed
+	if (!m_shader->InitShader(
+		"Shaders/SimpleShader/SimpleShader.vertex",
+		"Shaders/SimpleShader/SimpleShader.frag"
+	)) {
+		EDebug::Log("Graphics engine failed to initialise due to shader failure.");
+		return false;
+	}
+
 	// Log the success of the graphics engine initialisation
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 	
-	// Create a DEBUG mesh
-	m_mesh = std::make_unique<EMesh>();
+	// Create DEBUG meshes
+	m_mesh1 = std::make_unique<EMesh>();
+	m_mesh2 = std::make_unique<EMesh>();
 
-	vertexData.resize(7);
-	// Vertex 1 TL
-	vertexData[0].m_position[0] = 0.0f;
-	vertexData[0].m_position[1] = 0.5f;
-	vertexData[0].m_position[2] = 0.0f;
-	// Vertex 2 BL
-	vertexData[1].m_position[0] = 0.0f;
-	vertexData[1].m_position[1] = -0.5f;
-	vertexData[1].m_position[2] = 0.0f;
-	// Vertex 3 BR
-	vertexData[2].m_position[0] = 0.5f;
-	vertexData[2].m_position[1] = -0.5f;
-	vertexData[2].m_position[2] = 0.0f;
-	// Vertex 4 TR
-	vertexData[3].m_position[0] = 0.5f;
-	vertexData[3].m_position[1] = 0.5f;
-	vertexData[3].m_position[2] = 0.0f;
-
-	// Vertex 5 L
-	vertexData[4].m_position[0] = -0.75f;
-	vertexData[4].m_position[1] = 0.0f;
-	vertexData[4].m_position[2] = 0.0f;
-	// Vertex 6 R
-	vertexData[5].m_position[0] = -0.25f;
-	vertexData[5].m_position[1] = 0.0f;
-	vertexData[5].m_position[2] = 0.0f;
-	// Vertex 7 T
-	vertexData[6].m_position[0] = -0.5f;
-	vertexData[6].m_position[1] = sqrtf(3.0f) / 2.0f;
-	vertexData[6].m_position[2] = 0.0f;
-
-	indexData.resize(9);
 	// Square
-	indexData[0] = 0; // Vertex 1 TL
-	indexData[1] = 1; // Vertex 2 BL
-	indexData[2] = 2; // Vertex 3 BR
-	indexData[3] = 0; // Vertex 4 TL
-	indexData[4] = 3; // Vertex 5 TR
-	indexData[5] = 2; // Vertex 6 BR
+	vertexData1.resize(4);
+	// Vertex 1 TL
+	vertexData1[0].m_position[0] = -0.25f;
+	vertexData1[0].m_position[1] = 0.25f;
+	vertexData1[0].m_position[2] = 0.0f;
+	// Colour
+	vertexData1[0].m_color[0] = 1.0f;
+	vertexData1[0].m_color[1] = 1.0f;
+	vertexData1[0].m_color[2] = 0.0f;
+	// Vertex 2 BL
+	vertexData1[1].m_position[0] = -0.25f;
+	vertexData1[1].m_position[1] = -0.25f;
+	vertexData1[1].m_position[2] = 0.0f;
+	// Colour
+	vertexData1[1].m_color[0] = 1.0f;
+	vertexData1[1].m_color[1] = 1.0f;
+	vertexData1[1].m_color[2] = 0.0f;
+	// Vertex 3 BR
+	vertexData1[2].m_position[0] = 0.25f;
+	vertexData1[2].m_position[1] = -0.25f;
+	vertexData1[2].m_position[2] = 0.0f;
+	// Colour
+	vertexData1[2].m_color[0] = 1.0f;
+	vertexData1[2].m_color[1] = 1.0f;
+	vertexData1[2].m_color[2] = 0.0f;
+	// Vertex 4 TR
+	vertexData1[3].m_position[0] = 0.25f;
+	vertexData1[3].m_position[1] = 0.25f;
+	vertexData1[3].m_position[2] = 0.0f;
+	// Colour
+	vertexData1[3].m_color[0] = 1.0f;
+	vertexData1[3].m_color[1] = 1.0f;
+	vertexData1[3].m_color[2] = 0.0f;
+
 	// Triangle
-	indexData[6] = 4; // Vertex 7 L
-	indexData[7] = 5; // Vertex 8 R
-	indexData[8] = 6; // Vertex 9 T
+	vertexData2.resize(3);
+	// Vertex 1 L
+	vertexData2[0].m_position[0] = -0.25f;
+	vertexData2[0].m_position[1] = -0.25f;
+	vertexData2[0].m_position[2] = 0.0f;
+	// Colour
+	vertexData2[0].m_color[0] = 1.0f;
+	vertexData2[0].m_color[1] = 0.0f;
+	vertexData2[0].m_color[2] = 0.0f;
+	// Vertex 2 R
+	vertexData2[1].m_position[0] = 0.25f;
+	vertexData2[1].m_position[1] = -0.25f;
+	vertexData2[1].m_position[2] = 0.0f;
+	// Colour
+	vertexData2[1].m_color[0] = 0.0f;
+	vertexData2[1].m_color[1] = 1.0f;
+	vertexData2[1].m_color[2] = 0.0f;
+	// Vertex 3 T
+	vertexData2[2].m_position[0] = 0.0f;
+	vertexData2[2].m_position[1] = 0.25f;
+	vertexData2[2].m_position[2] = 0.0f;
+	// Colour
+	vertexData2[2].m_color[0] = 0.0f;
+	vertexData2[2].m_color[1] = 0.0f;
+	vertexData2[2].m_color[2] = 1.0f;
+
+	// Square
+	indexData1.resize(6);
+	indexData1[0] = 0; // Vertex 1 TL
+	indexData1[1] = 1; // Vertex 2 BL
+	indexData1[2] = 2; // Vertex 3 BR
+	indexData1[3] = 0; // Vertex 4 TL
+	indexData1[4] = 3; // Vertex 5 TR
+	indexData1[5] = 2; // Vertex 6 BR
+
+	// Triangle
+	indexData2.resize(3);
+	indexData2[0] = 0; // Vertex 7 L
+	indexData2[1] = 1; // Vertex 8 R
+	indexData2[2] = 2; // Vertex 9 T
 
 	// Create the mesh and test if it failed
-	if (!m_mesh->CreateMesh(vertexData, indexData)) {
-		EDebug::Log("Failed to create DEBUG mesh.");
+	if (!m_mesh1->CreateMesh(vertexData1, indexData1)) {
+		EDebug::Log("Failed to create DEBUG mesh 1.");
+	}
+
+	// Create the mesh and test if it failed
+	if (!m_mesh2->CreateMesh(vertexData2, indexData2)) {
+		EDebug::Log("Failed to create DEBUG mesh 2.");
 	}
 
 	return true;
@@ -121,17 +179,41 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 {
-	// Wireframe shader
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	
 	// Set a background color
-	glClearColor(0.15f, 0.15f, 0.25f, 1.0f);
+	glClearColor(0.10f, 0.10f, 0.20f, 1.0f);
 
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	static ESTransform transform;
+
+	static float rotationAmount = 0.05f;
+
+	static float moveAmountX = 0.0001f;
+	if (transform.position.x > 0.75 || transform.position.x < -0.75) {
+		moveAmountX *= -1;
+		rotationAmount *= -1;
+	}
+
+	static float moveAmountY = 0.00006f;
+	if (transform.position.y > 0.75 || transform.position.y < -0.75) {
+		moveAmountY *= -1;
+		rotationAmount *= -1;
+	}
+
+	transform.position.x += moveAmountX;
+	transform.position.y += moveAmountY;
+
+	transform.rotation.z += rotationAmount;
+	transform.scale = glm::vec3(0.75f);
+
 	// Render custom graphics
-	m_mesh->Render();
+	m_mesh1->Render(m_shader, transform);
+
+	static ESTransform transform2;
+	transform2.rotation.z += 0.01f;
+
+	m_mesh2->Render(m_shader, transform2);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
