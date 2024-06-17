@@ -1,11 +1,10 @@
 #pragma once
+#include "EngineTypes.h"
 
-// System Libs
-#include <string>
-#include <cstdint>
+class ETexture;
 
 // Enum to determine the type of shader
-enum EEShaderType : uint8_t {
+enum EEShaderType : EUi8 {
 	ST_VERTEX = 0U,
 	ST_FRAGMENT
 };
@@ -18,8 +17,8 @@ public:
 	~EShaderProgram();
 
 	// Create the shader using a vertex and fragment file
-	bool InitShader(const std::string& vShaderPath,
-		const std::string& fShaderPath);
+	bool InitShader(const EString& vShaderPath,
+		const EString& fShaderPath);
 
 	// Activate the shader to update
 	// You can't change values in a shader without activating it
@@ -28,23 +27,26 @@ public:
 	// Set the transform of the model in the shader
 	void SetModelTransform(const ESTransform& transform);
 
+	// Set a texture in the shader based on the slot
+	void RunTexture(const TShared<ETexture>& texture, const EUi32& slot);
+
 private:
 	// Import a shader based on the shader type
-	bool ImportShaderByType(const std::string& filePath, EEShaderType shaderType);
+	bool ImportShaderByType(const EString& filePath, EEShaderType shaderType);
 
 	// Convert a file into a string
-	std::string ConvertFileToString(const std::string& filePath);
+	EString ConvertFileToString(const EString& filePath);
 
 	// Link the shader to the GPU through OpenGL
 	bool LinkToGPU();
 
 private:
 	// Store the file paths
-	std::string m_filePath[2] = { "", "" };
+	EString m_filePath[2] = { "", "" };
 
 	// Store the shader IDs
-	uint32_t m_shaderIDs[2] = { 0, 0 };
+	EUi32 m_shaderIDs[2] = { 0, 0 };
 
 	// Store the ID for the program
-	uint32_t m_programID;
+	EUi32 m_programID;
 };

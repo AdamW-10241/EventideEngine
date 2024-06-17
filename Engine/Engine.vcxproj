@@ -98,18 +98,23 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
     <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
+    <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExternalLibs\Includes\STB_IMAGE\stb_image.h" />
     <ClInclude Include="Source\Public\Debug\EDebug.h" />
+    <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
+    <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Math\ESTransform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

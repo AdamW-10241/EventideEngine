@@ -92,7 +92,7 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	// Set the position of that data to the 0 index of the attribute array
 	glVertexAttribPointer(
 		0, // Location to store the data in the attribute array
-		3, // How many numbers to pass into the attributen array index
+		3, // How many numbers to pass into the attribute array index
 		GL_FLOAT, // The type of data to store
 		GL_FALSE, // Should we normalise the values (generally no)
 		sizeof(ESVertexData), // How big is each data array in a VertexData
@@ -106,11 +106,25 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	// Set the position of that data to the 1 index of the attribute array
 	glVertexAttribPointer(
 		1, // Location to store the data in the attribute array
-		3, // How many numbers to pass into the attributen array index
+		3, // How many numbers to pass into the attribute array index
 		GL_FLOAT, // The type of data to store
 		GL_FALSE, // Should we normalise the values (generally no)
 		sizeof(ESVertexData), // How big is each data array in a VertexData
 		(void*)(sizeof(float) * 3) // How many numbers to skip in bytes
+	);
+
+	// Tex Coords
+	// Pass out the vertex data in seperate formats
+	glEnableVertexAttribArray(2);
+
+	// Set the position of that data to the 2 index of the attribute array
+	glVertexAttribPointer(
+		2, // Location to store the data in the attribute array
+		2, // How many numbers to pass into the attribute array index
+		GL_FLOAT, // The type of data to store
+		GL_FALSE, // Should we normalise the values (generally no)
+		sizeof(ESVertexData), // How big is each data array in a VertexData
+		(void*)(sizeof(float) * 6) // How many numbers to skip in bytes
 	);
 
 	// Common practise to clear the VAO from the GPU
@@ -123,6 +137,12 @@ void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransf
 {
 	// Activate shader
 	shader->Activate();
+
+	// Does a texture exist
+	if (m_texture) {
+		// Run the texture
+		shader->RunTexture(m_texture, 0);
+	}
 
 	// Update the transform of the mesh based on the model transform
 	shader->SetModelTransform(transform);

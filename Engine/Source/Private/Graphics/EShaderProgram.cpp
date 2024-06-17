@@ -1,6 +1,7 @@
 #include "Graphics/EShaderProgram.h"
 #include "Debug/EDebug.h"
 #include "Math/ESTransform.h"
+#include "Graphics/ETexture.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -22,14 +23,14 @@ EShaderProgram::~EShaderProgram()
 	EDebug::Log("Shader program " + std::to_string(m_programID) + " destroyed.");
 }
 
-bool EShaderProgram::InitShader(const std::string& vShaderPath, const std::string& fShaderPath)
+bool EShaderProgram::InitShader(const EString& vShaderPath, const EString& fShaderPath)
 {
 	// Create the shader program in OpenGL
 	m_programID = glCreateProgram();
 
 	// Test if the create program failed
 	if (m_programID == 0) {
-		const std::string errorMsg = EGET_GLEW_ERROR;
+		const EString errorMsg = EGET_GLEW_ERROR;
 		EDebug::Log("Shader program failed to initialise, could not create program: " + errorMsg);
 		return false;
 	}
@@ -73,10 +74,31 @@ void EShaderProgram::SetModelTransform(const ESTransform& transform)
 	glUniformMatrix4fv(varID, 1, GL_FALSE, glm::value_ptr(matrixT));
 }
 
-bool EShaderProgram::ImportShaderByType(const std::string& filePath, EEShaderType shaderType)
+void EShaderProgram::RunTexture(const TShared<ETexture>& texture, const EUi32& slot)
+{
+	// Bind the texture
+	texture->BindTexture(slot);
+
+	// ID for the variable in the shader
+	int varID = 0;
+
+	// Get the ID depending on the slot
+	switch (slot) {
+	case 0:
+		varID = glGetUniformLocation(m_programID, "colourMap");
+		break;
+	default:
+		break;
+	}
+
+	// Update the shader
+	glUniform1i(varID, slot);
+}
+
+bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType shaderType)
 {
 	// Convert the shader to a string
-	const std::string shaderStr = ConvertFileToString(filePath);
+	const EString shaderStr = ConvertFileToString(filePath);
 	
 	// Make sure there is a string path
 	if (shaderStr.empty()) {
@@ -99,7 +121,7 @@ bool EShaderProgram::ImportShaderByType(const std::string& filePath, EEShaderTyp
 
 	// Make sure there was a shader ID assigned
 	if (m_shaderIDs[shaderType] == 0) {
-		const std::string errorMsg = EGET_GLEW_ERROR;
+		const EString errorMsg = EGET_GLEW_ERROR;
 		EDebug::Log("Shader program could not assign shader ID: " + errorMsg, LT_ERROR);
 		return false;
 	}
@@ -119,7 +141,7 @@ bool EShaderProgram::ImportShaderByType(const std::string& filePath, EEShaderTyp
 		// Fill the log with info from GL about what happened
 		glGetShaderInfoLog(m_shaderIDs[shaderType], 512, nullptr, infoLog);
 		// Log info
-		EDebug::Log("Shader compilation error: " + std::string(infoLog), LT_ERROR);
+		EDebug::Log("Shader compilation error: " + EString(infoLog), LT_ERROR);
 		return false;
 	}
 
@@ -129,7 +151,7 @@ bool EShaderProgram::ImportShaderByType(const std::string& filePath, EEShaderTyp
 	return true;
 }
 
-std::string EShaderProgram::ConvertFileToString(const std::string& filePath)
+EString EShaderProgram::ConvertFileToString(const EString& filePath)
 {
 	// Convert the file path into an ifstream
 	std::ifstream shaderSource(filePath);
@@ -168,7 +190,7 @@ bool EShaderProgram::LinkToGPU()
 		// Fill the log with info from GL about what happened
 		glGetShaderInfoLog(m_programID, 512, nullptr, infoLog);
 		// Log info
-		EDebug::Log("Shader link error: " + std::string(infoLog), LT_ERROR);
+		EDebug::Log("Shader link error: " + EString(infoLog), LT_ERROR);
 		return false;
 	}
 

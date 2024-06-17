@@ -1,12 +1,9 @@
 #pragma once
-
-// System Libs
-#include <iostream>
-#include <vector>
-#include <cstdint>
+#include "EngineTypes.h"
 
 class EShaderProgram;
 struct ESTransform;
+class ETexture;
 
 struct ESVertexData {
 	float m_position[3] = { 0.0f, 0.0f, 0.0f };
@@ -27,6 +24,9 @@ public:
 	// Draw the mesh to the renderer
 	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform);
 
+	// Set the texture for the mesh
+	void SetTexture(const TShared<ETexture>& texture) { m_texture = texture; }
+
 private:
 	// Store the vertices
 	std::vector<ESVertexData> m_vertices;
@@ -42,4 +42,7 @@ private:
 
 	// Store the ID for the element array object
 	uint32_t m_eao;
+
+	// Texture for the mesh
+	TShared<ETexture> m_texture;
 };

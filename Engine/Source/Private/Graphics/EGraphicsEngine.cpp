@@ -3,6 +3,7 @@
 #include "Graphics/EMesh.h"
 #include "Graphics/EShaderProgram.h"
 #include "Math/ESTransform.h"
+#include "Graphics/ETexture.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -11,14 +12,21 @@
 
 #include <string>
 
-std::vector<ESVertexData> vertexData1;
-std::vector<uint32_t> indexData1;
+const std::vector<ESVertexData> vertexData = {
+	 //  X,	    Y,    Z	        R,    G,    B		// Tex Coords
+	{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }, // Vertex Data 1 - TL
+	{ {  0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 1.0f } }, // Vertex Data 2 - TR
+	{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }, // Vertex Data 3 - BL
+	{ {  0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f } }  // Vertex Data 4 - BR
+};
 
-std::vector<ESVertexData> vertexData2;
-std::vector<uint32_t> indexData2;
-// Test mesh for debug
-std::unique_ptr<EMesh> m_mesh1;
-std::unique_ptr<EMesh> m_mesh2;
+const std::vector<uint32_t> indexData = {
+	0, 1, 2, // Tri 1
+	1, 2, 3 // Tri 2
+};
+
+// Test DEBUG mesh
+std::unique_ptr<EMesh> m_mesh;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -84,94 +92,19 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 	
 	// Create DEBUG meshes
-	m_mesh1 = std::make_unique<EMesh>();
-	m_mesh2 = std::make_unique<EMesh>();
-
-	// Square
-	vertexData1.resize(4);
-	// Vertex 1 TL
-	vertexData1[0].m_position[0] = -0.25f;
-	vertexData1[0].m_position[1] = 0.25f;
-	vertexData1[0].m_position[2] = 0.0f;
-	// Colour
-	vertexData1[0].m_color[0] = 1.0f;
-	vertexData1[0].m_color[1] = 1.0f;
-	vertexData1[0].m_color[2] = 0.0f;
-	// Vertex 2 BL
-	vertexData1[1].m_position[0] = -0.25f;
-	vertexData1[1].m_position[1] = -0.25f;
-	vertexData1[1].m_position[2] = 0.0f;
-	// Colour
-	vertexData1[1].m_color[0] = 1.0f;
-	vertexData1[1].m_color[1] = 1.0f;
-	vertexData1[1].m_color[2] = 0.0f;
-	// Vertex 3 BR
-	vertexData1[2].m_position[0] = 0.25f;
-	vertexData1[2].m_position[1] = -0.25f;
-	vertexData1[2].m_position[2] = 0.0f;
-	// Colour
-	vertexData1[2].m_color[0] = 1.0f;
-	vertexData1[2].m_color[1] = 1.0f;
-	vertexData1[2].m_color[2] = 0.0f;
-	// Vertex 4 TR
-	vertexData1[3].m_position[0] = 0.25f;
-	vertexData1[3].m_position[1] = 0.25f;
-	vertexData1[3].m_position[2] = 0.0f;
-	// Colour
-	vertexData1[3].m_color[0] = 1.0f;
-	vertexData1[3].m_color[1] = 1.0f;
-	vertexData1[3].m_color[2] = 0.0f;
-
-	// Triangle
-	vertexData2.resize(3);
-	// Vertex 1 L
-	vertexData2[0].m_position[0] = -0.25f;
-	vertexData2[0].m_position[1] = -0.25f;
-	vertexData2[0].m_position[2] = 0.0f;
-	// Colour
-	vertexData2[0].m_color[0] = 1.0f;
-	vertexData2[0].m_color[1] = 0.0f;
-	vertexData2[0].m_color[2] = 0.0f;
-	// Vertex 2 R
-	vertexData2[1].m_position[0] = 0.25f;
-	vertexData2[1].m_position[1] = -0.25f;
-	vertexData2[1].m_position[2] = 0.0f;
-	// Colour
-	vertexData2[1].m_color[0] = 0.0f;
-	vertexData2[1].m_color[1] = 1.0f;
-	vertexData2[1].m_color[2] = 0.0f;
-	// Vertex 3 T
-	vertexData2[2].m_position[0] = 0.0f;
-	vertexData2[2].m_position[1] = 0.25f;
-	vertexData2[2].m_position[2] = 0.0f;
-	// Colour
-	vertexData2[2].m_color[0] = 0.0f;
-	vertexData2[2].m_color[1] = 0.0f;
-	vertexData2[2].m_color[2] = 1.0f;
-
-	// Square
-	indexData1.resize(6);
-	indexData1[0] = 0; // Vertex 1 TL
-	indexData1[1] = 1; // Vertex 2 BL
-	indexData1[2] = 2; // Vertex 3 BR
-	indexData1[3] = 0; // Vertex 4 TL
-	indexData1[4] = 3; // Vertex 5 TR
-	indexData1[5] = 2; // Vertex 6 BR
-
-	// Triangle
-	indexData2.resize(3);
-	indexData2[0] = 0; // Vertex 7 L
-	indexData2[1] = 1; // Vertex 8 R
-	indexData2[2] = 2; // Vertex 9 T
+	m_mesh = std::make_unique<EMesh>();
 
 	// Create the mesh and test if it failed
-	if (!m_mesh1->CreateMesh(vertexData1, indexData1)) {
-		EDebug::Log("Failed to create DEBUG mesh 1.");
+	if (!m_mesh->CreateMesh(vertexData, indexData)) {
+		EDebug::Log("Failed to create DEBUG mesh.");
 	}
 
-	// Create the mesh and test if it failed
-	if (!m_mesh2->CreateMesh(vertexData2, indexData2)) {
-		EDebug::Log("Failed to create DEBUG mesh 2.");
+	// Create the texture object
+	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
+
+	// Add the texture to the mesh if exists
+	if (defaultTexture->LoadTexture("Default Texure", "Textures/T_DefaultGrid.png")) {
+		m_mesh->SetTexture(defaultTexture);
 	}
 
 	return true;
@@ -186,34 +119,10 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	static ESTransform transform;
-
-	static float rotationAmount = 0.05f;
-
-	static float moveAmountX = 0.0001f;
-	if (transform.position.x > 0.75 || transform.position.x < -0.75) {
-		moveAmountX *= -1;
-		rotationAmount *= -1;
-	}
-
-	static float moveAmountY = 0.00006f;
-	if (transform.position.y > 0.75 || transform.position.y < -0.75) {
-		moveAmountY *= -1;
-		rotationAmount *= -1;
-	}
-
-	transform.position.x += moveAmountX;
-	transform.position.y += moveAmountY;
-
-	transform.rotation.z += rotationAmount;
-	transform.scale = glm::vec3(0.75f);
+	//transform.rotation.z += 0.01f;
 
 	// Render custom graphics
-	m_mesh1->Render(m_shader, transform);
-
-	static ESTransform transform2;
-	transform2.rotation.z += 0.01f;
-
-	m_mesh2->Render(m_shader, transform2);
+	m_mesh->Render(m_shader, transform);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
