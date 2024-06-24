@@ -2,6 +2,7 @@
 #include "EngineTypes.h"
 
 class ETexture;
+struct ESCamera;
 
 // Enum to determine the type of shader
 enum EEShaderType : EUi8 {
@@ -26,6 +27,9 @@ public:
 
 	// Set the transform of the model in the shader
 	void SetModelTransform(const ESTransform& transform);
+
+	// Set the 3D coordinates for the model
+	void SetWorldTransform(const TShared<ESCamera>& camera);
 
 	// Set a texture in the shader based on the slot
 	void RunTexture(const TShared<ETexture>& texture, const EUi32& slot);

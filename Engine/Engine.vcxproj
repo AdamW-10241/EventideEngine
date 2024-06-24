@@ -102,6 +102,7 @@
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
+    <ClCompile Include="Source\Private\Graphics\EModel.cpp" />
     <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
     <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Source.cpp" />
@@ -113,6 +114,8 @@
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
+    <ClInclude Include="Source\Public\Graphics\EModel.h" />
+    <ClInclude Include="Source\Public\Graphics\ESCamera.h" />
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
     <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Math\ESTransform.h" />

@@ -1,10 +1,11 @@
 #pragma once
-#include <iostream>
+#include "EngineTypes.h"
 
 typedef void* SDL_GLContext;
 struct SDL_Window;
 class EMesh;
 class EShaderProgram;
+struct ESCamera;
 
 class EGraphicsEngine {
 public:
@@ -22,5 +23,8 @@ private:
 	SDL_GLContext m_sdlGLContext;
 
 	// Store the shader for the engine
-	std::shared_ptr<EShaderProgram> m_shader;
+	TShared<EShaderProgram> m_shader;
+
+	// Store the camera
+	TShared<ESCamera> m_camera;
 };

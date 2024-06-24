@@ -135,9 +135,6 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 
 void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform)
 {
-	// Activate shader
-	shader->Activate();
-
 	// Does a texture exist
 	if (m_texture) {
 		// Run the texture

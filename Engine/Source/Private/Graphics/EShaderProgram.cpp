@@ -2,6 +2,7 @@
 #include "Debug/EDebug.h"
 #include "Math/ESTransform.h"
 #include "Graphics/ETexture.h"
+#include "Graphics/ESCamera.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -71,7 +72,41 @@ void EShaderProgram::SetModelTransform(const ESTransform& transform)
 	// All the uniform variables are given an ID by OpenGL
 	const int varID = glGetUniformLocation(m_programID, "model");
 	// Update the value
-	glUniformMatrix4fv(varID, 1, GL_FALSE, glm::value_ptr(matrixT));
+	glUniformMatrix4fv(
+		varID, 1, GL_FALSE, glm::value_ptr(matrixT));
+}
+
+void EShaderProgram::SetWorldTransform(const TShared<ESCamera>& camera)
+{
+	// Initialise a matrix
+	glm::mat4 matrixT = glm::mat4(1.0f);
+
+	// Handle the view matrix
+	// Translate the matrix based on the camera position
+	matrixT = glm::translate(matrixT, camera->transform.position);
+
+	// Find the variable in the shader for the view matrix
+	int varID = glGetUniformLocation(m_programID, "view");
+
+	// Update the view matrix value in the shader
+	glUniformMatrix4fv(
+		varID, 1, GL_FALSE, glm::value_ptr(matrixT));
+
+	// Handle the projection matrix
+	// Set the projection matrix to a perspective view
+	matrixT = glm::perspective(
+		glm::radians(camera->fov),	// Zoom of camera
+		camera->aspectRatio,		// How wide the view is
+		camera->nearClip,			// How close 3D models can be seen
+		camera->farClip				// How far 3D models can be seen
+	);								// - all other models will not render
+
+	// Find the variable in the shader for the projection matrix
+	varID = glGetUniformLocation(m_programID, "projection");
+
+	// Update the projection matrix value in the shader
+	glUniformMatrix4fv(
+		varID, 1, GL_FALSE, glm::value_ptr(matrixT));
 }
 
 void EShaderProgram::RunTexture(const TShared<ETexture>& texture, const EUi32& slot)

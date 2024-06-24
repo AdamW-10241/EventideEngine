@@ -1,32 +1,17 @@
 #include "Graphics/EGraphicsEngine.h"
-#include "Debug/EDebug.h"
-#include "Graphics/EMesh.h"
+#include "Graphics/EModel.h"
 #include "Graphics/EShaderProgram.h"
 #include "Math/ESTransform.h"
 #include "Graphics/ETexture.h"
+#include "Graphics/ESCamera.h"
 
 // External Libs
 #include <GLEW/glew.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
 
-#include <string>
-
-const std::vector<ESVertexData> vertexData = {
-	 //  X,	    Y,    Z	        R,    G,    B		// Tex Coords
-	{ { -0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }, // Vertex Data 1 - TL
-	{ {  0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 1.0f } }, // Vertex Data 2 - TR
-	{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }, // Vertex Data 3 - BL
-	{ {  0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f } }  // Vertex Data 4 - BR
-};
-
-const std::vector<uint32_t> indexData = {
-	0, 1, 2, // Tri 1
-	1, 2, 3 // Tri 2
-};
-
-// Test DEBUG mesh
-std::unique_ptr<EMesh> m_mesh;
+// Test DEBUG model
+TUnique<EModel> m_model;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -72,12 +57,16 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Test if glew failed
 	if (glewResult != GLEW_OK) {
-		std::string errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glewResult));
+		EString errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glewResult));
 		EDebug::Log("Graphics Engine failed to initialise glew: " + errorMsg);
 		return false;
 	}
+	
+	// Enable depth to be tested
+	glEnable(GL_DEPTH_TEST);
 
-	m_shader = std::make_shared<EShaderProgram>();
+	// Creater the shader objectss
+	m_shader = TMakeShared<EShaderProgram>();
 
 	// Attempt to init shader and test if failed
 	if (!m_shader->InitShader(
@@ -88,24 +77,24 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		return false;
 	}
 
-	// Log the success of the graphics engine initialisation
-	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
-	
-	// Create DEBUG meshes
-	m_mesh = std::make_unique<EMesh>();
-
-	// Create the mesh and test if it failed
-	if (!m_mesh->CreateMesh(vertexData, indexData)) {
-		EDebug::Log("Failed to create DEBUG mesh.");
-	}
+	// Create the camera
+	m_camera = TMakeShared<ESCamera>();
+	m_camera->transform.position.z -= 5.0f;
 
 	// Create the texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
 
 	// Add the texture to the mesh if exists
-	if (defaultTexture->LoadTexture("Default Texure", "Textures/T_DefaultGrid.png")) {
-		m_mesh->SetTexture(defaultTexture);
+	if (!defaultTexture->LoadTexture("Default Texure", "Textures/T_DefaultGrid.png")) {
+		EDebug::Log("Graphics engine default texture did not load.", LT_ERROR);
 	}
+
+	// Log the success of the graphics engine initialisation
+	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
+
+	// DEBUG
+	m_model = TMakeUnique<EModel>();
+	m_model->MakeCube(defaultTexture);
 
 	return true;
 }
@@ -116,13 +105,21 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glClearColor(0.10f, 0.10f, 0.20f, 1.0f);
 
 	// Clear the back buffer with a solid color
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	static ESTransform transform;
-	//transform.rotation.z += 0.01f;
+	m_model->GetTransform().rotation.x += 0.01f;
+	m_model->GetTransform().rotation.y += 0.005f;
+	//m_model->GetTransform().rotation.z += 0.01f;
+
+	// Activate shader
+	m_shader->Activate();
+
+	// Set the world transformations based on the camera
+	m_shader->SetWorldTransform(m_camera);
 
 	// Render custom graphics
-	m_mesh->Render(m_shader, transform);
+	// Models will update their own positions in the mesh based on the transform
+	m_model->Render(m_shader);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
