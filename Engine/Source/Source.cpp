@@ -1,14 +1,17 @@
-// System Libs
-#include <iostream>
+#include "EngineTypes.h"
 
 // External Libs
 #include <SDL/SDL.h>
 
 // Engine Libs
 #include "EWindow.h"
+#include "Listeners/EInput.h"
+#include "Listeners/EEvents.h"
+#include "Graphics/ESCamera.h"
 
 // Source Variables
-std::unique_ptr<EWindow> m_window;
+TShared<EWindow> m_window;
+TShared<EInput> m_input;
 
 // Source Functions
 bool Initialise() {
@@ -32,7 +35,7 @@ bool Initialise() {
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 
 	// Creating the window object
-	m_window = std::make_unique<EWindow>();
+	m_window = TMakeShared<EWindow>();
 
 	// Creating an SDL window
 	if (!m_window->CreateWindow({ "Game Window", 
@@ -40,6 +43,10 @@ bool Initialise() {
 		720, 720 })) {
 		return false;
 	}
+
+	// Create the input class and assign the window
+	m_input = TMakeShared<EInput>();
+	m_input->InitInput(m_window);
 
 	return true;
 }
@@ -56,15 +63,25 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
+	// Register the window inputs
+	m_window->RegisterInput(m_input);
+
+	m_input->OnKeyPressed->Bind([](const SDL_Scancode& key){
+		if (key == SDL_SCANCODE_SPACE) {
+			EDebug::Log("Space Pressed");
+		}
+	});
+
+	m_input->OnKeyReleased->Bind([](const SDL_Scancode& key) {
+		if (key == SDL_SCANCODE_SPACE) {
+			EDebug::Log("Space Released");
+		}
+	});
+
 	// Keep the game open as long as the window is open
 	while (!m_window->IsPendingClose()) {
-		// TODO: Game Loop
-		SDL_Event e;
-
-		while (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT)
-				m_window->CloseWindow();
-		}
+		// Handle inputs
+		m_input->UpdateInputs();
 
 		// Render the window
 		m_window->Render();

@@ -1,10 +1,9 @@
 #pragma once
-
-// System Libs
-#include <iostream>
-#include <string>
+#include "EngineTypes.h"
+#include "Math/ESTransform.h"
 
 class EGraphicsEngine;
+class EInput;
 
 struct ESWindowParams {
 	// Default constructor
@@ -18,7 +17,7 @@ struct ESWindowParams {
 	}
 
 	// Settings constructor
-	ESWindowParams(std::string title, int x, int y, 
+	ESWindowParams(EString title, int x, int y,
 		unsigned int w, unsigned int h) : 
 		title(title), 
 		x(x), y(y), 
@@ -28,7 +27,7 @@ struct ESWindowParams {
 	{}
 
 	// Title of the window
-	std::string title;
+	EString title;
 	// Position of the window
 	int x, y;
 	// Width and height of the window
@@ -55,6 +54,9 @@ public:
 	// Check if the window has been set to closed
 	bool IsPendingClose() const { return m_shouldClose; }
 
+	// Listen for input
+	void RegisterInput(const TShared<EInput>& m_input);
+
 	// Render the graphics engine to the window
 	void Render();
 
@@ -69,5 +71,8 @@ private:
 	bool m_shouldClose;
 
 	// Store the graphics engine
-	std::unique_ptr<EGraphicsEngine> m_graphicsEngine;
+	TUnique<EGraphicsEngine> m_graphicsEngine;
+
+	// Direction to move the camera
+	glm::vec3 m_cameraDirection;
 };
