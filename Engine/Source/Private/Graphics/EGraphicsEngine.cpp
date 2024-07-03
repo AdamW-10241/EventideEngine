@@ -11,7 +11,8 @@
 #include "SDL/SDL_opengl.h"
 
 // Test DEBUG model
-TUnique<EModel> m_model;
+TUnique<EModel> m_modelCube;
+TUnique<EModel> m_modelSpike;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -81,7 +82,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	m_camera = TMakeShared<ESCamera>();
 	m_camera->transform.position.z -= 5.0f;
 
-	// Create the texture object
+	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
 
 	// Add the texture to the mesh if exists
@@ -89,12 +90,32 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		EDebug::Log("Graphics engine default texture did not load.", LT_ERROR);
 	}
 
+	// Create the black plastic texture object
+	TShared<ETexture> blackPlasticTexture = TMakeShared<ETexture>();
+
+	// Add the texture to the mesh if exists
+	if (!blackPlasticTexture->LoadTexture("Black Plastic Texure", "Textures/T_BlackPlastic.png")) {
+		EDebug::Log("Graphics engine black plastic texture did not load.", LT_ERROR);
+	}
+
+	// Create the black plastic texture object
+	TShared<ETexture> coinTexture = TMakeShared<ETexture>();
+
+	// Add the texture to the mesh if exists
+	if (!coinTexture->LoadTexture("Black Plastic Texure", "Textures/T_Coins.png")) {
+		EDebug::Log("Graphics engine coin texture did not load.", LT_ERROR);
+	}
+
 	// Log the success of the graphics engine initialisation
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 
 	// DEBUG
-	m_model = TMakeUnique<EModel>();
-	m_model->MakeCube(defaultTexture);
+	m_modelSpike = TMakeUnique<EModel>();
+	m_modelSpike->MakeSpike(blackPlasticTexture);
+
+	m_modelCube = TMakeUnique<EModel>();
+	m_modelCube->MakeCube(coinTexture);
+	m_modelCube->GetTransform().position.x = 4.0f;
 
 	return true;
 }
@@ -107,9 +128,9 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_model->GetTransform().rotation.x += 0.01f;
-	m_model->GetTransform().rotation.y += 0.005f;
-	//m_model->GetTransform().rotation.z += 0.01f;
+	// DEBUG Rotate spike model
+	m_modelSpike->GetTransform().rotation.x += 0.01f;
+	m_modelSpike->GetTransform().rotation.y += 0.005f;
 
 	// Activate shader
 	m_shader->Activate();
@@ -119,7 +140,8 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Render custom graphics
 	// Models will update their own positions in the mesh based on the transform
-	m_model->Render(m_shader);
+	m_modelSpike->Render(m_shader);
+	m_modelCube->Render(m_shader);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);

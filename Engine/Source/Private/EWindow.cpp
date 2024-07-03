@@ -90,11 +90,11 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 		// Move left
 		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += -1.0f;
+			m_cameraDirection.x += 1.0f;
 		}
 		// Move right
 		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += 1.0f;
+			m_cameraDirection.x += -1.0f;
 		}
 		// Move up
 		if (key == SDL_SCANCODE_Q) {
@@ -117,11 +117,11 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 		// Move left
 		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += 1.0f;
+			m_cameraDirection.x += -1.0f;
 		}
 		// Move right
 		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += -1.0f;
+			m_cameraDirection.x += 1.0f;
 		}
 		// Move up
 		if (key == SDL_SCANCODE_Q) {

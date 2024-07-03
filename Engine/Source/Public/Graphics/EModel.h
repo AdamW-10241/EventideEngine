@@ -14,6 +14,9 @@ public:
 	// Create a cube model and add a texture to it
 	void MakeCube(const TShared<ETexture>& texture);
 
+	// Create a spike model and add a texture to it
+	void MakeSpike(const TShared<ETexture>& texture);
+
 	// Create a poly model and add a texture to it
 	void MakePoly(const TShared<ETexture>& texture);
 	
