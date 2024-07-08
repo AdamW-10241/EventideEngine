@@ -82,8 +82,12 @@ void EShaderProgram::SetWorldTransform(const TShared<ESCamera>& camera)
 	glm::mat4 matrixT = glm::mat4(1.0f);
 
 	// Handle the view matrix
-	// Translate the matrix based on the camera position
-	matrixT = glm::translate(matrixT, camera->transform.position);
+	// Translate and rotate the matrix based on the cameras forward and up vector
+	matrixT = glm::lookAt(
+		camera->transform.position,
+		camera->transform.position + camera->transform.Forward(),
+		camera->transform.Up()
+	);
 
 	// Find the variable in the shader for the view matrix
 	int varID = glGetUniformLocation(m_programID, "view");

@@ -12,6 +12,9 @@ EWindow::EWindow()
 	m_sdlWindow = nullptr;
 	m_shouldClose = false;
 	m_cameraDirection = glm::vec3(0.0f);
+	m_cameraRotation = glm::vec3(0.0f);
+	m_canZoom = false;
+	m_inputMode = false;
 
 	EDebug::Log("Window created.");
 }
@@ -79,7 +82,21 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 
 void EWindow::RegisterInput(const TShared<EInput>& m_input)
 {
-	m_input->OnKeyPressed->Bind([this](const SDL_Scancode& key) {
+	// Hide the cursor and set relative mouse mode
+	m_input->ShowCursor(false);
+
+	m_input->OnKeyPressed->Bind([this, m_input](const SDL_Scancode& key) {
+		// Quick exit button for debug
+		if (key == SDL_SCANCODE_ESCAPE) {
+			CloseWindow();
+		}
+		// Toggle cursor visibility
+		if (key == SDL_SCANCODE_PERIOD) {
+			m_input->ShowCursor(m_input->IsCursorHidden());
+
+			m_inputMode = !m_input->IsCursorHidden();
+		}
+
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
 			m_cameraDirection.z += 1.0f;
@@ -90,21 +107,21 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 		// Move left
 		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += 1.0f;
+			m_cameraDirection.x += -1.0f;
 		}
 		// Move right
 		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += -1.0f;
+			m_cameraDirection.x += 1.0f;
 		}
 		// Move up
 		if (key == SDL_SCANCODE_Q) {
-			m_cameraDirection.y += 1.0f;
+			m_cameraDirection.y += -1.0f;
 		}
 		// Move down
 		if (key == SDL_SCANCODE_E) {
-			m_cameraDirection.y += -1.0f;
+			m_cameraDirection.y += 1.0f;
 		}
-	});
+		});
 
 	m_input->OnKeyReleased->Bind([this](const SDL_Scancode& key) {
 		// Move forward
@@ -117,19 +134,50 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 		// Move left
 		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += -1.0f;
+			m_cameraDirection.x += 1.0f;
 		}
 		// Move right
 		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += 1.0f;
+			m_cameraDirection.x += -1.0f;
 		}
 		// Move up
 		if (key == SDL_SCANCODE_Q) {
-			m_cameraDirection.y += -1.0f;
+			m_cameraDirection.y += 1.0f;
 		}
 		// Move down
 		if (key == SDL_SCANCODE_E) {
-			m_cameraDirection.y += 1.0f;
+			m_cameraDirection.y += -1.0f;
+		}
+		});
+
+	// On mouse move rotate the camera
+	m_input->OnMouseMoved->Bind([this](const float& x, const float& y,
+		const float& xrel, const float& yrel) {
+			m_cameraRotation.y = -xrel;
+			m_cameraRotation.x = -yrel;
+		});
+
+	// On mouse scroll zoom the camera
+	m_input->OnMouseScrolled->Bind([this](const float& delta) {
+		if (m_canZoom) {
+			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+				camRef->Zoom(delta);
+			}
+		}
+	});
+
+	m_input->OnMousePressed->Bind([this](const EUi8& button) {
+		if (button == SDL_BUTTON_RIGHT) {
+			m_canZoom = true;
+		}
+	});
+
+	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
+		if (button == SDL_BUTTON_RIGHT) {
+			m_canZoom = false;
+			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+				camRef->ResetZoom();
+			}
 		}
 	});
 }
@@ -140,8 +188,12 @@ void EWindow::Render()
 	if (m_graphicsEngine) {
 		// Test if there is a camera
 		if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-			// If there is a cmaera, move it based on camera direction input
-			camRef->transform.position += m_cameraDirection * 0.001f;
+			if (!m_inputMode) {
+				// Translate the camera based on input direction
+				camRef->Translate(m_cameraDirection);
+				// Rotate the camera based on input direction
+				camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
+			}
 		}
 
 		m_graphicsEngine->Render(m_sdlWindow);

@@ -75,4 +75,13 @@ private:
 
 	// Direction to move the camera
 	glm::vec3 m_cameraDirection;
+
+	// Amount to rotate the camera
+	glm::vec3 m_cameraRotation;
+
+	// Can zoom
+	bool m_canZoom;
+
+	// Is the user in input mode
+	bool m_inputMode;
 };

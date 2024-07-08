@@ -102,7 +102,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	TShared<ETexture> coinTexture = TMakeShared<ETexture>();
 
 	// Add the texture to the mesh if exists
-	if (!coinTexture->LoadTexture("Black Plastic Texure", "Textures/T_Coins.png")) {
+	if (!coinTexture->LoadTexture("Coin texture", "Textures/T_Coins.png")) {
 		EDebug::Log("Graphics engine coin texture did not load.", LT_ERROR);
 	}
 
