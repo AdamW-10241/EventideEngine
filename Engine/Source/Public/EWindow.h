@@ -98,4 +98,7 @@ private:
 	// Frame rate
 	int m_defaultFrameRate;
 	int m_frameRate;
+
+	// Direction to move a model
+	glm::vec3 m_modelDirection;
 };

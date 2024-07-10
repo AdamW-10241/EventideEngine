@@ -3,9 +3,9 @@
 
 typedef void* SDL_GLContext;
 struct SDL_Window;
-class EMesh;
 class EShaderProgram;
 struct ESCamera;
+class EModel;
 
 enum EEBackgroundColor : EUi8 {
 	BC_DEFAULT = 0U,
@@ -50,6 +50,9 @@ public:
 	// Set the background color based on the input EEBackgroundColor
 	void SetBackgroundColor(EEBackgroundColor backgroundColor) { m_backgroundColor = backgroundColor; }
 
+	// Return a weak version of the camera
+	TWeak<EModel> GetModel(int modelStackIndex) { return m_modelStack.at(modelStackIndex); }
+
 private:
 	// Storing memory location for OpenGL context
 	SDL_GLContext m_sdlGLContext;
@@ -62,4 +65,7 @@ private:
 
 	// Store the background color
 	EEBackgroundColor m_backgroundColor;
+
+	// Store the models
+	TArray<TShared<EModel>> m_modelStack;
 };

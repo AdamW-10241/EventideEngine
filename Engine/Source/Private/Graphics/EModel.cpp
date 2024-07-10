@@ -1,14 +1,14 @@
 #include "Graphics/EModel.h"
 
-const std::vector<ESVertexData> polyVData = {
-	//  X,	    Y,    Z	        R,    G,    B		// Tex Coords
-   { { -1.0f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }, // Vertex Data 1 - TL
-   { {  1.0f,  0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 1.0f } }, // Vertex Data 2 - TR
-   { { -1.0f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }, // Vertex Data 3 - BL
-   { {  1.0f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f } }  // Vertex Data 4 - BR
+const std::vector<ESVertexData> planeVData = {
+//      X  	   Y      Z	        R     G     B		 TX    TY
+   { { -5.0f,  0.0f,  5.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 1.0f } }, // Vertex Data 1 - TL
+   { {  5.0f,  0.0f,  5.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 1.0f } }, // Vertex Data 2 - TR
+   { { -5.0f,  0.0f, -5.0f }, { 1.0f, 1.0f, 1.0f}, { 0.0f, 0.0f } }, // Vertex Data 3 - BL
+   { {  5.0f,  0.0f, -5.0f }, { 1.0f, 1.0f, 1.0f}, { 1.0f, 0.0f } }  // Vertex Data 4 - BR
 };
 
-const std::vector<uint32_t> polyIData = {
+const std::vector<uint32_t> planeIData = {
 	0, 1, 2, // Tri 1
 	1, 2, 3 // Tri 2
 };
@@ -175,7 +175,7 @@ const std::vector<uint32_t> spikeIData = {
 
 void EModel::MakeCube(const TShared<ETexture>& texture)
 {
-	// Create the meshe
+	// Create the mesh
 	TUnique<EMesh> mesh = TMakeUnique<EMesh>();
 
 	// Create the mesh and test if it failed
@@ -205,14 +205,14 @@ void EModel::MakeSpike(const TShared<ETexture>& texture)
 	m_meshStack.push_back(std::move(mesh));
 }
 
-void EModel::MakePoly(const TShared<ETexture>& texture)
+void EModel::MakePlane(const TShared<ETexture>& texture)
 {
 	// Create the meshe
 	TUnique<EMesh> mesh = TMakeUnique<EMesh>();
 
 	// Create the mesh and test if it failed
-	if (!mesh->CreateMesh(polyVData, polyIData)) {
-		EDebug::Log("Failed to create the poly mesh.");
+	if (!mesh->CreateMesh(planeVData, planeIData)) {
+		EDebug::Log("Failed to create the plane mesh.");
 	}
 
 	// Add the texture to the mesh and add it to the mesh stack
@@ -226,4 +226,28 @@ void EModel::Render(const TShared<EShaderProgram>& shader)
 	for (const auto& mesh : m_meshStack) {
 		mesh->Render(shader, m_transform);
 	}
+}
+
+void EModel::TranslateLocal(glm::vec3 translation, glm::vec3 scale)
+{
+	// Move the input direction forward if required
+	glm::vec3 moveDir = m_transform.Forward() * translation.z;
+	moveDir += m_transform.Right() * translation.x;
+	moveDir.y += translation.y;
+
+	if (glm::length(moveDir) != 0.0f)
+		moveDir = glm::normalize(moveDir);
+
+	m_transform.position += moveDir * scale;
+}
+
+void EModel::TranslateWorld(glm::vec3 translation, glm::vec3 scale)
+{
+	// Normalise the move directon
+	glm::vec3 moveDir = translation;
+
+	if (glm::length(moveDir) != 0.0f)
+		moveDir = glm::normalize(moveDir);
+
+	m_transform.position += moveDir * scale;
 }

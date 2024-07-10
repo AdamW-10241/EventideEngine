@@ -17,8 +17,8 @@ public:
 	// Create a spike model and add a texture to it
 	void MakeSpike(const TShared<ETexture>& texture);
 
-	// Create a poly model and add a texture to it
-	void MakePoly(const TShared<ETexture>& texture);
+	// Create a plane model and add a texture to it
+	void MakePlane(const TShared<ETexture>& texture);
 	
 	// Render all of the meshes within the model
 	// Transform of meshes will be based on models transform
@@ -26,6 +26,12 @@ public:
 
 	// Get the transform of the model
 	ESTransform& GetTransform() { return m_transform; }
+
+	// Translate the model in local space based on the passed translation
+	void TranslateLocal(glm::vec3 translation, glm::vec3 scale = glm::vec3(1.0f));
+
+	// Translate the model in world space based on the passed translation
+	void TranslateWorld(glm::vec3 translation, glm::vec3 scale = glm::vec3(1.0f));
 
 private:
 	// Array of meshes

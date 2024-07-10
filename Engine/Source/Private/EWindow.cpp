@@ -3,6 +3,7 @@
 #include "Debug/EDebug.h"
 #include "Listeners/EInput.h"
 #include "Graphics/ESCamera.h"
+#include "Graphics/EModel.h"
 
 // External Libs
 #include <SDL/SDL.h>
@@ -13,15 +14,16 @@ EWindow::EWindow()
 	m_shouldClose = false;
 	m_cameraDirection = glm::vec3(0.0f);
 	m_cameraRotation = glm::vec3(0.0f);
-
 	m_canZoom = false;
 	m_inputMode = false;
+
 	m_doubleCameraSpeed = false;
 
 	m_deltaTime = 0.0f;
-
 	m_defaultFrameRate = 1000;
 	m_frameRate = m_defaultFrameRate;
+
+	m_modelDirection = glm::vec3(0.0f);
 
 	EDebug::Log("Window created.");
 }
@@ -123,6 +125,23 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 			if (m_graphicsEngine)
 				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
 		}
+
+		// Move model forward
+		if (key == SDL_SCANCODE_UP) {
+			m_modelDirection.z += 1.0f;
+		}
+		// Move model backward
+		if (key == SDL_SCANCODE_DOWN) {
+			m_modelDirection.z += -1.0f;
+		}
+		// Move model left
+		if (key == SDL_SCANCODE_LEFT) {
+			m_modelDirection.x += 1.0f;
+		}
+		// Move model right
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_modelDirection.x += -1.0f;
+		}
 		
 		// Quick exit button for debug
 		if (key == SDL_SCANCODE_ESCAPE) {
@@ -203,6 +222,23 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_E) {
 			m_cameraDirection.y += -1.0f;
 		}
+
+		// Move model forward
+		if (key == SDL_SCANCODE_UP) {
+			m_modelDirection.z += -1.0f;
+		}
+		// Move model backward
+		if (key == SDL_SCANCODE_DOWN) {
+			m_modelDirection.z += 1.0f;
+		}
+		// Move model left
+		if (key == SDL_SCANCODE_LEFT) {
+			m_modelDirection.x += -1.0f;
+		}
+		// Move model right
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_modelDirection.x += 1.0f;
+		}
 	});
 
 	// On mouse move rotate the camera
@@ -214,7 +250,7 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 
 	// On mouse scroll zoom the camera
 	m_input->OnMouseScrolled->Bind([this](const float& delta) {
-		if (m_canZoom) {
+		if (m_canZoom && !m_inputMode) {
 			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
 				camRef->Zoom(delta);
 			}
@@ -222,13 +258,13 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	});
 
 	m_input->OnMousePressed->Bind([this](const EUi8& button) {
-		if (button == SDL_BUTTON_RIGHT) {
+		if (button == SDL_BUTTON_RIGHT && !m_inputMode) {
 			m_canZoom = true;
 		}
 	});
 
 	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
-		if (button == SDL_BUTTON_RIGHT) {
+		if (button == SDL_BUTTON_RIGHT && !m_inputMode) {
 			m_canZoom = false;
 			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
 				camRef->ResetZoom();
@@ -280,6 +316,15 @@ void EWindow::Update()
 				// Rotate the camera based on input direction
 				glm::vec3 rotateSpeed = glm::abs(m_cameraRotation) * m_deltaTime;
 				camRef->Rotate(m_cameraRotation, rotateSpeed);
+			}
+		}
+
+		// Test if there is a model in index 0 (spike model)
+		// Can change 0 to 1 to move the cube instead
+		if (const auto& spikeModelRef = m_graphicsEngine->GetModel(0).lock()) {
+			if (!m_inputMode) {
+				glm::vec3 translateSpeed = glm::vec3(5.0f) * m_deltaTime;
+				spikeModelRef->TranslateWorld(m_modelDirection, translateSpeed);
 			}
 		}
 

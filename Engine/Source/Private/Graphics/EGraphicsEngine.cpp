@@ -10,10 +10,6 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
 
-// Test DEBUG model
-TUnique<EModel> m_modelCube;
-TUnique<EModel> m_modelSpike;
-
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
 	if (sdlWindow == nullptr) {
@@ -106,16 +102,32 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		EDebug::Log("Graphics engine coin texture did not load.", LT_ERROR);
 	}
 
+	// Create the water texture object
+	TShared<ETexture> waterTexture = TMakeShared<ETexture>();
+
+	// Add the texture to the mesh if exists
+	if (!waterTexture->LoadTexture("Water texture", "Textures/T_Water.png")) {
+		EDebug::Log("Graphics engine water texture did not load.", LT_ERROR);
+	}
+
 	// Log the success of the graphics engine initialisation
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 
 	// DEBUG
-	m_modelSpike = TMakeUnique<EModel>();
-	m_modelSpike->MakeSpike(blackPlasticTexture);
+	TShared<EModel> modelSpike = TMakeShared<EModel>();
+	modelSpike->MakeSpike(blackPlasticTexture);
+	m_modelStack.push_back(std::move(modelSpike));
 
-	m_modelCube = TMakeUnique<EModel>();
-	m_modelCube->MakeCube(coinTexture);
-	m_modelCube->GetTransform().position.x = 4.0f;
+	TShared<EModel> modelCube = TMakeShared<EModel>();
+	modelCube->MakeCube(coinTexture);
+	modelCube->GetTransform().position.x = 4.0f;
+	m_modelStack.push_back(std::move(modelCube));
+
+	TShared<EModel> modelPlane = TMakeShared<EModel>();
+	modelPlane->MakePlane(waterTexture);
+	modelPlane->GetTransform().position.y = -4.0f;
+	modelPlane->GetTransform().position.x = 2.0f;
+	m_modelStack.push_back(std::move(modelPlane));
 
 	return true;
 }
@@ -136,8 +148,9 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	m_shader->SetWorldTransform(m_camera);
 
 	// Render custom graphics
-	m_modelSpike->Render(m_shader);
-	m_modelCube->Render(m_shader);
+	for (const auto& model : m_modelStack) {
+		model->Render(m_shader);
+	}
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
@@ -147,20 +160,23 @@ void EGraphicsEngine::Update(float deltaTime)
 {	
 	// DEBUG 
 	// Rotate spike model
-	m_modelSpike->GetTransform().rotation.x += 60.0f * deltaTime;
-	m_modelSpike->GetTransform().rotation.y += 30.0f * deltaTime;
+	const auto spikeModel = GetModel(0).lock();
+	spikeModel->GetTransform().rotation.x += 60.0f * deltaTime;
+	spikeModel->GetTransform().rotation.y += 30.0f * deltaTime;
 
-	// Move cube model
+	// Move cube models
 	// Stores the current move direction and multiplies the move speed by it...
 	// ...each time the cube reaches the top or bottom of the movement
 	static float cubeSpeed = 2.0f;
 
 	// Check if cube outside range
 	float movementRangeMax = 2.5f;
-	if (m_modelCube->GetTransform().position.y > movementRangeMax || m_modelCube->GetTransform().position.y < -movementRangeMax) { 
+	const auto cubeModel = GetModel(1).lock();
+	if (cubeModel->GetTransform().position.y > movementRangeMax ||
+		cubeModel->GetTransform().position.y < -movementRangeMax) {
 		// Flip the move speed so the cube moves in the opposite direction
 		cubeSpeed *= -1.0f;
 	}
 
-	m_modelCube->GetTransform().position.y += cubeSpeed * deltaTime;
+	cubeModel->GetTransform().position.y += cubeSpeed * deltaTime;
 }
