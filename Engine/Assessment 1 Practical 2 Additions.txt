@@ -1,7 +1,12 @@
 Hold LEFT SHIFT to double movement speed of the camera.
-Hold TAB to make the program run at 10 FPS.
+Hold TAB to make the engine run at 10 FPS (by limiting frame rate)
+Move the spike model with IJKL UO (like WASD QE)
+Hold LEFT CONTROL to move the spike model in local space instead of world space.
+Press keys 1-6 to change background color.
 
 Added DeltaTime.
-Made cube move.
-Added spiky shape.
+Made cube move up and down.
+Added spiky shape and made it rotate.
+Added flat plane model.
 Added custom textures.
+Added model stack.

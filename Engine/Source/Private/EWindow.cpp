@@ -24,6 +24,7 @@ EWindow::EWindow()
 	m_frameRate = m_defaultFrameRate;
 
 	m_modelDirection = glm::vec3(0.0f);
+	m_moveModelLocally = false;
 
 	EDebug::Log("Window created.");
 }
@@ -127,20 +128,32 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 
 		// Move model forward
-		if (key == SDL_SCANCODE_UP) {
+		if (key == SDL_SCANCODE_I) {
 			m_modelDirection.z += 1.0f;
 		}
 		// Move model backward
-		if (key == SDL_SCANCODE_DOWN) {
+		if (key == SDL_SCANCODE_K) {
 			m_modelDirection.z += -1.0f;
 		}
 		// Move model left
-		if (key == SDL_SCANCODE_LEFT) {
+		if (key == SDL_SCANCODE_J) {
 			m_modelDirection.x += 1.0f;
 		}
 		// Move model right
-		if (key == SDL_SCANCODE_RIGHT) {
+		if (key == SDL_SCANCODE_L) {
 			m_modelDirection.x += -1.0f;
+		}
+		// Move model up
+		if (key == SDL_SCANCODE_U) {
+			m_modelDirection.y += -1.0f;
+		}
+		// Move model down
+		if (key == SDL_SCANCODE_O) {
+			m_modelDirection.y += 1.0f;
+		}
+		// Move model locally
+		if (key == SDL_SCANCODE_LCTRL) {
+			m_moveModelLocally = true;
 		}
 		
 		// Quick exit button for debug
@@ -198,6 +211,35 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 			m_frameRate = m_defaultFrameRate;
 		}
 		
+		// Move model forward
+		if (key == SDL_SCANCODE_I) {
+			m_modelDirection.z += -1.0f;
+		}
+		// Move model backward
+		if (key == SDL_SCANCODE_K) {
+			m_modelDirection.z += 1.0f;
+		}
+		// Move model left
+		if (key == SDL_SCANCODE_J) {
+			m_modelDirection.x += -1.0f;
+		}
+		// Move model right
+		if (key == SDL_SCANCODE_L) {
+			m_modelDirection.x += 1.0f;
+		}
+		// Move model up
+		if (key == SDL_SCANCODE_U) {
+			m_modelDirection.y += 1.0f;
+		}
+		// Move model down
+		if (key == SDL_SCANCODE_O) {
+			m_modelDirection.y += -1.0f;
+		}
+		// Move model locally
+		if (key == SDL_SCANCODE_LCTRL) {
+			m_moveModelLocally = false;
+		}
+
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
 			m_cameraDirection.z += -1.0f;
@@ -221,23 +263,6 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		// Move down
 		if (key == SDL_SCANCODE_E) {
 			m_cameraDirection.y += -1.0f;
-		}
-
-		// Move model forward
-		if (key == SDL_SCANCODE_UP) {
-			m_modelDirection.z += -1.0f;
-		}
-		// Move model backward
-		if (key == SDL_SCANCODE_DOWN) {
-			m_modelDirection.z += 1.0f;
-		}
-		// Move model left
-		if (key == SDL_SCANCODE_LEFT) {
-			m_modelDirection.x += -1.0f;
-		}
-		// Move model right
-		if (key == SDL_SCANCODE_RIGHT) {
-			m_modelDirection.x += 1.0f;
 		}
 	});
 
@@ -324,7 +349,15 @@ void EWindow::Update()
 		if (const auto& spikeModelRef = m_graphicsEngine->GetModel(0).lock()) {
 			if (!m_inputMode) {
 				glm::vec3 translateSpeed = glm::vec3(5.0f) * m_deltaTime;
-				spikeModelRef->TranslateWorld(m_modelDirection, translateSpeed);
+
+				// Move model locally or in world space (LCTRL)
+				if (m_moveModelLocally) {
+					spikeModelRef->TranslateLocal(m_modelDirection, translateSpeed);
+				}
+				else {
+					spikeModelRef->TranslateWorld(m_modelDirection, translateSpeed);
+				}
+
 			}
 		}
 

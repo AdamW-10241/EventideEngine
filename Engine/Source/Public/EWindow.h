@@ -101,4 +101,7 @@ private:
 
 	// Direction to move a model
 	glm::vec3 m_modelDirection;
+
+	// Move model in local space
+	bool m_moveModelLocally;
 };
