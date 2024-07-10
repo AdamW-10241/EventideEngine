@@ -123,7 +123,8 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 {
 	// Set a background color
-	glClearColor(0.10f, 0.10f, 0.20f, 1.0f);
+	ESBackgroundColorData backgroundColor = backgroundColorDataV.at(m_backgroundColor);
+	glClearColor(backgroundColor.m_color[0], backgroundColor.m_color[1], backgroundColor.m_color[2], 1.0f);
 
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -7,9 +7,32 @@ class EMesh;
 class EShaderProgram;
 struct ESCamera;
 
+enum EEBackgroundColor : EUi8 {
+	BC_DEFAULT = 0U,
+	BC_RED,
+	BC_GREEN,
+	BC_BLUE,
+	BC_WHITE,
+	BC_BLACK
+};
+
+struct ESBackgroundColorData {
+	float m_color[3] = { 0.0f, 0.0f, 0.0f };
+};
+
+const std::vector<ESBackgroundColorData> backgroundColorDataV {
+//	  R	    G     B
+	{ 0.1f, 0.1f, 0.2f }, // Default
+	{ 0.5f, 0.0f, 0.0f }, // Red
+	{ 0.0f, 0.5f, 0.0f }, // Green
+	{ 0.0f, 0.0f, 0.5f }, // Blue
+	{ 1.0f, 1.0f, 1.0f }, // White
+	{ 0.0f, 0.0f, 0.0f }  // Black
+};
+
 class EGraphicsEngine {
 public:
-	EGraphicsEngine() = default;
+	EGraphicsEngine() { m_backgroundColor = BC_DEFAULT; }
 	~EGraphicsEngine() = default;
 
 	// Initialise the graphics engine
@@ -24,6 +47,9 @@ public:
 	// Return a weak version of the camera
 	TWeak<ESCamera> GetCamera() { return m_camera; }
 
+	// Set the background color based on the input EEBackgroundColor
+	void SetBackgroundColor(EEBackgroundColor backgroundColor) { m_backgroundColor = backgroundColor; }
+
 private:
 	// Storing memory location for OpenGL context
 	SDL_GLContext m_sdlGLContext;
@@ -33,4 +59,7 @@ private:
 
 	// Store the camera
 	TShared<ESCamera> m_camera;
+
+	// Store the background color
+	EEBackgroundColor m_backgroundColor;
 };

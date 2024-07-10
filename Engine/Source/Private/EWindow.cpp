@@ -93,6 +93,37 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	m_input->ShowCursor(false);
 
 	m_input->OnKeyPressed->Bind([this, m_input](const SDL_Scancode& key) {
+		// Set background color to default
+		if (key == SDL_SCANCODE_1) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_DEFAULT);
+		}
+		// Set background color to red
+		if (key == SDL_SCANCODE_2) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_RED);
+		}
+		// Set background color to green
+		if (key == SDL_SCANCODE_3) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_GREEN);
+		}
+		// Set background color to blue
+		if (key == SDL_SCANCODE_4) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_BLUE);
+		}
+		// Set background color to white
+		if (key == SDL_SCANCODE_5) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_WHITE);
+		}
+		// Set background color to black
+		if (key == SDL_SCANCODE_6) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
+		}
+		
 		// Quick exit button for debug
 		if (key == SDL_SCANCODE_ESCAPE) {
 			CloseWindow();
