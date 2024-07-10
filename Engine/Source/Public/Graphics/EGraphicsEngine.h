@@ -18,6 +18,9 @@ public:
 	// Render the graphics engine
 	void Render(SDL_Window* sdlWindow);
 
+	// Update the graphics engine
+	void Update(float deltaTime);
+
 	// Return a weak version of the camera
 	TWeak<ESCamera> GetCamera() { return m_camera; }
 

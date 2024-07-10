@@ -1,1 +1,7 @@
-Hold shift to double movement speed of the camera.
+Hold LEFT SHIFT to double movement speed of the camera.
+Hold TAB to make the program run at 10 FPS.
+
+Added DeltaTime.
+Made cube move.
+Added spiky shape.
+Added custom textures.

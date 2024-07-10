@@ -18,6 +18,11 @@ EWindow::EWindow()
 	m_inputMode = false;
 	m_doubleCameraSpeed = false;
 
+	m_deltaTime = 0.0f;
+
+	m_defaultFrameRate = 1000;
+	m_frameRate = m_defaultFrameRate;
+
 	EDebug::Log("Window created.");
 }
 
@@ -102,6 +107,10 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = true;
 		}
+		// Set frame rate to 10
+		if (key == SDL_SCANCODE_TAB) {
+			m_frameRate = 10;
+		}
 
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
@@ -133,6 +142,10 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		// Double camera speed
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = false;
+		}
+		// Reset frame rate
+		if (key == SDL_SCANCODE_TAB) {
+			m_frameRate = m_defaultFrameRate;
 		}
 		
 		// Move forward
@@ -196,17 +209,49 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 void EWindow::Render()
 {
 	// Render the graphics engine if exists
+	if (m_graphicsEngine)
+		m_graphicsEngine->Render(m_sdlWindow);
+}
+
+void EWindow::Update()
+{
+	// Get delta time and cap frame rate
+	// Record the previous frame time
+	static double lastTickTime = 0.0;
+	// Record the current frame time
+	double currentTickTime = (double)SDL_GetTicks64();
+	// Get the delta time - how much time has passed since the last frame
+	double longDelta = currentTickTime - lastTickTime;
+	// Convert from milliseconds to seconds
+	m_deltaTime = float(longDelta) / 1000.0f;
+	// Set the last tick time
+	lastTickTime = currentTickTime;
+
+	// Caps the frame rate
+	int frameDuration = 1000 / m_frameRate;
+
+	if ((double)frameDuration > longDelta) {
+		frameDuration = (int)longDelta;
+	}
+
+	// If the frame rate is greater than m_frameRate, delay the frame
+	SDL_Delay((Uint32)frameDuration);
+	
+	// Update the graphics engine if exists
 	if (m_graphicsEngine) {
 		// Test if there is a camera
 		if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
 			if (!m_inputMode) {
 				// Translate the camera based on input direction
-				camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
+				glm::vec3 translateSpeed = glm::vec3(m_doubleCameraSpeed ? 2 : 1) * m_deltaTime;
+				camRef->Translate(m_cameraDirection, translateSpeed);
+
 				// Rotate the camera based on input direction
-				camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
+				glm::vec3 rotateSpeed = glm::abs(m_cameraRotation) * m_deltaTime;
+				camRef->Rotate(m_cameraRotation, rotateSpeed);
 			}
 		}
 
-		m_graphicsEngine->Render(m_sdlWindow);
+		m_graphicsEngine->Update(m_deltaTime);
 	}
 }

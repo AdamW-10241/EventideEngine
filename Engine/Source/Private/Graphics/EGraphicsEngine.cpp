@@ -80,7 +80,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the camera
 	m_camera = TMakeShared<ESCamera>();
-	m_camera->transform.position.z -= 5.0f;
+	m_camera->transform.position.z = -5.0f;
 
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
@@ -128,10 +128,6 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// DEBUG Rotate spike model
-	m_modelSpike->GetTransform().rotation.x += 0.01f;
-	m_modelSpike->GetTransform().rotation.y += 0.005f;
-
 	// Activate shader
 	m_shader->Activate();
 
@@ -139,10 +135,31 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	m_shader->SetWorldTransform(m_camera);
 
 	// Render custom graphics
-	// Models will update their own positions in the mesh based on the transform
 	m_modelSpike->Render(m_shader);
 	m_modelCube->Render(m_shader);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
+}
+
+void EGraphicsEngine::Update(float deltaTime)
+{	
+	// DEBUG 
+	// Rotate spike model
+	m_modelSpike->GetTransform().rotation.x += 60.0f * deltaTime;
+	m_modelSpike->GetTransform().rotation.y += 30.0f * deltaTime;
+
+	// Move cube model
+	// Stores the current move direction and multiplies the move speed by it...
+	// ...each time the cube reaches the top or bottom of the movement
+	static float cubeSpeed = 2.0f;
+
+	// Check if cube outside range
+	float movementRangeMax = 2.5f;
+	if (m_modelCube->GetTransform().position.y > movementRangeMax || m_modelCube->GetTransform().position.y < -movementRangeMax) { 
+		// Flip the move speed so the cube moves in the opposite direction
+		cubeSpeed *= -1.0f;
+	}
+
+	m_modelCube->GetTransform().position.y += cubeSpeed * deltaTime;
 }

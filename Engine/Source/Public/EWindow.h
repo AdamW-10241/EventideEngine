@@ -60,6 +60,10 @@ public:
 	// Render the graphics engine to the window
 	void Render();
 
+	// Update the graphics engine in the window
+	void Update();
+
+
 private:
 	// A ref to the window in SDL
 	SDL_Window* m_sdlWindow;
@@ -87,4 +91,11 @@ private:
 
 	// Double camera speed
 	bool m_doubleCameraSpeed;
+
+	// Delta time
+	float m_deltaTime;
+
+	// Frame rate
+	int m_defaultFrameRate;
+	int m_frameRate;
 };

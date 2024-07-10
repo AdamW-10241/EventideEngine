@@ -66,22 +66,13 @@ int main(int argc, char* argv[]) {
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	m_input->OnKeyPressed->Bind([](const SDL_Scancode& key){
-		if (key == SDL_SCANCODE_SPACE) {
-			EDebug::Log("Space Pressed");
-		}
-	});
-
-	m_input->OnKeyReleased->Bind([](const SDL_Scancode& key) {
-		if (key == SDL_SCANCODE_SPACE) {
-			EDebug::Log("Space Released");
-		}
-	});
-
 	// Keep the game open as long as the window is open
 	while (!m_window->IsPendingClose()) {
 		// Handle inputs
 		m_input->UpdateInputs();
+
+		// Update the window
+		m_window->Update();
 
 		// Render the window
 		m_window->Render();
