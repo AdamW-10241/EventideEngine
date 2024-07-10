@@ -128,6 +128,23 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
 		}
 
+		// Rotate camera up
+		if (key == SDL_SCANCODE_UP) {
+			m_cameraRotation.x += 1.0f;
+		}
+		// Rotate camera down
+		if (key == SDL_SCANCODE_DOWN) {
+			m_cameraRotation.x += -1.0f;
+		}
+		// Rotate camera left
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_cameraRotation.y += -1.0f;
+		}
+		// Rotate camera right
+		if (key == SDL_SCANCODE_LEFT) {
+			m_cameraRotation.y += 1.0f;
+		}
+
 		// Move model forward
 		if (key == SDL_SCANCODE_I) {
 			m_modelDirection.z += 1.0f;
@@ -211,7 +228,24 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_TAB) {
 			m_frameRate = m_defaultFrameRate;
 		}
-		
+
+		// Rotate camera up
+		if (key == SDL_SCANCODE_UP) {
+			m_cameraRotation.x += -1.0f;
+		}
+		// Rotate camera down
+		if (key == SDL_SCANCODE_DOWN) {
+			m_cameraRotation.x += 1.0f;
+		}
+		// Rotate camera left
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_cameraRotation.y += 1.0f;
+		}
+		// Rotate camera right
+		if (key == SDL_SCANCODE_LEFT) {
+			m_cameraRotation.y += -1.0f;
+		}
+
 		// Move model forward
 		if (key == SDL_SCANCODE_I) {
 			m_modelDirection.z += -1.0f;
