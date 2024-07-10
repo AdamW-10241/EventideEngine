@@ -56,7 +56,13 @@ public:
 	// Reset the texture depth to be used in the shader
 	void ResetTextureDepth();
 
-	// Return a weak version of the camera
+	// Get a random float value between 2 floats
+	float GetRandomFloatRange(float min = 0.0f, float max = 1.0f) const;
+
+	// Get a random int value between 2 ints
+	float GetRandomIntRange(int min = 0, int max = 1) const;
+
+	// Return a weak version of a model
 	TWeak<EModel> GetModel(int modelStackIndex) { return m_modelStack.at(modelStackIndex); }
 
 private:

@@ -1,5 +1,5 @@
 Hold LEFT SHIFT to double movement speed of the camera.
-Hold TAB to make the engine run at 10 FPS (by limiting frame rate)
+Hold TAB to make the engine run at 10 FPS (by limiting frame rate).
 Move the spike model with IJKL UO (like WASD QE)
 Hold LEFT CONTROL to move the spike model in local space instead of world space.
 Press keys 1-6 to change background color.
@@ -12,3 +12,5 @@ Added spiky shape and made it rotate.
 Added flat plane model.
 Added custom textures.
 Added model stack.
+Added random number generator to EGraphicsEngine.
+Added a bunch of randomly spawning spikes with random textures.
