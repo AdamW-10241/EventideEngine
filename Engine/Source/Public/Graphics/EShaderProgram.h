@@ -31,6 +31,12 @@ public:
 	// Set the 3D coordinates for the model
 	void SetWorldTransform(const TShared<ESCamera>& camera);
 
+	// Set the texture depth for textures in the vertex shader
+	void AdjustTextureDepth(const float delta);
+
+	// Reset the texture depth for textures in the vertex shader
+	void ResetTextureDepth();
+
 	// Set a texture in the shader based on the slot
 	void RunTexture(const TShared<ETexture>& texture, const EUi32& slot);
 
@@ -53,4 +59,8 @@ private:
 
 	// Store the ID for the program
 	EUi32 m_programID;
+
+	// Store the texture depth
+	float m_defaultTextureDepth;
+	float m_textureDepth;
 };

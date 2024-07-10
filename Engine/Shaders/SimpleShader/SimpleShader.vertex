@@ -7,6 +7,7 @@ layout (location = 2) in vec2 vTexCoords;
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
 uniform mat4 projection = mat4(1.0);
+uniform float textureDepth = float(1.0);
 
 out vec3 fColour;
 out vec2 fTexCoords;
@@ -20,5 +21,5 @@ void main() {
 	fColour = vColour;
 
 	// Pass the teture coordinates to the frag shader
-	fTexCoords = vTexCoords;
+	fTexCoords = vTexCoords * textureDepth;
 }

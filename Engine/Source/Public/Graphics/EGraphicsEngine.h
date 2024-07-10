@@ -50,6 +50,12 @@ public:
 	// Set the background color based on the input EEBackgroundColor
 	void SetBackgroundColor(EEBackgroundColor backgroundColor) { m_backgroundColor = backgroundColor; }
 
+	// Adjust the texture depth to be used in the shader
+	void AdjustTextureDepth(float delta);
+
+	// Reset the texture depth to be used in the shader
+	void ResetTextureDepth();
+
 	// Return a weak version of the camera
 	TWeak<EModel> GetModel(int modelStackIndex) { return m_modelStack.at(modelStackIndex); }
 

@@ -17,6 +17,8 @@
 EShaderProgram::EShaderProgram()
 {
 	m_programID = 0;
+	m_defaultTextureDepth = 1.0f;
+	m_textureDepth = m_defaultTextureDepth;
 }
 
 EShaderProgram::~EShaderProgram()
@@ -111,6 +113,26 @@ void EShaderProgram::SetWorldTransform(const TShared<ESCamera>& camera)
 	// Update the projection matrix value in the shader
 	glUniformMatrix4fv(
 		varID, 1, GL_FALSE, glm::value_ptr(matrixT));
+}
+
+void EShaderProgram::AdjustTextureDepth(float delta)
+{
+	// Find the variable in the shader
+	// All the uniform variables are given an ID by OpenGL
+	const int varID = glGetUniformLocation(m_programID, "textureDepth");
+	// Update the value
+	m_textureDepth += delta;
+	glUniform1f(varID, m_textureDepth);
+}
+
+void EShaderProgram::ResetTextureDepth()
+{
+	// Find the variable in the shader
+	// All the uniform variables are given an ID by OpenGL
+	const int varID = glGetUniformLocation(m_programID, "textureDepth");
+	// Update the value
+	m_textureDepth = m_defaultTextureDepth;
+	glUniform1f(varID, m_defaultTextureDepth);
 }
 
 void EShaderProgram::RunTexture(const TShared<ETexture>& texture, const EUi32& slot)

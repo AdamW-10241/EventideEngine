@@ -3,6 +3,7 @@ Hold TAB to make the engine run at 10 FPS (by limiting frame rate)
 Move the spike model with IJKL UO (like WASD QE)
 Hold LEFT CONTROL to move the spike model in local space instead of world space.
 Press keys 1-6 to change background color.
+Hold LEFT CLICK and scroll the cursor to adjust the texture depth in the shader.
 
 Added DeltaTime.
 Made cube move up and down.

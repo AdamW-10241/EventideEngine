@@ -104,4 +104,7 @@ private:
 
 	// Move model in local space
 	bool m_moveModelLocally;
+
+	// Can adjust texture depth
+	bool m_canAdjustTextureDepth;
 };

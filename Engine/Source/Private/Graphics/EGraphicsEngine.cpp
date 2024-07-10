@@ -180,3 +180,15 @@ void EGraphicsEngine::Update(float deltaTime)
 
 	cubeModel->GetTransform().position.y += cubeSpeed * deltaTime;
 }
+
+void EGraphicsEngine::AdjustTextureDepth(float delta)
+{
+	// Adjust the texture depth by the delta
+	m_shader->AdjustTextureDepth(delta);
+}
+
+void EGraphicsEngine::ResetTextureDepth()
+{
+	// Reset the texture depth
+	m_shader->ResetTextureDepth();
+}
