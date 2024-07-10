@@ -84,4 +84,7 @@ private:
 
 	// Is the user in input mode
 	bool m_inputMode;
+
+	// Double camera speed
+	bool m_doubleCameraSpeed;
 };

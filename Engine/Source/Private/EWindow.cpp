@@ -13,8 +13,10 @@ EWindow::EWindow()
 	m_shouldClose = false;
 	m_cameraDirection = glm::vec3(0.0f);
 	m_cameraRotation = glm::vec3(0.0f);
+
 	m_canZoom = false;
 	m_inputMode = false;
+	m_doubleCameraSpeed = false;
 
 	EDebug::Log("Window created.");
 }
@@ -96,6 +98,10 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 
 			m_inputMode = !m_input->IsCursorHidden();
 		}
+		// Double camera speed
+		if (key == SDL_SCANCODE_LSHIFT) {
+			m_doubleCameraSpeed = true;
+		}
 
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
@@ -121,9 +127,14 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_E) {
 			m_cameraDirection.y += 1.0f;
 		}
-		});
+	});
 
 	m_input->OnKeyReleased->Bind([this](const SDL_Scancode& key) {
+		// Double camera speed
+		if (key == SDL_SCANCODE_LSHIFT) {
+			m_doubleCameraSpeed = false;
+		}
+		
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
 			m_cameraDirection.z += -1.0f;
@@ -148,7 +159,7 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_E) {
 			m_cameraDirection.y += -1.0f;
 		}
-		});
+	});
 
 	// On mouse move rotate the camera
 	m_input->OnMouseMoved->Bind([this](const float& x, const float& y,
@@ -190,7 +201,7 @@ void EWindow::Render()
 		if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
 			if (!m_inputMode) {
 				// Translate the camera based on input direction
-				camRef->Translate(m_cameraDirection);
+				camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
 				// Rotate the camera based on input direction
 				camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
 			}
