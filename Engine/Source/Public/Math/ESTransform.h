@@ -11,6 +11,12 @@ struct ESTransform {
 		scale = glm::vec3(1.0f);
 	}
 
+	ESTransform(const glm::vec3& p, const glm::vec3& r, const glm::vec3& s) {
+		position = p;
+		rotation = r;
+		scale = s;
+	}
+
 	// Get the forward vector of the local rotation
 	glm::vec3 Forward() {
 		glm::vec3 forward = glm::vec3(0.0f);
@@ -49,6 +55,18 @@ struct ESTransform {
 			glm::normalize(up);
 
 		return up;
+	}
+
+	ESTransform operator+(const ESTransform& other) const {
+		return {
+			position + other.position,
+			rotation + other.rotation,
+			scale + other.scale
+		};
+	}
+
+	ESTransform& operator+=(const ESTransform& other) {
+		return *this = *this + other;
 	}
 
 	glm::vec3 position;

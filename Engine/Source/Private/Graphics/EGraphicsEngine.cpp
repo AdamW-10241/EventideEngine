@@ -11,7 +11,7 @@
 #include "SDL/SDL_opengl.h"
 
 // Test DEBUG model
-TUnique<EModel> m_modelCube;
+TUnique<EModel> m_model;
 TUnique<EModel> m_modelSpike;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
@@ -110,12 +110,13 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 
 	// DEBUG
+	m_model = TMakeUnique<EModel>();
+	m_model->ImportModel("Models/Lambo/Lambo.fbx");
+	m_model->GetTransform().scale = glm::vec3(0.01f);
+	m_model->GetTransform().position.x = 5.0f;
+
 	m_modelSpike = TMakeUnique<EModel>();
 	m_modelSpike->MakeSpike(blackPlasticTexture);
-
-	m_modelCube = TMakeUnique<EModel>();
-	m_modelCube->MakeCube(coinTexture);
-	m_modelCube->GetTransform().position.x = 4.0f;
 
 	return true;
 }
@@ -132,6 +133,9 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	m_modelSpike->GetTransform().rotation.x += 0.01f;
 	m_modelSpike->GetTransform().rotation.y += 0.005f;
 
+	m_model->GetTransform().rotation.x += -0.005f;
+	m_model->GetTransform().rotation.y += -0.01f;
+
 	// Activate shader
 	m_shader->Activate();
 
@@ -140,8 +144,8 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Render custom graphics
 	// Models will update their own positions in the mesh based on the transform
+	m_model->Render(m_shader);
 	m_modelSpike->Render(m_shader);
-	m_modelCube->Render(m_shader);
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);

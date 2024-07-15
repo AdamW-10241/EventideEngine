@@ -50,6 +50,16 @@ void EShaderProgram::Activate()
 	glUseProgram(m_programID);
 }
 
+void EShaderProgram::SetMeshTransform(const glm::mat4& matTransform)
+{
+	// Find the variable in the shader
+	// All the uniform variables are given an ID by OpenGL
+	const int varID = glGetUniformLocation(m_programID, "mesh");
+	// Update the value
+	glUniformMatrix4fv(
+		varID, 1, GL_FALSE, glm::value_ptr(matTransform));
+}
+
 void EShaderProgram::SetModelTransform(const ESTransform& transform)
 {
 	// Translate (move) > rotate > scale

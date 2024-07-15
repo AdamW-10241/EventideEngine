@@ -1,6 +1,9 @@
 #pragma once
 #include "EngineTypes.h"
 
+// External Libs
+#include <GLM/mat4x4.hpp>
+
 class ETexture;
 struct ESCamera;
 
@@ -24,6 +27,9 @@ public:
 	// Activate the shader to update
 	// You can't change values in a shader without activating it
 	void Activate();
+
+	// Set the transform of the model in the shader
+	void SetMeshTransform(const glm::mat4& matTransform);
 
 	// Set the transform of the model in the shader
 	void SetModelTransform(const ESTransform& transform);

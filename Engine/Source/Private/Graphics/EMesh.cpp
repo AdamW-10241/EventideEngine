@@ -8,6 +8,7 @@
 EMesh::EMesh()
 {
 	m_vao = m_vbo = m_eao = 0;
+	m_matTransform = glm::mat4(1.0f);
 
 	EDebug::Log("Mesh created.");
 }
@@ -144,6 +145,9 @@ void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransf
 	// Update the transform of the mesh based on the model transform
 	shader->SetModelTransform(transform);
 	
+	// Set the relative transform for the mesh in the shader
+	shader->SetMeshTransform(m_matTransform);
+
 	// Binding this mesh as the active VAO
 	glBindVertexArray(m_vao);
 
