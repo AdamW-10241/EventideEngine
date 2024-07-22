@@ -99,6 +99,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
+    <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\EObject.cpp" />
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
@@ -112,6 +114,9 @@
     <ClInclude Include="ExternalLibs\Includes\STB_IMAGE\stb_image.h" />
     <ClInclude Include="Source\Public\Debug\EDebug.h" />
     <ClInclude Include="Source\Public\EngineTypes.h" />
+    <ClInclude Include="Source\Public\Game\EGameEngine.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\EObjectChild.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
