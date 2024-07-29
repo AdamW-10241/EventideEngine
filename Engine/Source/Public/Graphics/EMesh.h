@@ -7,6 +7,7 @@
 class EShaderProgram;
 class ETexture;
 struct ESTransform;
+struct ESLight;
 
 struct ESVertexData {
 	// 0 = x
@@ -36,7 +37,8 @@ public:
 		const std::vector<uint32_t>& indices);
 
 	// Draw the mesh to the renderer
-	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform);
+	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
+		const TArray<TShared<ESLight>>& lights);
 
 	// Set the texture for the mesh
 	void SetTexture(const TShared<ETexture>& texture) { m_texture = texture; }

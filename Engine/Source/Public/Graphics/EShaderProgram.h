@@ -6,6 +6,7 @@
 
 class ETexture;
 struct ESCamera;
+struct ESLight;
 
 // Enum to determine the type of shader
 enum EEShaderType : EUi8 {
@@ -39,6 +40,9 @@ public:
 
 	// Set a texture in the shader based on the slot
 	void RunTexture(const TShared<ETexture>& texture, const EUi32& slot);
+
+	// Set the lights in the shader
+	void SetLights(const TArray<TShared<ESLight>>& lights);
 
 private:
 	// Import a shader based on the shader type

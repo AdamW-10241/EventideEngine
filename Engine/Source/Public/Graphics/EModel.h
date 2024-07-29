@@ -10,6 +10,7 @@ class ETexture;
 class EShaderProgram;
 struct aiScene;
 struct aiNode;
+struct ESLight;
 
 class EModel {
 public:
@@ -31,14 +32,15 @@ public:
 	
 	// Render all of the meshes within the model
 	// Transform of meshes will be based on models transform
-	void Render(const TShared<EShaderProgram>& shader);
+	void Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights);
 
 	// Get the transform of the model
 	ESTransform& GetTransform() { return m_transform; }
 
 private:
 	// Find all of the meshes in a scene and convert them to an EMesh
-	bool FindAndImportMeshes(const aiNode& node, const aiScene& scene, const aiMatrix4x4& parentTransform);
+	bool FindAndImportMeshes(const aiNode& node, const aiScene& scene, 
+		const aiMatrix4x4& parentTransform, EUi32* meshesCreated);
 
 private:
 	// Array of meshes

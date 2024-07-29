@@ -6,6 +6,7 @@ struct SDL_Window;
 class EMesh;
 class EShaderProgram;
 struct ESCamera;
+struct ESLight;
 
 class EGraphicsEngine {
 public:
@@ -30,4 +31,7 @@ private:
 
 	// Store the camera
 	TShared<ESCamera> m_camera;
+
+	// Stores all the lights in the engine
+	TArray<TShared<ESLight>> m_lights;
 };

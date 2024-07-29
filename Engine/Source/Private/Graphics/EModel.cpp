@@ -258,24 +258,29 @@ void EModel::ImportModel(const EString& filePath)
 	// Set the scale to x1, y1, z1
 	aiMatrix4x4::Scaling({ 1.0f, 1.0f, 1.0f }, sceneTransform);
 
+	// Meshes count
+	EUi32 meshesCreated = 0;
+
 	// Find all the meshes in the scene and fail in any of them fail
-	if (!FindAndImportMeshes(*scene->mRootNode, *scene, sceneTransform)) {
+	if (!FindAndImportMeshes(*scene->mRootNode, *scene, sceneTransform, &meshesCreated)) {
 		EDebug::Log("Model failed to convert ASSIMP scene: " + filePath, LT_ERROR);
 		return;
 	}
 
 	// Log the success of the model
-	EDebug::Log("Model successfully imported: " + filePath, LT_SUCCESS);
+	EDebug::Log("Model successfully imported with (" + std::to_string(meshesCreated) + ") meshes: " + 
+		filePath, LT_SUCCESS);
 }
 
-void EModel::Render(const TShared<EShaderProgram>& shader)
+void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)
 {
 	for (const auto& mesh : m_meshStack) {
-		mesh->Render(shader, m_transform);
+		mesh->Render(shader, m_transform, lights);
 	}
 }
 
-bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene, const aiMatrix4x4& parentTransform)
+bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene, 
+	const aiMatrix4x4& parentTransform, EUi32* meshesCreated)
 {
 	// Looping though all of the meshes in the node
 	for (EUi32 i = 0; i < node.mNumMeshes; ++i) {
@@ -373,6 +378,9 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene, const
 
 		// Add the new mesh to the mesh stack
 		m_meshStack.push_back(std::move(eMesh));
+
+		// Count the meshes created
+		++(*meshesCreated);
 	}
 
 	// Adding the relative transform to the parent transform
@@ -380,7 +388,7 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene, const
 
 	// Loop though all of the child nodes inside this node
 	for (EUi32 i = 0; i < node.mNumChildren; ++i) {
-		if (!FindAndImportMeshes(*node.mChildren[i], scene, nodeRelTransform)) {
+		if (!FindAndImportMeshes(*node.mChildren[i], scene, nodeRelTransform, meshesCreated)) {
 			return false;
 		}
 	}

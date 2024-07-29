@@ -3,6 +3,7 @@
 #include "Math/ESTransform.h"
 #include "Graphics/ETexture.h"
 #include "Graphics/ESCamera.h"
+#include "Graphics/ESLight.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -11,6 +12,10 @@
 // System Libs
 #include <fstream>
 #include <sstream>
+
+// Constant value for light amounts
+const EUi32 maxDirLights = 2;
+const EUi32 maxPointLights = 20;
 
 #define EGET_GLEW_ERROR reinterpret_cast<const char*>(glewGetErrorString(glGetError()))
 
@@ -142,6 +147,61 @@ void EShaderProgram::RunTexture(const TShared<ETexture>& texture, const EUi32& s
 
 	// Update the shader
 	glUniform1i(varID, slot);
+}
+
+void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
+{	
+	// Number of created lights
+	EUi32 dirLights = 0;
+	EUi32 pointLights = 0;
+	int varID = 0;
+	
+	// Loop through all of the lights and add them to the shader
+	for (EUi32 i = 0; i < lights.size(); ++i) {
+		if (const TShared<ESDirLight> lightRef = std::dynamic_pointer_cast<ESDirLight>(lights[i])) {
+			// Ignore dirLight is reached max number
+			if (dirLights >= maxDirLights)
+				continue;
+			
+			// Add a dirLight and use as index
+			EString lightIndexStr = "dirLights[" + std::to_string(dirLights) + "]";
+			
+			// --------- COLOR
+			// Get the colour variable from the dirLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".colour").c_str());
+
+			// Change the colour
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->colour));
+
+			// --------- AMBIENT
+			// Get the ambient variable from the dirLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".ambient").c_str());
+
+			// Change the ambient colour
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->ambient));
+
+			// --------- DIRECTION
+			// Get the direction variable from the dirLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".direction").c_str());
+
+			// Change the direction
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->direction));
+
+			// --------- INTENSITY
+			// Get the intensity variable from the dirLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".intensity").c_str());
+
+			// Change the intensity
+			glUniform1f(varID, lightRef->intensity);
+
+			// Increment the number of dirLights
+			++dirLights;
+		}
+	}
 }
 
 bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType shaderType)

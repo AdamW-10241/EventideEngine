@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 vPosition;
 layout (location = 1) in vec3 vColour;
 layout (location = 2) in vec2 vTexCoords;
+layout (location = 3) in vec3 vNormals;
 
 uniform mat4 mesh = mat4(1.0f);
 uniform mat4 model = mat4(1.0);
@@ -11,6 +12,7 @@ uniform mat4 projection = mat4(1.0);
 
 out vec3 fColour;
 out vec2 fTexCoords;
+out vec3 fNormals;
 
 void main() {
 	// Combine the model and mesh to get the correct relative position from the model
@@ -25,4 +27,8 @@ void main() {
 
 	// Pass the teture coordinates to the frag shader
 	fTexCoords = vTexCoords;
+
+	// Pass the normals to the frag shader reversed
+	mat3 normalMatrix = mat3(transpose(inverse(relPos)));
+	fNormals = normalize(normalMatrix * vNormals);
 }

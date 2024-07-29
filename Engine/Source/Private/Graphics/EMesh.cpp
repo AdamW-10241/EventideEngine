@@ -9,14 +9,9 @@ EMesh::EMesh()
 {
 	m_vao = m_vbo = m_eao = 0;
 	m_matTransform = glm::mat4(1.0f);
-
-	EDebug::Log("Mesh created.");
 }
 
-EMesh::~EMesh()
-{
-	EDebug::Log("Mesh destroyed.");
-}
+EMesh::~EMesh() {}
 
 bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vector<uint32_t>& indices)
 {
@@ -128,13 +123,28 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 		(void*)(sizeof(float) * 6) // How many numbers to skip in bytes
 	);
 
+	// Normals
+	// Pass out the vertex data in seperate formats
+	glEnableVertexAttribArray(3);
+
+	// Set the position of that data to the 3 index of the attribute array
+	glVertexAttribPointer(
+		3, // Location to store the data in the attribute array
+		3, // How many numbers to pass into the attribute array index
+		GL_FLOAT, // The type of data to store
+		GL_FALSE, // Should we normalise the values (generally no)
+		sizeof(ESVertexData), // How big is each data array in a VertexData
+		(void*)(sizeof(float) * 8) // How many numbers to skip in bytes
+	);
+
 	// Common practise to clear the VAO from the GPU
 	glBindVertexArray(0);
 
 	return true;
 }
 
-void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform)
+void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
+	const TArray<TShared<ESLight>>& lights)
 {
 	// Does a texture exist
 	if (m_texture) {
@@ -147,6 +157,9 @@ void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransf
 	
 	// Set the relative transform for the mesh in the shader
 	shader->SetMeshTransform(m_matTransform);
+
+	// Set the lights in the shader for the mesh
+	shader->SetLights(lights);
 
 	// Binding this mesh as the active VAO
 	glBindVertexArray(m_vao);
