@@ -7,6 +7,7 @@
 class ETexture;
 struct ESCamera;
 struct ESLight;
+struct ESMaterial;
 
 // Enum to determine the type of shader
 enum EEShaderType : EUi8 {
@@ -38,11 +39,11 @@ public:
 	// Set the 3D coordinates for the model
 	void SetWorldTransform(const TShared<ESCamera>& camera);
 
-	// Set a texture in the shader based on the slot
-	void RunTexture(const TShared<ETexture>& texture, const EUi32& slot);
-
 	// Set the lights in the shader
 	void SetLights(const TArray<TShared<ESLight>>& lights);
+
+	// Set the material in the shader
+	void SetMaterial(const TShared<ESMaterial>& material);
 
 private:
 	// Import a shader based on the shader type

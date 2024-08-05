@@ -12,8 +12,7 @@
 #include "SDL/SDL_opengl.h"
 
 // Test DEBUG model
-TUnique<EModel> m_model;
-TUnique<EModel> m_modelSpike;
+TWeak<EModel> m_model;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -22,7 +21,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		EDebug::Log("Graphics Engine failed to initialise.", LT_ERROR);
 		return false;
 	}
-	
+
 	// Create an OpenGL context
 	m_sdlGLContext = SDL_GL_CreateContext(sdlWindow);
 
@@ -47,7 +46,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 			// Try enable standard vsync and test if it failed
 			if (SDL_GL_SetSwapInterval(1) != 0) {
 				EDebug::Log(
-					"Graphics Engine failed to initialise vsync: " + std::string(SDL_GetError()), 
+					"Graphics Engine failed to initialise vsync: " + std::string(SDL_GetError()),
 					LT_WARNING);
 				return false;
 			}
@@ -63,7 +62,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		EDebug::Log("Graphics Engine failed to initialise glew: " + errorMsg);
 		return false;
 	}
-	
+
 	// Enable depth to be tested
 	glEnable(GL_DEPTH_TEST);
 
@@ -111,27 +110,35 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 
 	// DEBUG
-	m_model = TMakeUnique<EModel>();
-	m_model->ImportModel("Models/Helmet/Helmet3.fbx");
-	m_model->GetTransform().scale = glm::vec3(0.1f);
-	m_model->GetTransform().position.x = 5.0f;
+	m_model = ImportModel("Models/Helmet/Helmet3.fbx");
+	m_model.lock()->GetTransform().scale = glm::vec3(0.1f);
 
-	m_modelSpike = TMakeUnique<EModel>();
-	m_modelSpike->MakeSpike(blackPlasticTexture);
+	// Add the texture to the model if exists
+	TShared<ETexture> tex = TMakeShared<ETexture>();
+	tex->LoadTexture("Helmet Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
+	TShared<ESMaterial> mat = CreateMaterial();
+	mat->m_baseColourMap = tex;
 
-	TShared<ESDirLight> dirLight1 = TMakeShared<ESDirLight>();
-	dirLight1->colour = glm::vec3(1.0f, 0.0f, 1.0f);
-	dirLight1->direction = glm::vec3(0.0f, -1.0f, 0.0f);
-	dirLight1->ambient = glm::vec3(0.0f);
-	dirLight1->intensity = 1.0f;
-	m_lights.push_back(dirLight1);
+	m_model.lock()->SetMaterialBySlot(0, mat);
 
-	TShared<ESDirLight> dirLight2 = TMakeShared<ESDirLight>();
-	dirLight2->colour = glm::vec3(0.0f, 1.0f, 0.0f);
-	dirLight2->direction = glm::vec3(0.0f, 1.0f, 0.0f);
-	dirLight2->ambient = glm::vec3(0.0f);
-	dirLight2->intensity = 1.0f;
-	m_lights.push_back(dirLight2);
+	// Create the dir light
+	const auto& dirLight = CreateDirLight();
+
+	if (const auto& lightRef = dirLight.lock()) {
+		lightRef->colour = glm::vec3(1.0f, 1.0f, 1.0f);
+		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
+		lightRef->ambient = glm::vec3(0.0f);
+		lightRef->intensity = 0.1f;
+	}
+
+	// Create the point light
+	const auto& pointLight = CreatePointLight();
+
+	if (const auto& lightRef = pointLight.lock()) {
+		lightRef->colour = glm::vec3(0.0f, 1.0f, 0.0f);
+		lightRef->intensity = 2.0f;
+		lightRef->position.x = 20.0f;
+	}
 
 	return true;
 }
@@ -144,12 +151,9 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// DEBUG Rotate spike model
-	m_modelSpike->GetTransform().rotation.x += 0.01f;
-	m_modelSpike->GetTransform().rotation.y += 0.005f;
-
-	m_model->GetTransform().rotation.x += -0.005f;
-	m_model->GetTransform().rotation.y += -0.01f;
+	// DEBUG Rotate model
+	m_model.lock()->GetTransform().rotation.x += -0.005f;
+	m_model.lock()->GetTransform().rotation.y += -0.01f;
 
 	// Activate shader
 	m_shader->Activate();
@@ -159,9 +163,40 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Render custom graphics
 	// Models will update their own positions in the mesh based on the transform
-	m_model->Render(m_shader, m_lights);
-	m_modelSpike->Render(m_shader, m_lights);
+	for (const auto& modelRef : m_models) {
+		modelRef->Render(m_shader, m_lights);
+	}
 
 	// Swap the back buffer with the front buffer
 	SDL_GL_SwapWindow(sdlWindow);
+}
+
+TWeak<ESPointLight> EGraphicsEngine::CreatePointLight()
+{
+	const auto& newLight = TMakeShared<ESPointLight>();
+	m_lights.push_back(newLight);
+	
+	return newLight;
+}
+
+TWeak<ESDirLight> EGraphicsEngine::CreateDirLight()
+{
+	const auto& newLight = TMakeShared<ESDirLight>();
+	m_lights.push_back(newLight);
+
+	return newLight;
+}
+
+TWeak<EModel> EGraphicsEngine::ImportModel(const EString& path)
+{
+	const auto& newModel = TMakeShared<EModel>();
+	newModel->ImportModel(path);
+	m_models.push_back(newModel);
+	
+	return newModel;
+}
+
+TShared<ESMaterial> EGraphicsEngine::CreateMaterial()
+{
+	return TMakeShared<ESMaterial>();
 }

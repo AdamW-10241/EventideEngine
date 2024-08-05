@@ -11,21 +11,13 @@ class EShaderProgram;
 struct aiScene;
 struct aiNode;
 struct ESLight;
+struct ESMaterial;
 
 class EModel {
 public:
 	EModel() = default;
 	~EModel() = default;
 	
-	// Create a cube model and add a texture to it
-	void MakeCube(const TShared<ETexture>& texture);
-
-	// Create a spike model and add a texture to it
-	void MakeSpike(const TShared<ETexture>& texture);
-
-	// Create a poly model and add a texture to it
-	void MakePoly(const TShared<ETexture>& texture);
-
 	// Import a 3D model from file
 	// Uses the ASSIMP import library, check docs to know which file types are accepted
 	void ImportModel(const EString& filePath);
@@ -37,6 +29,9 @@ public:
 	// Get the transform of the model
 	ESTransform& GetTransform() { return m_transform; }
 
+	// Set a material by the slot number
+	void SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& material);
+
 private:
 	// Find all of the meshes in a scene and convert them to an EMesh
 	bool FindAndImportMeshes(const aiNode& node, const aiScene& scene, 
@@ -45,6 +40,9 @@ private:
 private:
 	// Array of meshes
 	TArray<TUnique<EMesh>> m_meshStack;
+
+	// Array of materials for the model
+	TArray<TShared<ESMaterial>> m_materialStack;
 
 	// Transform for the model in 3D space
 	ESTransform m_transform;

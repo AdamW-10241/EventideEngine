@@ -5,9 +5,9 @@
 #include <GLM/mat4x4.hpp>
 
 class EShaderProgram;
-class ETexture;
 struct ESTransform;
 struct ESLight;
+struct ESMaterial;
 
 struct ESVertexData {
 	// 0 = x
@@ -38,13 +38,14 @@ public:
 
 	// Draw the mesh to the renderer
 	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
-		const TArray<TShared<ESLight>>& lights);
-
-	// Set the texture for the mesh
-	void SetTexture(const TShared<ETexture>& texture) { m_texture = texture; }
+		const TArray<TShared<ESLight>>& lights, const TShared<ESMaterial>& material);
 
 	// Set the transform of the mesh relative to the model
 	void SetRelativeTransform(const glm::mat4 &transform) { m_matTransform = transform; }
+
+public:
+	// Index for the material relative to the model
+	unsigned int materialIndex;
 
 private:
 	// Store the vertices
@@ -61,9 +62,6 @@ private:
 
 	// Store the ID for the element array object
 	uint32_t m_eao;
-
-	// Texture for the mesh
-	TShared<ETexture> m_texture;
 
 	// Relative transform of the mesh
 	glm::mat4 m_matTransform;

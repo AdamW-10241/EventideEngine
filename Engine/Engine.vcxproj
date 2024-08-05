@@ -124,6 +124,7 @@
     <ClInclude Include="Source\Public\Graphics\ESCamera.h" />
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
     <ClInclude Include="Source\Public\Graphics\ESLight.h" />
+    <ClInclude Include="Source\Public\Graphics\ESMaterial.h" />
     <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Listeners\EInput.h" />
     <ClInclude Include="Source\Public\Listeners\EEvents.h" />

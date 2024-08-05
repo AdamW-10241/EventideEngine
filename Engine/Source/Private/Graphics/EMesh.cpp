@@ -144,13 +144,10 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 }
 
 void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
-	const TArray<TShared<ESLight>>& lights)
+	const TArray<TShared<ESLight>>& lights, const TShared<ESMaterial>& material)
 {
-	// Does a texture exist
-	if (m_texture) {
-		// Run the texture
-		shader->RunTexture(m_texture, 0);
-	}
+	// Update the material in the shader
+	shader->SetMaterial(material);
 
 	// Update the transform of the mesh based on the model transform
 	shader->SetModelTransform(transform);
