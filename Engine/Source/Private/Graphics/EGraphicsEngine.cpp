@@ -113,17 +113,40 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	m_model = ImportModel("Models/Helmet/Helmet3.fbx");
 	m_model.lock()->GetTransform().scale = glm::vec3(0.1f);
 
-	// Add the texture to the model if exists
-	TShared<ETexture> tex = TMakeShared<ETexture>();
-	tex->LoadTexture("Helmet Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
-	TShared<ESMaterial> mat = CreateMaterial();
-	mat->m_baseColourMap = tex;
+	// Creating the first texture
+	TShared<ETexture> tex1 = TMakeShared<ETexture>();
+	tex1->LoadTexture("Helet Face Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
+	
+	// Creating a specular texture
+	TShared<ETexture> specTex1 = TMakeShared<ETexture>();
+	specTex1->LoadTexture("Helmet Face Spec Colour", "Models/Helmet/textures/facetexture_Specular.png");
 
-	m_model.lock()->SetMaterialBySlot(0, mat);
+	// Creating the second texture
+	TShared<ETexture> tex2 = TMakeShared<ETexture>();
+	tex2->LoadTexture("Helmet Head Base Colour", "Models/Helmet/textures/Head_Base_color.jpg");
+	
+	// Creating a specular texture
+	TShared<ETexture> specTex2 = TMakeShared<ETexture>();
+	specTex2->LoadTexture("Helmet Head Spec Colour", "Models/Helmet/textures/Head_Specular.png");
+
+	// Creating materials
+	TShared<ESMaterial> mat1 = CreateMaterial();
+	TShared<ESMaterial> mat2 = CreateMaterial();
+	mat2->specularStrength = 0.05f;
+
+	// Assinging the texture to the base colour map for the material
+	mat1->m_baseColourMap = tex1;
+	mat1->m_specularMap = specTex1;
+
+	mat2->m_baseColourMap = tex2;
+	mat2->m_specularMap = specTex2;
+
+	// Setting the material to slots in the model
+	m_model.lock()->SetMaterialBySlot(0, mat2);
+	m_model.lock()->SetMaterialBySlot(1, mat1);
 
 	// Create the dir light
 	const auto& dirLight = CreateDirLight();
-
 	if (const auto& lightRef = dirLight.lock()) {
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 1.0f);
 		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
@@ -133,7 +156,6 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the point light
 	const auto& pointLight = CreatePointLight();
-
 	if (const auto& lightRef = pointLight.lock()) {
 		lightRef->colour = glm::vec3(0.0f, 1.0f, 0.0f);
 		lightRef->intensity = 2.0f;
@@ -152,8 +174,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// DEBUG Rotate model
-	m_model.lock()->GetTransform().rotation.x += -0.005f;
-	m_model.lock()->GetTransform().rotation.y += -0.01f;
+	m_model.lock()->GetTransform().rotation.y += 0.005f;
 
 	// Activate shader
 	m_shader->Activate();

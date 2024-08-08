@@ -103,7 +103,7 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene,
 			// Texture coordinate can have multiple sets
 			// The first array index is the set [0]
 			// The second array index is the vertex data [j]
-			if (aMesh->HasTextureCoords(j)) {
+			if (aMesh->HasTextureCoords(0)) {
 				vertex.m_texCoords[0] = aMesh->mTextureCoords[0][j].x;
 				vertex.m_texCoords[1] = aMesh->mTextureCoords[0][j].y;
 			}	
