@@ -4,6 +4,8 @@ layout (location = 0) in vec3 vPosition;
 layout (location = 1) in vec3 vColour;
 layout (location = 2) in vec2 vTexCoords;
 layout (location = 3) in vec3 vNormals;
+layout (location = 4) in vec3 vTangents;
+layout (location = 5) in vec3 vBitTangents;
 
 uniform mat4 mesh = mat4(1.0f);
 uniform mat4 model = mat4(1.0);
@@ -32,7 +34,11 @@ void main() {
 
 	// Pass the normals to the frag shader reversed
 	mat3 normalMatrix = mat3(transpose(inverse(relPos)));
-	fNormals = normalize(normalMatrix * vNormals);
+	vec3 tangents = normalize(normalMatrix * vTangents);
+	vec3 bitTangents = normalize(normalMatrix * vBitTangents);
+	vec3 normals = normalize(normalMatrix * vNormals);
+
+	mat3 fNormals = mat3(tangents, bitTangents, normals);
 
 	// Get position of the vertex in world space
 	fVertPos = vec3(relPos * vec4(vPosition, 1.0f));

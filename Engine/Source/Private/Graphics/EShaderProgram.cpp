@@ -270,6 +270,16 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 		glUniform1f(varID, 1);
 	}
 
+	// --------- NORMAL
+	if (material->m_normalMap) {
+		// Bind the texture to the 2 index
+		material->m_normalMap->BindTexture(2);
+		// Get the base colour map ID
+		varID = glGetUniformLocation(m_programID, "material.normalMap");
+		// Update the shader
+		glUniform1f(varID, 2);
+	}
+
 	// --------- SHININESS
 	// Get the base colour map ID
 	varID = glGetUniformLocation(m_programID, "material.shininess");

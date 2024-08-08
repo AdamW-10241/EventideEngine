@@ -4,7 +4,7 @@
 #include "Graphics/EShaderProgram.h"
 
 // DEBUG
-#include "Game/GameObjects/EObjectChild.h"
+// object classes
 
 EGameEngine* EGameEngine::GetGameEngine()
 {
@@ -146,6 +146,8 @@ void EGameEngine::Tick()
 		eObjectRef->Tick(DeltaTimeF());
 		eObjectRef->PostTick(DeltaTimeF());
 	}
+
+	m_window->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(1.0f);
 }
 
 void EGameEngine::ProcessInput()

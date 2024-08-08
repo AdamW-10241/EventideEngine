@@ -9,6 +9,7 @@ EMesh::EMesh()
 {
 	m_vao = m_vbo = m_eao = 0;
 	m_matTransform = glm::mat4(1.0f);
+	materialIndex = 0;
 }
 
 EMesh::~EMesh() {}
@@ -18,6 +19,9 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	// Store the vertex data
 	m_vertices = vertices;
 	m_indices = indices;
+
+	// Calculate the tangents
+	CalculateTangents(m_vertices, m_indices);
 
 	// Create a vertex array object (VAO)
 	// Assign the ID for object to the m_vao variable
@@ -137,7 +141,35 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 		(void*)(sizeof(float) * 8) // How many numbers to skip in bytes
 	);
 
-	// Common practise to clear the VAO from the GPU
+	// Tangents
+	// Pass out the tangent data in seperate formats
+	glEnableVertexAttribArray(4);
+
+	// Set the position of that data to the 4 index of the attribute array
+	glVertexAttribPointer(
+		4, // Location to store the data in the attribute array
+		3, // How many numbers to pass into the attribute array index
+		GL_FLOAT, // The type of data to store
+		GL_FALSE, // Should we normalise the values (generally no)
+		sizeof(ESVertexData), // How big is each data array in a VertexData
+		(void*)(sizeof(float) * 11) // How many numbers to skip in bytes
+	);
+
+	// Bit Tangents
+	// Pass out the vertex data in seperate formats
+	glEnableVertexAttribArray(5);
+
+	// Set the position of that data to the 5 index of the attribute array
+	glVertexAttribPointer(
+		5, // Location to store the data in the attribute array
+		3, // How many numbers to pass into the attribute array index
+		GL_FLOAT, // The type of data to store
+		GL_FALSE, // Should we normalise the values (generally no)
+		sizeof(ESVertexData), // How big is each data array in a VertexData
+		(void*)(sizeof(float) * 14) // How many numbers to skip in bytes
+	);
+
+	// Common practice to clear the VAO from the GPU
 	glBindVertexArray(0);
 
 	return true;
@@ -171,4 +203,59 @@ void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransf
 
 	// Clear the VAO
 	glBindVertexArray(0);
+}
+
+void EMesh::CalculateTangents(std::vector<ESVertexData>& vertices, std::vector<uint32_t>& indices)
+{
+	// Used learnOpenGL to make this code
+	// LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advanced-Lighting/Normal-Mapping
+	// Loop through every 3 indices for each triangle
+	for (int i = 0; i < indices.size(); i += 3) {
+		// Get each vertex
+		ESVertexData& vertex0 = vertices[indices[i]];
+		ESVertexData& vertex1 = vertices[indices[i + 1]];
+		ESVertexData& vertex2 = vertices[indices[i + 2]];
+
+		// Get vec3 positions since the positions are stored as float arrays
+		glm::vec3 position0(vertex0.m_position[0], vertex0.m_position[1], vertex0.m_position[2]);
+		glm::vec3 position1(vertex1.m_position[0], vertex1.m_position[1], vertex1.m_position[2]);
+		glm::vec3 position2(vertex2.m_position[0], vertex2.m_position[1], vertex2.m_position[2]);
+
+		// Get vec2 texCoords since the texCoords are stored as float arrays
+		glm::vec2 texCoords0(vertex0.m_texCoords[0], vertex0.m_texCoords[1]); 
+		glm::vec2 texCoords1(vertex1.m_texCoords[0], vertex1.m_texCoords[1]);
+		glm::vec2 texCoords2(vertex2.m_texCoords[0], vertex2.m_texCoords[1]);
+
+		// Get the edges and deltaUVs from the positions and texture coordinates
+		// These will be used to find the tangent and bit tangents
+		glm::vec3 edge1 = position1 - position0;
+		glm::vec3 edge2 = position2 - position0;
+		glm::vec2 deltaUV1 = texCoords1 - texCoords0;
+		glm::vec2 deltaUV2 = texCoords2 - texCoords0;
+
+		// Calculate the tangents and bit tangents
+		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		glm::vec3 tangent(0.0f);
+		tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+		tangent = glm::normalize(tangent);
+
+		glm::vec3 bitTangent(0.0f);
+		bitTangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+		bitTangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+		bitTangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+		bitTangent = glm::normalize(bitTangent);
+
+		// Copy the tangent values to each vertex
+		vertex0.m_tangent[0] = tangent.x; vertex0.m_tangent[1] = tangent.y; vertex0.m_tangent[2] = tangent.z;
+		vertex1.m_tangent[0] = tangent.x; vertex1.m_tangent[1] = tangent.y; vertex1.m_tangent[2] = tangent.z;
+		vertex2.m_tangent[0] = tangent.x; vertex2.m_tangent[1] = tangent.y; vertex2.m_tangent[2] = tangent.z;
+
+		// Copy the bitTangent values to each vertex
+		vertex0.m_bitTangent[0] = tangent.x; vertex0.m_bitTangent[1] = tangent.y; vertex0.m_bitTangent[2] = tangent.z;
+		vertex1.m_bitTangent[0] = tangent.x; vertex1.m_bitTangent[1] = tangent.y; vertex1.m_bitTangent[2] = tangent.z;
+		vertex2.m_bitTangent[0] = tangent.x; vertex2.m_bitTangent[1] = tangent.y; vertex2.m_bitTangent[2] = tangent.z;
+	}
 }

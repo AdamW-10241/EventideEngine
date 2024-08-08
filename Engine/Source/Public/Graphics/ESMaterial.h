@@ -14,6 +14,10 @@ struct ESMaterial {
 	// White is completely shiny and black is completely not
 	TShared<ETexture> m_specularMap;
 
+	// Normal map for the material
+	// Influences the light bounce direction
+	TShared<ETexture> m_normalMap;
+
 	// Material properties
 	// Shininess of the material
 	float shininess = 32.0f;

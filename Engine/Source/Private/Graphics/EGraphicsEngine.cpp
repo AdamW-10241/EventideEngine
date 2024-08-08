@@ -112,21 +112,29 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	TWeak<EModel> m_modelHelmet = ImportModel("Models/Helmet/Helmet3.fbx");
 	m_modelHelmet.lock()->GetTransform().scale = glm::vec3(0.1f);
 
-	// Creating the first texture
+	// Face base colour
 	TShared<ETexture> helmetTex1 = TMakeShared<ETexture>();
 	helmetTex1->LoadTexture("Helmet Face Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
 	
-	// Creating a specular texture
+	// Face specular
 	TShared<ETexture> helmetSpecTex1 = TMakeShared<ETexture>();
 	helmetSpecTex1->LoadTexture("Helmet Face Spec Colour", "Models/Helmet/textures/facetexture_Specular.png");
 
-	// Creating the second texture
+	// Face normal
+	TShared<ETexture> helmetNormal1 = TMakeShared<ETexture>();
+	helmetNormal1->LoadTexture("Helmet Face Normals", "Models/Helmet/textures/facetexture_Normal_DirectX.jpg");
+
+	// Head base colour
 	TShared<ETexture> helmetTex2 = TMakeShared<ETexture>();
 	helmetTex2->LoadTexture("Helmet Head Base Colour", "Models/Helmet/textures/Head_Base_color.jpg");
 	
-	// Creating a specular texture
+	// Head specular
 	TShared<ETexture> helmetSpecTex2 = TMakeShared<ETexture>();
 	helmetSpecTex2->LoadTexture("Helmet Head Spec Colour", "Models/Helmet/textures/Head_Specular.png");
+
+	// Head normal
+	TShared<ETexture> helmetNormal2 = TMakeShared<ETexture>();
+	helmetNormal2->LoadTexture("Helmet Head Normals", "Models/Helmet/textures/Head_Normal_DirectX.jpg");
 
 	// Creating materials
 	TShared<ESMaterial> helmetMat1 = CreateMaterial();
@@ -136,9 +144,11 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Assinging the texture to the base colour map for the material
 	helmetMat1->m_baseColourMap = helmetTex1;
 	helmetMat1->m_specularMap = helmetSpecTex1;
+	helmetMat1->m_normalMap = helmetNormal1;
 
 	helmetMat2->m_baseColourMap = helmetTex2;
 	helmetMat2->m_specularMap = helmetSpecTex2;
+	helmetMat2->m_normalMap = helmetNormal2;
 
 	// Setting the material to slots in the model
 	m_modelHelmet.lock()->SetMaterialBySlot(0, helmetMat2);
@@ -177,8 +187,8 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	const auto& pointLight = CreatePointLight();
 	if (const auto& lightRef = pointLight.lock()) {
 		lightRef->colour = glm::vec3(0.0f, 1.0f, 0.0f);
-		lightRef->intensity = 2.0f;
-		lightRef->position.x = 20.0f;
+		lightRef->intensity = 1.0f;
+		lightRef->position.x = 10.0f;
 	}
 
 	return true;
@@ -194,7 +204,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// DEBUG Rotate model
 	float rotationRate = 100.0f;
-	m_models.at(0)->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
+	// m_models.at(0)->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
 
 	// Activate shader
 	m_shader->Activate();

@@ -1,2 +1,5 @@
 // Found discard function for shader from:
 Victor Gordon 2021, OpenGL Tutorial 17 - Transparency & Blending, viewed August 8, https://www.youtube.com/watch?v=crOfyWiWxmc
+
+// Found normal map implementation code from:
+LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advanced-Lighting/Normal-Mapping
