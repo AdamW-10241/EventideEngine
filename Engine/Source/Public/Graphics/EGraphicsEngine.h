@@ -37,6 +37,9 @@ public:
 	// Create a material for the engine
 	TShared<ESMaterial> CreateMaterial();
 
+	// Get a weak reference to the shader
+	TWeak<EShaderProgram> GetShader() { return m_shader; }
+
 private:
 	// Storing memory location for OpenGL context
 	SDL_GLContext m_sdlGLContext;

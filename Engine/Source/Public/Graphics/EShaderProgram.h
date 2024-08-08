@@ -45,6 +45,9 @@ public:
 	// Set the material in the shader
 	void SetMaterial(const TShared<ESMaterial>& material);
 
+	// Set the brightness in the shader
+	void SetBrightness(const float& brightness = 1.0f);
+
 private:
 	// Import a shader based on the shader type
 	bool ImportShaderByType(const EString& filePath, EEShaderType shaderType);

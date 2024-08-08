@@ -60,6 +60,9 @@ public:
 	// Render the graphics engine to the window
 	void Render();
 
+	// Get a weak reference to the graphics engine
+	TWeak<EGraphicsEngine> GetGraphicsEngine() { return m_graphicsEngine; }
+
 private:
 	// A ref to the window in SDL
 	SDL_Window* m_sdlWindow;
@@ -71,7 +74,7 @@ private:
 	bool m_shouldClose;
 
 	// Store the graphics engine
-	TUnique<EGraphicsEngine> m_graphicsEngine;
+	TShared<EGraphicsEngine> m_graphicsEngine;
 
 	// Direction to move the camera
 	glm::vec3 m_cameraDirection;

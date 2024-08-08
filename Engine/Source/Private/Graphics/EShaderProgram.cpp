@@ -257,7 +257,7 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 		// Get the base colour map ID
 		varID = glGetUniformLocation(m_programID, "material.baseColourMap");
 		// Update the shader
-		glUniform1i(varID, 0);
+		glUniform1f(varID, 0);
 	}
 
 	// --------- SPECULAR
@@ -267,7 +267,7 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 		// Get the base colour map ID
 		varID = glGetUniformLocation(m_programID, "material.specularMap");
 		// Update the shader
-		glUniform1i(varID, 1);
+		glUniform1f(varID, 1);
 	}
 
 	// --------- SHININESS
@@ -281,6 +281,14 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 	varID = glGetUniformLocation(m_programID, "material.specularStrength");
 	// Update the shader
 	glUniform1f(varID, material->specularStrength);
+}
+
+void EShaderProgram::SetBrightness(const float& brightness)
+{
+	// Get the brightness ID
+	int varID = glGetUniformLocation(m_programID, "brightness");
+	// Update the shader
+	glUniform1f(varID, brightness);
 }
 
 bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType shaderType)

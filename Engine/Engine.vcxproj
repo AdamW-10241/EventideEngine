@@ -116,7 +116,6 @@
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
-    <ClInclude Include="Source\Public\Game\GameObjects\EObjectChild.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />

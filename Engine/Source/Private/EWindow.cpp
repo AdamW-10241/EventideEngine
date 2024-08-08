@@ -70,7 +70,7 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 	}
 
 	// Create the graphics engine objects
-	m_graphicsEngine = std::make_unique<EGraphicsEngine>();
+	m_graphicsEngine = TMakeShared<EGraphicsEngine>();
 
 	// Initialise the graphics engine and test if it failed
 	if (!m_graphicsEngine->InitEngine(m_sdlWindow, m_params.vsync)) {

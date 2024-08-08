@@ -16,4 +16,14 @@ public:
 	static void Log(const std::string& msg, const EELogType& logType = LT_LOG) {
 		std::cout << msg << std::endl;
 	}
+
+	// Log a message to the console based on log type as an int
+	static void Log(const int& intMsg, const EELogType& logType = LT_LOG) {
+		std::cout << std::to_string(intMsg) << std::endl;
+	}
+	
+	// Log a message to the console based on log type as a float
+	static void Log(const float& floatMsg, const EELogType& logType = LT_LOG) {
+		std::cout << std::to_string(floatMsg) << std::endl;
+	}
 };

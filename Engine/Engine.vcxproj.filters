@@ -95,9 +95,6 @@
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\Game\GameObjects\EObjectChild.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Public\Graphics\ESLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,5 +1,7 @@
 #include "Game/EGameEngine.h"
 #include "Game/GameObjects/EObject.h"
+#include "Graphics/EGraphicsEngine.h"
+#include "Graphics/EShaderProgram.h"
 
 // DEBUG
 #include "Game/GameObjects/EObjectChild.h"
@@ -93,7 +95,7 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	CreateObject<EObjectChild>().lock()->SetLifeTime(5.0f);
+	// CreateObject<EObjectChild>().lock()->SetLifeTime(5.0f);
 }
 
 void EGameEngine::GameLoop()
@@ -114,7 +116,6 @@ void EGameEngine::GameLoop()
 
 		// The order of these functions is important
 		// We must detect input, react with logic and then render based on logic
-
 		PreLoop();
 
 		// Process all engine input functions

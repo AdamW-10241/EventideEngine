@@ -5,14 +5,12 @@
 #include "Graphics/ETexture.h"
 #include "Graphics/ESCamera.h"
 #include "Graphics/ESLight.h"
+#include "Game/EGameEngine.h"
 
 // External Libs
 #include <GLEW/glew.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
-
-// Test DEBUG model
-TWeak<EModel> m_model;
 
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
@@ -110,41 +108,62 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
 
 	// DEBUG
-	m_model = ImportModel("Models/Helmet/Helmet3.fbx");
-	m_model.lock()->GetTransform().scale = glm::vec3(0.1f);
+	// ----------- HELMET
+	TWeak<EModel> m_modelHelmet = ImportModel("Models/Helmet/Helmet3.fbx");
+	m_modelHelmet.lock()->GetTransform().scale = glm::vec3(0.1f);
 
 	// Creating the first texture
-	TShared<ETexture> tex1 = TMakeShared<ETexture>();
-	tex1->LoadTexture("Helet Face Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
+	TShared<ETexture> helmetTex1 = TMakeShared<ETexture>();
+	helmetTex1->LoadTexture("Helmet Face Base Colour", "Models/Helmet/textures/facetexture_Base_color.jpg");
 	
 	// Creating a specular texture
-	TShared<ETexture> specTex1 = TMakeShared<ETexture>();
-	specTex1->LoadTexture("Helmet Face Spec Colour", "Models/Helmet/textures/facetexture_Specular.png");
+	TShared<ETexture> helmetSpecTex1 = TMakeShared<ETexture>();
+	helmetSpecTex1->LoadTexture("Helmet Face Spec Colour", "Models/Helmet/textures/facetexture_Specular.png");
 
 	// Creating the second texture
-	TShared<ETexture> tex2 = TMakeShared<ETexture>();
-	tex2->LoadTexture("Helmet Head Base Colour", "Models/Helmet/textures/Head_Base_color.jpg");
+	TShared<ETexture> helmetTex2 = TMakeShared<ETexture>();
+	helmetTex2->LoadTexture("Helmet Head Base Colour", "Models/Helmet/textures/Head_Base_color.jpg");
 	
 	// Creating a specular texture
-	TShared<ETexture> specTex2 = TMakeShared<ETexture>();
-	specTex2->LoadTexture("Helmet Head Spec Colour", "Models/Helmet/textures/Head_Specular.png");
+	TShared<ETexture> helmetSpecTex2 = TMakeShared<ETexture>();
+	helmetSpecTex2->LoadTexture("Helmet Head Spec Colour", "Models/Helmet/textures/Head_Specular.png");
 
 	// Creating materials
-	TShared<ESMaterial> mat1 = CreateMaterial();
-	TShared<ESMaterial> mat2 = CreateMaterial();
-	mat2->specularStrength = 0.05f;
+	TShared<ESMaterial> helmetMat1 = CreateMaterial();
+	TShared<ESMaterial> helmetMat2 = CreateMaterial();
+	helmetMat2->specularStrength = 0.05f;
 
 	// Assinging the texture to the base colour map for the material
-	mat1->m_baseColourMap = tex1;
-	mat1->m_specularMap = specTex1;
+	helmetMat1->m_baseColourMap = helmetTex1;
+	helmetMat1->m_specularMap = helmetSpecTex1;
 
-	mat2->m_baseColourMap = tex2;
-	mat2->m_specularMap = specTex2;
+	helmetMat2->m_baseColourMap = helmetTex2;
+	helmetMat2->m_specularMap = helmetSpecTex2;
 
 	// Setting the material to slots in the model
-	m_model.lock()->SetMaterialBySlot(0, mat2);
-	m_model.lock()->SetMaterialBySlot(1, mat1);
+	m_modelHelmet.lock()->SetMaterialBySlot(0, helmetMat2);
+	m_modelHelmet.lock()->SetMaterialBySlot(1, helmetMat1);
 
+	// ----------- GRASS
+	TWeak<EModel> m_modelGrass = ImportModel("Models/Grass/Grass_green.fbx");
+	m_modelGrass.lock()->GetTransform().scale = glm::vec3(0.01f);
+	m_modelGrass.lock()->GetTransform().position.x -= 2.0f;
+
+	// Creating the first texture
+	TShared<ETexture> grassTex1 = TMakeShared<ETexture>();
+	grassTex1->LoadTexture("Grass Base Colour", "Models/Grass/textures/Grass_green.png");
+
+	// Creating materials
+	TShared<ESMaterial> grassMat1 = CreateMaterial();
+	grassMat1->specularStrength = 0.0f;
+
+	// Assinging the texture to the base colour map for the material
+	grassMat1->m_baseColourMap = grassTex1;
+
+	// Setting the material to slots in the model
+	m_modelGrass.lock()->SetMaterialBySlot(0, grassMat1);
+
+	// ----------- LIGHTS
 	// Create the dir light
 	const auto& dirLight = CreateDirLight();
 	if (const auto& lightRef = dirLight.lock()) {
@@ -174,7 +193,8 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// DEBUG Rotate model
-	m_model.lock()->GetTransform().rotation.y += 0.005f;
+	float rotationRate = 100.0f;
+	m_models.at(0)->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
 
 	// Activate shader
 	m_shader->Activate();

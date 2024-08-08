@@ -1,0 +1,2 @@
+// Found discard function for shader from:
+Victor Gordon 2021, OpenGL Tutorial 17 - Transparency & Blending, viewed August 8, https://www.youtube.com/watch?v=crOfyWiWxmc

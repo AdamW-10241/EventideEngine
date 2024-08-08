@@ -39,12 +39,19 @@ uniform PointLight pointLights[NUM_POINT_LIGHTS];
 
 out vec4 finalColour;
 
+uniform float brightness = 1.0f;
+
 void main() {
 	// Final colour result for the vertex
 	vec3 result = vec3(0.0f);
 
 	// Base colour map value that the object starts as
 	vec3 baseColour = texture(material.baseColourMap, fTexCoords).rgb * fColour;
+
+	// Remove transparent pixels
+	// Found discard function from:
+	// Victor Gordon 2021, OpenGL Tutorial 17 - Transparency & Blending, viewed August 8, https://www.youtube.com/watch?v=crOfyWiWxmc
+	if (texture(material.baseColourMap, fTexCoords).a < 0.1f) discard;
 
 	// Specular map value that the object starts as
 	vec3 specularColour = texture(material.specularMap, fTexCoords).rgb;
@@ -128,5 +135,5 @@ void main() {
 		result += lightColour + specular;
 	}
 
-	finalColour = vec4(result, 1.0f);
+	finalColour = vec4(result * brightness, 1.0f);
 }
