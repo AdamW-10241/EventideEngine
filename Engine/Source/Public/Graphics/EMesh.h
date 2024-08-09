@@ -51,10 +51,6 @@ public:
 	// Set the transform of the mesh relative to the model
 	void SetRelativeTransform(const glm::mat4 &transform) { m_matTransform = transform; }
 
-	// Calculate the tangent and bit tangents from the mesh triangle vertices and indices
-	void CalculateTangents(std::vector<ESVertexData>& vertices,
-		std::vector<uint32_t>& indices);
-
 public:
 	// Index for the material relative to the model
 	unsigned int materialIndex;

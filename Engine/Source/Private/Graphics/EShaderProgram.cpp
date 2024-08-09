@@ -257,37 +257,37 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 		// Get the base colour map ID
 		varID = glGetUniformLocation(m_programID, "material.baseColourMap");
 		// Update the shader
-		glUniform1f(varID, 0);
+		glUniform1i(varID, 0);
 	}
 
 	// --------- SPECULAR
 	if (material->m_specularMap) {
 		// Bind the texture to the 1 index
 		material->m_specularMap->BindTexture(1);
-		// Get the base colour map ID
+		// Get the specular map ID
 		varID = glGetUniformLocation(m_programID, "material.specularMap");
 		// Update the shader
-		glUniform1f(varID, 1);
+		glUniform1i(varID, 1);
 	}
 
 	// --------- NORMAL
 	if (material->m_normalMap) {
 		// Bind the texture to the 2 index
 		material->m_normalMap->BindTexture(2);
-		// Get the base colour map ID
+		// Get the normal map ID
 		varID = glGetUniformLocation(m_programID, "material.normalMap");
 		// Update the shader
-		glUniform1f(varID, 2);
+		glUniform1i(varID, 2);
 	}
 
 	// --------- SHININESS
-	// Get the base colour map ID
+	// Get the shininess ID
 	varID = glGetUniformLocation(m_programID, "material.shininess");
 	// Update the shader
 	glUniform1f(varID, material->shininess);
 
 	// --------- SPECULAR STRENGTH
-	// Get the base colour map ID
+	// Get the specular strength ID
 	varID = glGetUniformLocation(m_programID, "material.specularStrength");
 	// Update the shader
 	glUniform1f(varID, material->specularStrength);

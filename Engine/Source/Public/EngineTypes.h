@@ -1,6 +1,8 @@
 #pragma once
 #include "Debug/EDebug.h"
 
+#define PI 3.14159265358979323846
+
 // System libs
 #include <iostream>
 #include <vector>

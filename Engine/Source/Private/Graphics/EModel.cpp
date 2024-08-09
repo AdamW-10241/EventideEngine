@@ -14,7 +14,8 @@ void EModel::ImportModel(const EString& filePath)
 	// Read the file and convert to an ASSIMP scene
 	// Add post processing flag triangulate to make sure the model is triangles
 	// Can add a processing flag here to remove bones
-	const auto scene = importer.ReadFile(filePath, aiProcess_Triangulate);
+	// Added a flag to calculate the tangent space and get the tangent and bitTangent for normal maps
+	const auto scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
 	// Check if the import failed in any way
 	// !scene is checking if the object was null
@@ -112,6 +113,16 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene,
 			vertex.m_normal[0] = aMesh->mNormals[j].x;
 			vertex.m_normal[1] = aMesh->mNormals[j].y;
 			vertex.m_normal[2] = aMesh->mNormals[j].z;
+
+			// Set the tangents for the model
+			vertex.m_tangent[0] = aMesh->mTangents[j].x;
+			vertex.m_tangent[1] = aMesh->mTangents[j].y;
+			vertex.m_tangent[2] = aMesh->mTangents[j].z;
+
+			// Set the bitTangents for the model
+			vertex.m_bitTangent[0] = aMesh->mBitangents[j].x;
+			vertex.m_bitTangent[1] = aMesh->mBitangents[j].y;
+			vertex.m_bitTangent[2] = aMesh->mBitangents[j].z;
 
 			// Add the data into out vertex array
 			meshVertices.push_back(vertex);

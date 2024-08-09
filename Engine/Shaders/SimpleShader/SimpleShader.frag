@@ -2,13 +2,14 @@
 
 in vec3 fColour;
 in vec2 fTexCoords;
-in vec3 fNormals;
+in mat3 fTBN;
 in vec3 fVertPos;
 in vec3 fViewPos;
 
 struct Material {
 	sampler2D baseColourMap;
 	sampler2D specularMap;
+	sampler2D normalMap;
 	float shininess;
 	float specularStrength;
 };
@@ -45,16 +46,23 @@ void main() {
 	// Final colour result for the vertex
 	vec3 result = vec3(0.0f);
 
-	// Base colour map value that the object starts as
-	vec3 baseColour = texture(material.baseColourMap, fTexCoords).rgb * fColour;
-
 	// Remove transparent pixels
 	// Found discard function from:
 	// Victor Gordon 2021, OpenGL Tutorial 17 - Transparency & Blending, viewed August 8, https://www.youtube.com/watch?v=crOfyWiWxmc
 	if (texture(material.baseColourMap, fTexCoords).a < 0.1f) discard;
 
+	// Base colour map value that the object starts as
+	vec3 baseColour = texture(material.baseColourMap, fTexCoords).rgb * fColour;
+
 	// Specular map value that the object starts as
 	vec3 specularColour = texture(material.specularMap, fTexCoords).rgb;
+
+	// Normal colour map value that the object starts as
+	vec3 normalColour = texture(material.normalMap, fTexCoords).rgb;
+	vec3 normals = normalize(normalColour * 2.0f - 1.0f);
+
+	// Normalise the texture normals based on the TBN matrix
+	normals = normalize(fTBN * normals);
 
 	// Get the view direction
 	vec3 viewDir = normalize(fViewPos - fVertPos);
@@ -65,10 +73,10 @@ void main() {
 		vec3 lightDir = normalize(-dirLights[i].direction);
 
 		// Get the reflection light value
-		vec3 reflectDir = reflect(-lightDir, fNormals);
+		vec3 reflectDir = reflect(-lightDir, normals);
 
 		// How much light should show colour based on direction of normal facing the light
-		float diff = max(dot(fNormals, lightDir), 0.0f);
+		float diff = max(dot(normals, lightDir), 0.0f);
 
 		// Ambient algorithm
 		// Minimum light value
@@ -96,10 +104,10 @@ void main() {
 		vec3 lightDir = normalize(pointLights[i].position - fVertPos);
 
 		// Get the reflection light value
-		vec3 reflectDir = reflect(-lightDir, fNormals);
+		vec3 reflectDir = reflect(-lightDir, normals);
 
 		// How much light should show colour based on direction of normal facing the light
-		float diff = max(dot(fNormals, lightDir), 0.0f);
+		float diff = max(dot(normals, lightDir), 0.0f);
 
 		// Distance between the lights position and vertex position
 		float distance = length(pointLights[i].position - fVertPos);
@@ -134,6 +142,6 @@ void main() {
 		// Add our light values together to get the results
 		result += lightColour + specular;
 	}
-
+	
 	finalColour = vec4(result * brightness, 1.0f);
 }

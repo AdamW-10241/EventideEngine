@@ -82,26 +82,8 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
-
-	// Add the texture to the mesh if exists
 	if (!defaultTexture->LoadTexture("Default Texure", "Textures/T_DefaultGrid.png")) {
 		EDebug::Log("Graphics engine default texture did not load.", LT_ERROR);
-	}
-
-	// Create the black plastic texture object
-	TShared<ETexture> blackPlasticTexture = TMakeShared<ETexture>();
-
-	// Add the texture to the mesh if exists
-	if (!blackPlasticTexture->LoadTexture("Black Plastic Texure", "Textures/T_BlackPlastic.png")) {
-		EDebug::Log("Graphics engine black plastic texture did not load.", LT_ERROR);
-	}
-
-	// Create the black plastic texture object
-	TShared<ETexture> coinTexture = TMakeShared<ETexture>();
-
-	// Add the texture to the mesh if exists
-	if (!coinTexture->LoadTexture("Coin texture", "Textures/T_Coins.png")) {
-		EDebug::Log("Graphics engine coin texture did not load.", LT_ERROR);
 	}
 
 	// Log the success of the graphics engine initialisation
@@ -122,7 +104,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Face normal
 	TShared<ETexture> helmetNormal1 = TMakeShared<ETexture>();
-	helmetNormal1->LoadTexture("Helmet Face Normals", "Models/Helmet/textures/facetexture_Normal_DirectX.jpg");
+	helmetNormal1->LoadTexture("Helmet Face Normals", "Models/Helmet/textures/facetexture_Normal_OpenGL.jpg");
 
 	// Head base colour
 	TShared<ETexture> helmetTex2 = TMakeShared<ETexture>();
@@ -134,7 +116,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Head normal
 	TShared<ETexture> helmetNormal2 = TMakeShared<ETexture>();
-	helmetNormal2->LoadTexture("Helmet Head Normals", "Models/Helmet/textures/Head_Normal_DirectX.jpg");
+	helmetNormal2->LoadTexture("Helmet Head Normals", "Models/Helmet/textures/Head_Normal_OpenGL.jpg");
 
 	// Creating materials
 	TShared<ESMaterial> helmetMat1 = CreateMaterial();
@@ -159,9 +141,13 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	m_modelGrass.lock()->GetTransform().scale = glm::vec3(0.01f);
 	m_modelGrass.lock()->GetTransform().position.x -= 2.0f;
 
-	// Creating the first texture
+	// Grass base colour
 	TShared<ETexture> grassTex1 = TMakeShared<ETexture>();
 	grassTex1->LoadTexture("Grass Base Colour", "Models/Grass/textures/Grass_green.png");
+
+	// Grass normal
+	TShared<ETexture> grassNormal1 = TMakeShared<ETexture>();
+	grassNormal1->LoadTexture("Grass Normals", "Models/Grass/textures/Normal_grass.png");
 
 	// Creating materials
 	TShared<ESMaterial> grassMat1 = CreateMaterial();
@@ -169,6 +155,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Assinging the texture to the base colour map for the material
 	grassMat1->m_baseColourMap = grassTex1;
+	grassMat1->m_normalMap = grassNormal1;
 
 	// Setting the material to slots in the model
 	m_modelGrass.lock()->SetMaterialBySlot(0, grassMat1);
@@ -186,9 +173,9 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Create the point light
 	const auto& pointLight = CreatePointLight();
 	if (const auto& lightRef = pointLight.lock()) {
-		lightRef->colour = glm::vec3(0.0f, 1.0f, 0.0f);
-		lightRef->intensity = 1.0f;
-		lightRef->position.x = 10.0f;
+		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
+		lightRef->intensity = 0.5f;
+		lightRef->position.x = 0.0f;
 	}
 
 	return true;
@@ -203,8 +190,20 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// DEBUG Rotate model
-	float rotationRate = 100.0f;
-	// m_models.at(0)->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
+	float rotationRate = 10.0f;
+	m_models.at(0)->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
+
+	static float lightTimer = 0.0f;
+	const float timeToRotate = 1.0f;
+	lightTimer += EGameEngine::GetGameEngine()->DeltaTimeF();
+
+	if (lightTimer > timeToRotate)
+		lightTimer = 0.0f;
+
+	if (const auto& lightRef = std::dynamic_pointer_cast<ESPointLight>(m_lights[1])) {
+		lightRef->position.x = sin(lightTimer / timeToRotate * 2 * PI) * 5.0f;
+		lightRef->position.z = cos(lightTimer / timeToRotate * 2 * PI) * 5.0f;
+	}
 
 	// Activate shader
 	m_shader->Activate();
