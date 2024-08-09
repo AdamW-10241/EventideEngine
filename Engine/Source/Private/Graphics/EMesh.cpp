@@ -4,6 +4,8 @@
 
 // External Libs
 #include <GLEW/glew.h>
+#include <GLM/glm.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 
 EMesh::EMesh()
 {
@@ -200,4 +202,17 @@ void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransf
 
 	// Clear the VAO
 	glBindVertexArray(0);
+}
+
+const glm::vec3 EMesh::GetVertexPosition(unsigned int vertexIndex)
+{
+	// Return a copy of the vertex position converted to a GLM vec3
+	return glm::make_vec3(m_vertices[vertexIndex].m_position);
+}
+
+const glm::vec3 EMesh::GetRandomVertexPosition()
+{
+	GetNumberOfVertices()
+
+		// add in the rand thing
 }

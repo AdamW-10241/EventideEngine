@@ -284,13 +284,19 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 	// Get the shininess ID
 	varID = glGetUniformLocation(m_programID, "material.shininess");
 	// Update the shader
-	glUniform1f(varID, material->shininess);
+	glUniform1f(varID, material->m_shininess);
 
 	// --------- SPECULAR STRENGTH
 	// Get the specular strength ID
 	varID = glGetUniformLocation(m_programID, "material.specularStrength");
 	// Update the shader
-	glUniform1f(varID, material->specularStrength);
+	glUniform1f(varID, material->m_specularStrength);
+
+	// --------- BRIGHTNESS
+	// Get the brightness ID
+	varID = glGetUniformLocation(m_programID, "material.brightness");
+	// Update the shader
+	glUniform1f(varID, material->m_brightness);
 }
 
 void EShaderProgram::SetBrightness(const float& brightness)

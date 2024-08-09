@@ -20,8 +20,11 @@ struct ESMaterial {
 
 	// Material properties
 	// Shininess of the material
-	float shininess = 32.0f;
+	float m_shininess = 32.0f;
 
 	// Intensity of the specular
-	float specularStrength = 0.5f;
+	float m_specularStrength = 0.05f;
+
+	// Brightness of the material
+	float m_brightness = 1.0f;
 };

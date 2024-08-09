@@ -6,7 +6,7 @@
 struct ESLight {
 	ESLight() {
 		colour = glm::vec3(1.0f);
-		intensity = 1.0f;
+		intensity = 0.0f;
 	}
 
 	virtual ~ESLight() = default;
@@ -17,7 +17,7 @@ struct ESLight {
 
 struct ESDirLight : public ESLight {
 	ESDirLight() {
-		ambient = glm::vec3(0.01f);
+		ambient = glm::vec3(0.0f);
 		direction = glm::vec3(0.0f);
 	}
 	

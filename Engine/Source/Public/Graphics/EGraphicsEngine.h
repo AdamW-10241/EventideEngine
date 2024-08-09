@@ -37,6 +37,9 @@ public:
 	// Create a material for the engine
 	TShared<ESMaterial> CreateMaterial();
 
+	// Create a material for the engine
+	TShared<ESMaterial> CreateMaterialB(float brightness);
+
 	// Get a weak reference to the shader
 	TWeak<EShaderProgram> GetShader() { return m_shader; }
 

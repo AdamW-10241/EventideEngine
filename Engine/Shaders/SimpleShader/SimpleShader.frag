@@ -12,6 +12,7 @@ struct Material {
 	sampler2D normalMap;
 	float shininess;
 	float specularStrength;
+	float brightness;
 };
 
 // Material for the shader to interface with our engine material
@@ -52,7 +53,7 @@ void main() {
 	if (texture(material.baseColourMap, fTexCoords).a < 0.1f) discard;
 
 	// Base colour map value that the object starts as
-	vec3 baseColour = texture(material.baseColourMap, fTexCoords).rgb * fColour;
+	vec3 baseColour = texture(material.baseColourMap, fTexCoords).rgb * fColour * material.brightness;
 
 	// Specular map value that the object starts as
 	vec3 specularColour = texture(material.specularMap, fTexCoords).rgb;

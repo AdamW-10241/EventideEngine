@@ -2,7 +2,7 @@
 #include "EngineTypes.h"
 
 // External Libs
-#include <GLM/mat4x4.hpp>
+#include <GLM/matrix.hpp>
 
 class EShaderProgram;
 struct ESTransform;
@@ -50,6 +50,15 @@ public:
 
 	// Set the transform of the mesh relative to the model
 	void SetRelativeTransform(const glm::mat4 &transform) { m_matTransform = transform; }
+
+	// Get the number of vertices stored in the mesh
+	const unsigned int GetNumberOfVertices() { return m_vertices.size(); }
+
+	// Get the vertex position of a indexed vertex in the mesh
+	const glm::vec3 GetVertexPosition(unsigned int vertexIndex);
+
+	// Get a random vertex position in the mesh
+	const glm::vec3 GetRandomVertexPosition();
 
 public:
 	// Index for the material relative to the model
