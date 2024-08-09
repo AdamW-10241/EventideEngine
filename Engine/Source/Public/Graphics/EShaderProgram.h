@@ -48,6 +48,12 @@ public:
 	// Set the brightness in the shader
 	void SetBrightness(const float& brightness = 1.0f);
 
+	// Set the texture depth for textures in the vertex shader
+	void AdjustTextureDepth(const float delta);
+
+	// Reset the texture depth for textures in the vertex shader
+	void ResetTextureDepth();
+
 private:
 	// Import a shader based on the shader type
 	bool ImportShaderByType(const EString& filePath, EEShaderType shaderType);
@@ -67,4 +73,8 @@ private:
 
 	// Store the ID for the program
 	EUi32 m_programID;
+
+	// Depth of the texture size
+	float m_textureDepth;
+	float m_defaultTextureDepth;
 };

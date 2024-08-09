@@ -90,4 +90,10 @@ private:
 
 	// Double camera speed
 	bool m_doubleCameraSpeed;
+
+	// Can adjust texture depth
+	bool m_canAdjustTextureDepth;
+
+	// Model direction
+	glm::vec3 m_modelDirection;
 };

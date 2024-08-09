@@ -6,6 +6,11 @@
 #include <ASSIMP/postprocess.h>
 #include <ASSIMP/mesh.h>
 
+EModel::~EModel()
+{
+	EDebug::Log("Model destroyed: " + m_path);
+}
+
 void EModel::ImportModel(const EString& filePath)
 {
 	// Create an ASSIMP model importer
@@ -57,6 +62,9 @@ void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<
 	for (const auto& mesh : m_meshStack) {
 		mesh->Render(shader, m_transform, lights, m_materialStack[mesh->materialIndex]);
 	}
+
+	// DEBUG
+	// EDebug::Log("Index " + toEString(m_spawnID) + " from: " + m_path);
 }
 
 void EModel::SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& material)

@@ -17,6 +17,11 @@ public:
 		std::cout << msg << std::endl;
 	}
 
+	// Log a message to the console based on log type as a uInt
+	static void Log(const unsigned int& uIntMsg, const EELogType& logType = LT_LOG) {
+		std::cout << std::to_string(uIntMsg) << std::endl;
+	}
+
 	// Log a message to the console based on log type as an int
 	static void Log(const int& intMsg, const EELogType& logType = LT_LOG) {
 		std::cout << std::to_string(intMsg) << std::endl;

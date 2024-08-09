@@ -15,9 +15,9 @@ struct ESMaterial;
 
 class EModel {
 public:
-	EModel() = default;
-	~EModel() = default;
-	
+	EModel(unsigned int spawnID, EString path) { m_spawnID = spawnID; m_path = path; }
+	~EModel();
+
 	// Import a 3D model from file
 	// Uses the ASSIMP import library, check docs to know which file types are accepted
 	void ImportModel(const EString& filePath);
@@ -31,6 +31,12 @@ public:
 
 	// Set a material by the slot number
 	void SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& material);
+
+	// Get the spawn ID of the model
+	unsigned int GetSpawnID() const { return m_spawnID; }
+
+	// Get the path of the model
+	EString GetPath() const { return m_path; }
 
 private:
 	// Find all of the meshes in a scene and convert them to an EMesh
@@ -46,4 +52,10 @@ private:
 
 	// Transform for the model in 3D space
 	ESTransform m_transform;
+
+	// Spawn ID
+	unsigned int m_spawnID;
+
+	// Model path
+	EString m_path;
 };

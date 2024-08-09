@@ -18,4 +18,5 @@ LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advan
 // REMAINS
 "Remains" (https://skfb.ly/6yoGs) by seenoise is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
 
-
+// PTERA
+"Animated Flying Pteradactal Dinosaur Loop" (https://skfb.ly/o9nTY) by LasquetiSpice is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).

@@ -11,6 +11,7 @@ uniform mat4 mesh = mat4(1.0f);
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
 uniform mat4 projection = mat4(1.0);
+uniform float textureDepth = 1.0f;
 
 out vec3 fColour;
 out vec2 fTexCoords;
@@ -30,8 +31,8 @@ void main() {
 	fColour = vColour;
 
 	// Pass the texture coordinates to the frag shader
-	fTexCoords = vTexCoords;
-	
+	fTexCoords = vTexCoords * textureDepth;
+
 	// Calculate the TBN matrix to allow for texture normals to correctly map
 	// Found normal map implementation code from:
 	// LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advanced-Lighting/Normal-Mapping

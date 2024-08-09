@@ -52,7 +52,7 @@ public:
 	void SetRelativeTransform(const glm::mat4 &transform) { m_matTransform = transform; }
 
 	// Get the number of vertices stored in the mesh
-	const unsigned int GetNumberOfVertices() { return m_vertices.size(); }
+	size_t GetNumberOfVertices() { return m_vertices.size(); }
 
 	// Get the vertex position of a indexed vertex in the mesh
 	const glm::vec3 GetVertexPosition(unsigned int vertexIndex);

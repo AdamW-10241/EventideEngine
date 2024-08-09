@@ -12,6 +12,12 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
 
+EGraphicsEngine::EGraphicsEngine()
+{
+	m_sdlGLContext = nullptr;
+	m_backgroundColor = EEBackgroundColor::BC_DEFAULT;
+}
+
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
 	if (sdlWindow == nullptr) {
@@ -295,7 +301,8 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 {
 	// Set a background color
-	glClearColor(0.10f, 0.10f, 0.20f, 1.0f);
+	ESBackgroundColorData backgroundColor = backgroundColorDataV.at(m_backgroundColor);
+	glClearColor(backgroundColor.m_color[0], backgroundColor.m_color[1], backgroundColor.m_color[2], 1.0f);
 
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -350,7 +357,11 @@ TWeak<ESDirLight> EGraphicsEngine::CreateDirLight()
 
 TWeak<EModel> EGraphicsEngine::ImportModel(const EString& path)
 {
-	const auto& newModel = TMakeShared<EModel>();
+	// Get spawn id
+	size_t spawnID = m_models.size();
+
+	// Create model
+	const auto& newModel = TMakeShared<EModel>(spawnID, path);
 	newModel->ImportModel(path);
 	m_models.push_back(newModel);
 	
@@ -367,4 +378,16 @@ TShared<ESMaterial> EGraphicsEngine::CreateMaterialB(float brightness)
 	TShared<ESMaterial> material = CreateMaterial();
 	material->m_brightness = brightness;
 	return material;
+}
+
+void EGraphicsEngine::AdjustTextureDepth(float delta)
+{
+	// Adjust the texture depth by the delta
+	m_shader->AdjustTextureDepth(delta);
+}
+
+void EGraphicsEngine::ResetTextureDepth()
+{
+	// Reset the texture depth
+	m_shader->ResetTextureDepth();
 }

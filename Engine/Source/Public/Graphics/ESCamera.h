@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/ESTransform.h"
+#include "Game/EGameEngine.h"
 
 struct ESCamera {
 	ESCamera() {
@@ -7,8 +8,8 @@ struct ESCamera {
 		aspectRatio = 1.0f;
 		nearClip = 0.01f;
 		farClip = 10000.0f;
-		moveSpeed = 0.001f;
-		rotateSpeed = 0.1f;
+		moveSpeed = 3.0f;
+		rotateSpeed = 70.0f;
 		zoomSpeed = 3.0f;
 	}
 
@@ -18,7 +19,7 @@ struct ESCamera {
 		if (glm::length(rotation) != 0.0f)
 			rotation = glm::normalize(rotation);
 
-		transform.rotation += rotation * scale * rotateSpeed;
+		transform.rotation += rotation * scale * rotateSpeed * EGameEngine::GetGameEngine()->DeltaTimeF();
 
 		if (transform.rotation.x < -89.0f)
 			transform.rotation.x = -89.0f;
@@ -37,7 +38,7 @@ struct ESCamera {
 		if (glm::length(moveDir) != 0.0f)
 			moveDir = glm::normalize(moveDir);
 
-		transform.position += moveDir * scale * moveSpeed;
+		transform.position += moveDir * scale * moveSpeed * EGameEngine::GetGameEngine()->DeltaTimeF();
 	};
 
 	// Zoom in the fov based on the amount added

@@ -3,6 +3,7 @@
 #include "Debug/EDebug.h"
 #include "Listeners/EInput.h"
 #include "Graphics/ESCamera.h"
+#include "Game/EGameEngine.h"
 
 // External Libs
 #include <SDL/SDL.h>
@@ -17,6 +18,9 @@ EWindow::EWindow()
 	m_canZoom = false;
 	m_inputMode = false;
 	m_doubleCameraSpeed = false;
+
+	m_modelDirection = glm::vec3(0.0f);
+	m_canAdjustTextureDepth = false;
 
 	EDebug::Log("Window created.");
 }
@@ -88,6 +92,37 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	m_input->ShowCursor(false);
 
 	m_input->OnKeyPressed->Bind([this, m_input](const SDL_Scancode& key) {
+		// Set background color to default
+		if (key == SDL_SCANCODE_1) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_DEFAULT);
+		}
+		// Set background color to red
+		if (key == SDL_SCANCODE_2) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_RED);
+		}
+		// Set background color to green
+		if (key == SDL_SCANCODE_3) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_GREEN);
+		}
+		// Set background color to blue
+		if (key == SDL_SCANCODE_4) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_BLUE);
+		}
+		// Set background color to white
+		if (key == SDL_SCANCODE_5) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_WHITE);
+		}
+		// Set background color to black
+		if (key == SDL_SCANCODE_6) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
+		}
+		
 		// Quick exit button for debug
 		if (key == SDL_SCANCODE_ESCAPE) {
 			CloseWindow();
@@ -101,6 +136,27 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		// Double camera speed
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = true;
+		}
+		// Set frame rate to 10
+		if (key == SDL_SCANCODE_TAB) {
+			EGameEngine::GetGameEngine()->SetFrameRate(10);
+		}
+
+		// Rotate camera up
+		if (key == SDL_SCANCODE_UP) {
+			m_cameraRotation.x += 1.0f;
+		}
+		// Rotate camera down
+		if (key == SDL_SCANCODE_DOWN) {
+			m_cameraRotation.x += -1.0f;
+		}
+		// Rotate camera left
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_cameraRotation.y += -1.0f;
+		}
+		// Rotate camera right
+		if (key == SDL_SCANCODE_LEFT) {
+			m_cameraRotation.y += 1.0f;
 		}
 
 		// Move forward
@@ -134,7 +190,28 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = false;
 		}
+		// Reset frame rate
+		if (key == SDL_SCANCODE_TAB) {
+			EGameEngine::GetGameEngine()->ResetFrameRate();
+		}
 		
+		// Rotate camera up
+		if (key == SDL_SCANCODE_UP) {
+			m_cameraRotation.x += -1.0f;
+		}
+		// Rotate camera down
+		if (key == SDL_SCANCODE_DOWN) {
+			m_cameraRotation.x += 1.0f;
+		}
+		// Rotate camera left
+		if (key == SDL_SCANCODE_RIGHT) {
+			m_cameraRotation.y += 1.0f;
+		}
+		// Rotate camera right
+		if (key == SDL_SCANCODE_LEFT) {
+			m_cameraRotation.y += -1.0f;
+		}
+
 		// Move forward
 		if (key == SDL_SCANCODE_W) {
 			m_cameraDirection.z += -1.0f;
@@ -166,28 +243,48 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		const float& xrel, const float& yrel) {
 			m_cameraRotation.y = -xrel;
 			m_cameraRotation.x = -yrel;
-		});
+	});
 
-	// On mouse scroll zoom the camera
+	// On mouse scroll
 	m_input->OnMouseScrolled->Bind([this](const float& delta) {
-		if (m_canZoom) {
-			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-				camRef->Zoom(delta);
+		if (!m_inputMode) {
+			// Zoom camera
+			if (m_canZoom) {
+				if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+					camRef->Zoom(delta);
+				}
+			}
+			// Adjust the texture depth
+			if (m_canAdjustTextureDepth) {
+				if (m_graphicsEngine)
+					m_graphicsEngine->AdjustTextureDepth(delta * 0.05f);
 			}
 		}
 	});
 
 	m_input->OnMousePressed->Bind([this](const EUi8& button) {
-		if (button == SDL_BUTTON_RIGHT) {
-			m_canZoom = true;
+		if (!m_inputMode) {
+			if (button == SDL_BUTTON_RIGHT) {
+				m_canZoom = true;
+			}
+			if (button == SDL_BUTTON_LEFT) {
+				m_canAdjustTextureDepth = true;
+			}
 		}
 	});
 
 	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
-		if (button == SDL_BUTTON_RIGHT) {
-			m_canZoom = false;
-			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-				camRef->ResetZoom();
+		if (!m_inputMode) {
+			if (button == SDL_BUTTON_RIGHT) {
+				m_canZoom = false;
+				if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+					camRef->ResetZoom();
+				}
+			}
+			if (button == SDL_BUTTON_LEFT) {
+				m_canAdjustTextureDepth = false;
+				if (m_graphicsEngine)
+					m_graphicsEngine->ResetTextureDepth();
 			}
 		}
 	});

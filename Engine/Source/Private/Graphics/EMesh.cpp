@@ -212,7 +212,8 @@ const glm::vec3 EMesh::GetVertexPosition(unsigned int vertexIndex)
 
 const glm::vec3 EMesh::GetRandomVertexPosition()
 {
-	GetNumberOfVertices()
+	// GetNumberOfVertices()
 
 		// add in the rand thing
+	return glm::vec3(0.0f);
 }

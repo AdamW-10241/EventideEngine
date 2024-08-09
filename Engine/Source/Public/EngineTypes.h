@@ -46,3 +46,9 @@ template <typename T, typename ... Args>
 TUnique<T> TMakeUnique(Args&&... args) {
 	return std::make_unique<T>(std::forward<Args>(args)...);
 }
+
+// Template function to convert to EString
+template <typename T>
+EString toEString(T value) {
+	return std::to_string(value);
+}

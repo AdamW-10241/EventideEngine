@@ -7,6 +7,8 @@
 #include "EngineTypes.h"
 #include "EWindow.h"
 #include "Listeners/EInput.h"
+#include "Graphics/EModel.h"
+#include "Graphics/ESMaterial.h"
 
 class EObject;
 
@@ -42,6 +44,27 @@ public:
 	// Mark an object for destroy
 	// All game objects destroy functions will automatically run this
 	void DestroyObject(const TShared<EObject>& object);
+
+	// Get a random float value between 2 floats
+	float GetRandomFloatRange(float min = 0.0f, float max = 1.0f) const;
+
+	// Get a random int value between 2 ints
+	float GetRandomIntRange(int min = 0, int max = 1) const;
+
+	// Set the frame rate
+	void SetFrameRate(unsigned int frameRate) { m_frameRate = frameRate; }
+
+	// Reset the frame rate
+	void ResetFrameRate() { SetFrameRate(m_defaultFrameRate); }
+
+	// Import a model from a path
+	TWeak<EModel> ImportModel(const EString& path);
+
+	// Create a material for the engine
+	TShared<ESMaterial> CreateMaterial();
+
+	// Create a material for the engine
+	TShared<ESMaterial> CreateMaterialB(float brightness);
 
 private:
 	// Constructor and destructor are private to ensure only 1 game engine
@@ -96,4 +119,13 @@ private:
 
 	// Store all EObjects that have been marked for destroy
 	TArray<TShared<EObject>> m_objectsPendingDestroy;
+
+	// Frame rate
+	unsigned int m_frameRate;
+
+	unsigned int m_defaultFrameRate;
+
+	// Store time taken to load so it can be subtracted
+	// Otherwise massive delta on first frame
+	float m_timeToLoad;
 };

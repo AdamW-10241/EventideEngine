@@ -3,8 +3,14 @@
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/EShaderProgram.h"
 
+// External Livsd
+#include <random>
+
+// Initialise a random generator
+std::default_random_engine RandGenerator;
+
 // DEBUG
-// object classes
+#include "Game/GameObjects/EPteraObject.h"
 
 EGameEngine* EGameEngine::GetGameEngine()
 {
@@ -37,10 +43,33 @@ void EGameEngine::DestroyObject(const TShared<EObject>& object)
 	m_objectsPendingDestroy.push_back(object);
 }
 
+TWeak<EModel> EGameEngine::ImportModel(const EString& path)
+{
+	return m_window->GetGraphicsEngine().lock()->ImportModel(path);
+}
+
+TShared<ESMaterial> EGameEngine::CreateMaterial()
+{
+	return m_window->GetGraphicsEngine().lock()->CreateMaterial();
+}
+
+TShared<ESMaterial> EGameEngine::CreateMaterialB(float brightness)
+{
+	return m_window->GetGraphicsEngine().lock()->CreateMaterialB(brightness);
+}
+
 EGameEngine::EGameEngine()
 {
 	m_lastTickTime = 0.0f;
 	m_deltaTime = 0.0f;
+
+	m_defaultFrameRate = 240;
+	m_frameRate = m_defaultFrameRate;
+
+	m_timeToLoad = 0.0f;
+
+	// Set random seed
+	RandGenerator.seed(time(0));
 	
 	EDebug::Log("Game engine created");
 }
@@ -95,7 +124,12 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	// CreateObject<EObjectChild>().lock()->SetLifeTime(5.0f);
+	// Spawn objects
+	for (int i = 0; i <= 10; i++)
+		CreateObject<EPteraObject>().lock()->SetLifeTime(20.0f);
+
+	// Get the time to load
+	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
 }
 
 void EGameEngine::GameLoop()
@@ -105,7 +139,7 @@ void EGameEngine::GameLoop()
 		// Create delta time
 		// Set the current tick time
 		// SDL_GetTicks64() gets the time since the engine started in milliseconds
-		double curTickTime = static_cast<double>(SDL_GetTicks64());
+		double curTickTime = static_cast<double>(SDL_GetTicks64()) - m_timeToLoad;
 		// Convert the tick time into delta milli
 		// How much time has passed since the last frame
 		double deltaMilli = curTickTime - m_lastTickTime;
@@ -113,6 +147,16 @@ void EGameEngine::GameLoop()
 		m_deltaTime = deltaMilli / 1000;
 		// Update the last tick time to the current tick time for the loop
 		m_lastTickTime = curTickTime;
+
+		// Caps the frame rate
+		int frameDuration = 1000 / m_frameRate;
+
+		if ((double)frameDuration > deltaMilli) {
+			frameDuration = int(deltaMilli);
+		}
+
+		// If the frame rate is greater than m_frameRate, delay the frame
+		SDL_Delay((EUi32)frameDuration);
 
 		// The order of these functions is important
 		// We must detect input, react with logic and then render based on logic
@@ -182,6 +226,9 @@ void EGameEngine::PreLoop()
 
 void EGameEngine::PostLoop()
 {
+	// Get model stack
+	TArray<TShared<EModel>>& eModelStack = m_window->GetGraphicsEngine().lock()->GetModels();
+	
 	// Loop through all objects pending destroy
 	// Remove their references from the object stack
 	for (const auto& eObjectRef : m_objectsPendingDestroy) {
@@ -190,10 +237,35 @@ void EGameEngine::PostLoop()
 		if (it == m_objectStack.end())
 			continue;
 		
-		
+		if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
+			// Get the model
+			TWeak<EModel>& eModel = eModelObjectRef->GetModel();
+			
+			// Find the model objects model
+			auto modelIt = std::find(eModelStack.begin(), eModelStack.end(), eModel.lock());
+			
+			// If it was found then erase it
+			if (modelIt != eModelStack.end())
+				eModelStack.erase(modelIt);
+		}
+
 		m_objectStack.erase(it);
 	}
 
 	// Make sure the clear the pending destroy array so no references remain
 	m_objectsPendingDestroy.clear();
+}
+
+float EGameEngine::GetRandomFloatRange(float min, float max) const
+{
+	std::uniform_real_distribution<float> RandNum(min, max);
+
+	return RandNum(RandGenerator);
+}
+
+float EGameEngine::GetRandomIntRange(int min, int max) const
+{
+	std::uniform_int_distribution<int> RandNum(min, max);
+
+	return RandNum(RandGenerator);
 }

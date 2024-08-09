@@ -23,6 +23,8 @@ const EUi32 maxPointLights = 20;
 EShaderProgram::EShaderProgram()
 {
 	m_programID = 0;
+	m_defaultTextureDepth = 1.0f;
+	m_textureDepth = m_defaultTextureDepth;
 }
 
 EShaderProgram::~EShaderProgram()
@@ -305,6 +307,26 @@ void EShaderProgram::SetBrightness(const float& brightness)
 	int varID = glGetUniformLocation(m_programID, "brightness");
 	// Update the shader
 	glUniform1f(varID, brightness);
+}
+
+void EShaderProgram::AdjustTextureDepth(float delta)
+{
+	// Find the variable in the shader
+	// All the uniform variables are given an ID by OpenGL
+	const int varID = glGetUniformLocation(m_programID, "textureDepth");
+	// Update the value
+	m_textureDepth += delta;
+	glUniform1f(varID, m_textureDepth);
+}
+
+void EShaderProgram::ResetTextureDepth()
+{
+	// Find the variable in the shader
+	// All the uniform variables are given an ID by OpenGL
+	const int varID = glGetUniformLocation(m_programID, "textureDepth");
+	// Update the value
+	m_textureDepth = m_defaultTextureDepth;
+	glUniform1f(varID, m_defaultTextureDepth);
 }
 
 bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType shaderType)
