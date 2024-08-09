@@ -100,7 +100,9 @@
   <ItemGroup>
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EModelObject.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\EMovingObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EPteraObject.cpp" />
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
@@ -117,7 +119,9 @@
     <ClInclude Include="Source\Public\Debug\EDebug.h" />
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EModelObject.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\EMovingObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EPteraObject.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />

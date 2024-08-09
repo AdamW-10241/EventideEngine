@@ -7,6 +7,7 @@ Added:
 -	ModelObject class can manipulate and use models
 -	Can delete models from modelStack when the ModelObject is deleted (EGameEngine PostLoop)
 -	ModelObjects can move in local space
+-	LightObjects with lights
 -	Framerate limits
 -	Random generator
 

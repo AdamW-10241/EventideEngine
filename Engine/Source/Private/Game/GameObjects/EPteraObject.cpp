@@ -76,7 +76,6 @@ void EPteraObject::OnTick(float deltaTime)
 
 		// Apply scale the the transform
 		m_transform.scale = glm::vec3(m_modelScale);
-		EDebug::Log(m_modelScale);
 	}
 	
 	// Rotate to the left

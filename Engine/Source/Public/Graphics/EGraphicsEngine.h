@@ -78,6 +78,9 @@ public:
 	// Get the models stack
 	TArray<TShared<EModel>>& GetModels() { return m_models; }
 
+	// Get the lights stack
+	TArray<TShared<ESLight>>& GetLights() { return m_lights; }
+
 private:
 	// Storing memory location for OpenGL context
 	SDL_GLContext m_sdlGLContext;

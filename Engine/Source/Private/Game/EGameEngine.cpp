@@ -11,6 +11,7 @@ std::default_random_engine RandGenerator;
 
 // DEBUG
 #include "Game/GameObjects/EPteraObject.h"
+#include "Game/GameObjects/ELightObject.h"
 
 EGameEngine* EGameEngine::GetGameEngine()
 {
@@ -128,6 +129,10 @@ void EGameEngine::Start()
 	for (int i = 0; i <= 10; i++)
 		CreateObject<EPteraObject>().lock()->SetLifeTime(20.0f);
 
+	TWeak<ELightObject> light = CreateObject<ELightObject>();
+	light.lock()->AddPointLight(glm::vec3(1.0f, 0.0f, 1.0f));
+	light.lock()->SetLifeTime(15.0f);
+
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
 }
@@ -226,8 +231,9 @@ void EGameEngine::PreLoop()
 
 void EGameEngine::PostLoop()
 {
-	// Get model stack
+	// Get stacks stack
 	TArray<TShared<EModel>>& eModelStack = m_window->GetGraphicsEngine().lock()->GetModels();
+	TArray<TShared<ESLight>>& eLightStack = m_window->GetGraphicsEngine().lock()->GetLights();
 	
 	// Loop through all objects pending destroy
 	// Remove their references from the object stack
@@ -240,7 +246,7 @@ void EGameEngine::PostLoop()
 		// Cleanup models from the model stack (otherwise they stay forever)
 		if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
 			// Get the model
-			TWeak<EModel>& eModel = eModelObjectRef->GetModel();
+			const auto& eModel = eModelObjectRef->GetModel();
 			
 			// Find the model objects model
 			auto modelIt = std::find(eModelStack.begin(), eModelStack.end(), eModel.lock());
@@ -248,6 +254,19 @@ void EGameEngine::PostLoop()
 			// If it was found then erase it
 			if (modelIt != eModelStack.end())
 				eModelStack.erase(modelIt);
+		}
+
+		// Cleanup lights from the lights stack (otherwise they stay forever)
+		if (const auto& eLightObjectRef = std::dynamic_pointer_cast<ELightObject>(eObjectRef)) {
+			// Get the model
+			const auto& eLight = eLightObjectRef->GetPointLight();
+
+			// Find the light objects light
+			auto lightIt = std::find(eLightStack.begin(), eLightStack.end(), eLight.lock());
+
+			// If it was found then erase it
+			if (lightIt != eLightStack.end())
+				eLightStack.erase(lightIt);
 		}
 
 		m_objectStack.erase(it);
