@@ -1,0 +1,16 @@
+Added:
+-	Shader texture normal maps
+-	Real-time brightness changing (EGameEngine)
+-	Material brightness setting
+-	Many models with normals
+-	ModelObject and PterosaurObject classes
+-	ModelObject class can manipulate and use models
+-	Can delete models from modelStack when the ModelObject is deleted (EGameEngine PostLoop)
+-	ModelObjects can move in local space
+-	Framerate limits
+-	Random generator
+
+-	KEYS 1-6:	Change background colour
+-	ARROW KEYS:	Adjust camera view
+-	LEFT SCROLL:	Adjust texture depth
+-	TAB:		Lower framerate to 10 fps

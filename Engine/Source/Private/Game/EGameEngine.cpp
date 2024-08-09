@@ -237,6 +237,7 @@ void EGameEngine::PostLoop()
 		if (it == m_objectStack.end())
 			continue;
 		
+		// Cleanup models from the model stack (otherwise they stay forever)
 		if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
 			// Get the model
 			TWeak<EModel>& eModel = eModelObjectRef->GetModel();
