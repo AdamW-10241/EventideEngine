@@ -63,6 +63,10 @@ public:
 	// Get a weak reference to the graphics engine
 	TWeak<EGraphicsEngine> GetGraphicsEngine() { return m_graphicsEngine; }
 
+public:
+	// Flag to randomly change brightness
+	bool m_randomlyChangeBrightness;
+
 private:
 	// A ref to the window in SDL
 	SDL_Window* m_sdlWindow;
@@ -93,7 +97,4 @@ private:
 
 	// Can adjust texture depth
 	bool m_canAdjustTextureDepth;
-
-	// Model direction
-	glm::vec3 m_modelDirection;
 };

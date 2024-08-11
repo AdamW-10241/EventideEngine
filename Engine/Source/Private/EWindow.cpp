@@ -4,6 +4,7 @@
 #include "Listeners/EInput.h"
 #include "Graphics/ESCamera.h"
 #include "Game/EGameEngine.h"
+#include "Graphics/EShaderProgram.h"
 
 // External Libs
 #include <SDL/SDL.h>
@@ -18,8 +19,8 @@ EWindow::EWindow()
 	m_canZoom = false;
 	m_inputMode = false;
 	m_doubleCameraSpeed = false;
+	m_randomlyChangeBrightness = false;
 
-	m_modelDirection = glm::vec3(0.0f);
 	m_canAdjustTextureDepth = false;
 
 	EDebug::Log("Window created.");
@@ -141,6 +142,10 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_TAB) {
 			EGameEngine::GetGameEngine()->SetFrameRate(10);
 		}
+		// Set flag to randomly change brightness
+		if (key == SDL_SCANCODE_LCTRL) {
+			m_randomlyChangeBrightness = true;
+		}
 
 		// Rotate camera up
 		if (key == SDL_SCANCODE_UP) {
@@ -193,6 +198,12 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		// Reset frame rate
 		if (key == SDL_SCANCODE_TAB) {
 			EGameEngine::GetGameEngine()->ResetFrameRate();
+		}
+		// Set flag to randomly change brightness
+		if (key == SDL_SCANCODE_LCTRL) {
+			m_randomlyChangeBrightness = false;
+			// Reset to default 1.0f
+			EGameEngine::GetGameEngine()->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(1.0f);
 		}
 		
 		// Rotate camera up

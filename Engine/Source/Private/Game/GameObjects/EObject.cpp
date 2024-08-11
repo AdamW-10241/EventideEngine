@@ -28,8 +28,8 @@ void EObject::Tick(float deltaTime)
 		m_lifeTimeTimer -= deltaTime;
 	}
 
-	// When the timer hits 0, destroy the object
-	if (m_lifeTimeTimer <= 0.0f) {
+	// When the timer hits less than 0, destroy the object
+	if (m_lifeTimeTimer < 0.0f) {
 		Destroy();
 	}
 }

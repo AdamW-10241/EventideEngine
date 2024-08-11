@@ -125,13 +125,53 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	// Spawn objects
+	// Spawn Ptera Objects
 	for (int i = 0; i <= 10; i++)
-		CreateObject<EPteraObject>().lock()->SetLifeTime(20.0f);
+		CreateObject<EPteraObject>();
 
-	TWeak<ELightObject> light = CreateObject<ELightObject>();
-	light.lock()->AddPointLight(glm::vec3(1.0f, 0.0f, 1.0f));
-	light.lock()->SetLifeTime(15.0f);
+	// Spawn Grid
+	TWeak<EModelObject> gridModel = CreateObject<EModelObject>();
+	gridModel.lock()->AddModel("Models/Grid/grid.fbx");
+	// Grid base color texture
+	TShared<ETexture> gridBaseTex = TMakeShared<ETexture>();
+	gridBaseTex->LoadTexture("Grid Base Colour", "Models/Remains/textures/Ground_baseColor.png");
+	TShared<ETexture> gridNormal = TMakeShared<ETexture>();
+	gridNormal->LoadTexture("Grid Base Colour", "Models/Remains/textures/Ground_normal.png");
+	// Grid material
+	TShared<ESMaterial> gridMat = CreateMaterial();
+	gridMat->m_baseColourMap = gridBaseTex;
+	gridMat->m_normalMap = gridNormal;
+	// Setting the grid material to the material slot
+	gridModel.lock()->GetModel().lock()->SetMaterialBySlot(0, gridMat);
+	// Adjust placement and size
+	gridModel.lock()->GetTransform().scale = glm::vec3(0.02f, 1.0f, 0.02f);
+	gridModel.lock()->GetTransform().position.y = -1.6f;
+
+	// Spawn grass at a random position on the floor grid based on the mesh
+	for (int i = 0; i < 10; i++) {
+		// Spawn Grass
+		TWeak<EModelObject> grassModel = CreateObject<EModelObject>();
+		grassModel.lock()->AddModel("Models/Grass/Grass_green.fbx");
+		// Grid base color texture
+		TShared<ETexture> grassBaseTex = TMakeShared<ETexture>();
+		grassBaseTex->LoadTexture("Grass Base Colour", "Models/Grass/textures/Grass_green.png");
+		TShared<ETexture> grassNormal = TMakeShared<ETexture>();
+		grassNormal->LoadTexture("Grass Normals", "Models/Grass/textures/Normal_grass.png");
+		// Grid material
+		TShared<ESMaterial> grassMat = CreateMaterial();
+		grassMat->m_baseColourMap = grassBaseTex;
+		grassMat->m_normalMap = grassNormal;
+		// Setting the grid material to the material slot
+		grassModel.lock()->GetModel().lock()->SetMaterialBySlot(0, grassMat);
+		// Adjust size
+		grassModel.lock()->GetTransform().scale = glm::vec3(0.01f);
+
+		// Get a random position on the model from its mesh and set a new object to that position
+		glm::vec3 randomPositionOnModel = gridModel.lock()->GetModel().lock()->GetMeshStack().at(0)->GetRandomVertexPosition();
+		grassModel.lock()->GetTransform().position = randomPositionOnModel;
+		// Adjust to height of grid
+		grassModel.lock()->GetTransform().position.y -= 1.6f;
+	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
@@ -196,7 +236,38 @@ void EGameEngine::Tick()
 		eObjectRef->PostTick(DeltaTimeF());
 	}
 
-	m_window->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(1.0f);
+	// Randomly change brightness if flag set (LEFT CTRL)
+	if (m_window->m_randomlyChangeBrightness) {
+		float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
+		m_window->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(randBrightness);
+	}
+
+	// Create random light after time
+	static float timeUntilNextLight = 0.0f;
+	timeUntilNextLight -= m_deltaTime;
+
+	if (timeUntilNextLight <= 0.0f) {
+		TWeak<ELightObject> light = CreateObject<ELightObject>();
+
+		// Get random values
+		glm::vec3 randColour = glm::vec3(
+			GetRandomFloatRange(0.0f, 1.0f),
+			GetRandomFloatRange(0.0f, 1.0f), 
+			GetRandomFloatRange(0.0f, 1.0f)
+		);
+		glm::vec3 randPosition = glm::vec3(
+			GetRandomFloatRange(-10.0f, 10.0f),
+			GetRandomFloatRange(-10.0f, 10.0f),
+			GetRandomFloatRange(-10.0f, 10.0f)
+		);
+		float randIntensity = GetRandomFloatRange(0.5, 2.0f);
+		float randLifeTime = GetRandomFloatRange(1.0f, 5.0f);
+		 
+		light.lock()->AddPointLight(randColour, randIntensity, randPosition);
+		light.lock()->SetLifeTime(randLifeTime);
+
+		timeUntilNextLight = GetRandomFloatRange(0.5f, 4.0f);
+	}
 }
 
 void EGameEngine::ProcessInput()

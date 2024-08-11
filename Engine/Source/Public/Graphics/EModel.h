@@ -38,6 +38,9 @@ public:
 	// Get the path of the model
 	EString GetPath() const { return m_path; }
 
+	// Get the models mesh stack
+	TArray<TUnique<EMesh>>& GetMeshStack() { return m_meshStack; }
+
 private:
 	// Find all of the meshes in a scene and convert them to an EMesh
 	bool FindAndImportMeshes(const aiNode& node, const aiScene& scene, 

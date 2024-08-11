@@ -127,7 +127,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Creating materials
 	TShared<ESMaterial> helmetMat1 = CreateMaterial();
-	helmetMat1->m_specularStrength = 10.0f;
+	helmetMat1->m_specularStrength = 1.0f;
 
 	TShared<ESMaterial> helmetMat2 = CreateMaterial();
 
@@ -143,29 +143,6 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Setting the material to slots in the model
 	m_modelHelmet.lock()->SetMaterialBySlot(0, helmetMat2);
 	m_modelHelmet.lock()->SetMaterialBySlot(1, helmetMat1);
-
-	// ----------- GRASS
-	TWeak<EModel> m_modelGrass = ImportModel("Models/Grass/Grass_green.fbx");
-	m_modelGrass.lock()->GetTransform().scale = glm::vec3(0.01f);
-	m_modelGrass.lock()->GetTransform().position.x -= 2.0f;
-
-	// Grass base colour
-	TShared<ETexture> grassTex1 = TMakeShared<ETexture>();
-	grassTex1->LoadTexture("Grass Base Colour", "Models/Grass/textures/Grass_green.png");
-
-	// Grass normal
-	TShared<ETexture> grassNormal1 = TMakeShared<ETexture>();
-	grassNormal1->LoadTexture("Grass Normals", "Models/Grass/textures/Normal_grass.png");
-
-	// Creating materials
-	TShared<ESMaterial> grassMat1 = CreateMaterial();
-
-	// Assigning the texture to the base colour map for the material
-	grassMat1->m_baseColourMap = grassTex1;
-	grassMat1->m_normalMap = grassNormal1;
-
-	// Setting the material to slots in the model
-	m_modelGrass.lock()->SetMaterialBySlot(0, grassMat1);
 
 	// --------- SKULL
 	TWeak<EModel> m_modelSkull = ImportModel("Models/Skull/scene.gltf");
@@ -284,7 +261,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 1.0f);
 		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
 		lightRef->ambient = glm::vec3(0.1f);
-		lightRef->intensity = 0.2f;
+		lightRef->intensity = 0.3f;
 	}
 
 	// Create the point light

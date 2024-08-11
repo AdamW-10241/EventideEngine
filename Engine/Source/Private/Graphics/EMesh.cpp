@@ -1,6 +1,7 @@
 #include "Graphics/EMesh.h"
 #include "Debug/EDebug.h"
 #include "Graphics/EShaderProgram.h"
+#include "Game/EGameEngine.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -212,8 +213,13 @@ const glm::vec3 EMesh::GetVertexPosition(unsigned int vertexIndex)
 
 const glm::vec3 EMesh::GetRandomVertexPosition()
 {
-	// GetNumberOfVertices()
-
-		// add in the rand thing
-	return glm::vec3(0.0f);
+	// Get the position of a random vertex in the mesh
+	int randomVertex = EGameEngine::GetGameEngine()->GetRandomIntRange(0, GetNumberOfVertices() - 1);
+	// Convert to vec3 and return the position
+	glm::vec3 position(
+		m_vertices[randomVertex].m_position[0],
+		m_vertices[randomVertex].m_position[2],
+		m_vertices[randomVertex].m_position[1]
+	);
+	return position;
 }

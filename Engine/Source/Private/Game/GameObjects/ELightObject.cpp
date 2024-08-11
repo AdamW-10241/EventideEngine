@@ -8,7 +8,9 @@ void ELightObject::AddPointLight(glm::vec3 colour, float intensity, glm::vec3 po
 {
 	// Create point 
 	m_pointLight = EGameEngine::GetGameEngine()->GetGraphicsEngine().lock()->CreatePointLight();
+	m_transform.position = position;
 
+	// Copy point light values
 	if (const auto& lightRef = m_pointLight.lock()) {
 		lightRef->colour = colour;
 		lightRef->intensity = intensity;
@@ -20,7 +22,10 @@ void ELightObject::AddPointLight(glm::vec3 colour, float intensity, glm::vec3 po
 
 void ELightObject::OnTick(float deltaTime)
 {
-	m_pointLight.lock()->position = m_transform.position + m_lightTransformOffset.position;
+	// Move light if light exists
+	if (m_pointLight.lock()) {
+		m_pointLight.lock()->position = m_transform.position + m_lightTransformOffset.position;
+	}
 
 	Super::OnTick(deltaTime);
 }

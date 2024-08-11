@@ -35,9 +35,11 @@ struct PointLight {
 
 #define NUM_DIR_LIGHTS 2
 uniform DirLight dirLights[NUM_DIR_LIGHTS];
+uniform int addedDirLights = 0;
 
 #define NUM_POINT_LIGHTS 20
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
+uniform int addedPointLights = 0;
 
 out vec4 finalColour;
 
@@ -69,7 +71,7 @@ void main() {
 	vec3 viewDir = normalize(fViewPos - fVertPos);
 
 	// ------------ DIRECTIONAL LIGHTS
-	for (int i = 0; i < NUM_DIR_LIGHTS; ++i) {
+	for (int i = 0; i < addedDirLights; ++i) {
 		// Material light direction
 		vec3 lightDir = normalize(-dirLights[i].direction);
 
@@ -100,7 +102,7 @@ void main() {
 	}
 
 	// ------------ POINT LIGHTS
-	for (int i = 0; i < NUM_POINT_LIGHTS; ++i) {
+	for (int i = 0; i < addedPointLights; ++i) {
 		// Light direction from the point light to the vertex
 		vec3 lightDir = normalize(pointLights[i].position - fVertPos);
 

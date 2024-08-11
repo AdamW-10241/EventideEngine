@@ -133,12 +133,17 @@ void EShaderProgram::SetWorldTransform(const TShared<ESCamera>& camera)
 
 void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 {	
+	// Set number of lights in the shader
+	// Max out to ensure lights can be added
+	SetNumberOfLights((int)maxDirLights, (int)maxPointLights);
+	
 	// Number of created lights
 	EUi32 dirLights = 0;
 	EUi32 pointLights = 0;
-	int varID = 0;
+
 	// Name of the variable array. Will set in the loop depending on light type
 	EString lightIndexStr = "";
+	int varID = 0;
 
 	// Loop through all of the lights and add them to the shader
 	for (EUi32 i = 0; i < lights.size(); ++i) {
@@ -242,6 +247,26 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 			continue;
 		}
 	}
+
+	// Cap the values so unused lights are not drawn to the shader
+	SetNumberOfLights((int)dirLights, (int)pointLights);
+}
+
+void EShaderProgram::SetNumberOfLights(const int& dirLights, const int& pointLights)
+{
+	int varID = 0;
+	
+	//  ---------- Set number of dir lights in shader
+	// Get the addedDirLight variable in the shader
+	varID = glGetUniformLocation(m_programID, "addedDirLights");
+	// Set the number of added Dir Lights
+	glUniform1i(varID, dirLights);
+
+	//  ---------- Set number of point lights in shader
+	// Get the addedPointLight variable in the shader
+	varID = glGetUniformLocation(m_programID, "addedPointLights");
+	// Set the number of added Point Lights
+	glUniform1i(varID, pointLights);
 }
 
 void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)

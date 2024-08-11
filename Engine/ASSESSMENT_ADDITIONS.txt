@@ -7,11 +7,20 @@ Added:
 -	ModelObject class can manipulate and use models
 -	Can delete models from modelStack when the ModelObject is deleted (EGameEngine PostLoop)
 -	ModelObjects can move in local space
--	LightObjects with lights
+-	PterosaurObjects spawn with random positions and speeds and can scale randomly based on spawn flag
 -	Framerate limits
--	Random generator
+-	Fixed issue where, due to load lag, massive delta would be processed on the first frame
+-	Random generatorm for int and float values
+- 	Shader uniforms to limit the number of drawn lights (lights were still being drawn if unset)
+-	Randomly generating light objects with random values
+-	Functions to get the position of a random vertex of a mesh as a vec3
+-	Randomly placed grass EModelObjects across a mesh based on random mesh vertex positions 
 
 -	KEYS 1-6:	Change background colour
 -	ARROW KEYS:	Adjust camera view
 -	LEFT SCROLL:	Adjust texture depth
--	TAB:		Lower framerate to 10 fps
+-	TAB:		Lower framerate to 10 fps 
+-	LEFT CTRL:	Randomly change brightness (SEIZURE WARNING)
+
+I wanted to add some more than this because I find this stuff really fun.
+I did not have as much time as I would like but I added some really cool stuff.

@@ -9,7 +9,7 @@ struct ESLight {
 		intensity = 0.0f;
 	}
 
-	virtual ~ESLight() = default;
+ 	virtual ~ESLight() = default;
 
 	glm::vec3 colour;
 	float intensity;
@@ -20,6 +20,8 @@ struct ESDirLight : public ESLight {
 		ambient = glm::vec3(0.0f);
 		direction = glm::vec3(0.0f);
 	}
+
+	~ESDirLight() = default;
 	
 	glm::vec3 ambient;
 	glm::vec3 direction;
@@ -32,6 +34,8 @@ struct ESPointLight : public ESLight {
 		linear = 0.045f;
 		quadratic = 0.0075f;
 	};
+
+	~ESPointLight() = default;
 	
 	glm::vec3 position;
 
