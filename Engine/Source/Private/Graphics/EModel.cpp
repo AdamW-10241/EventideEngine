@@ -11,7 +11,7 @@ EModel::~EModel()
 	EDebug::Log("Model destroyed: " + m_path);
 }
 
-void EModel::ImportModel(const EString& filePath)
+void EModel::ImportModel(const EString& filePath, const ESMaterial& defaultMaterial)
 {
 	// Create an ASSIMP model importer
 	Assimp::Importer importer;
@@ -52,6 +52,11 @@ void EModel::ImportModel(const EString& filePath)
 	// Set the material stack size to the amount of materials on the model
 	m_materialStack.resize(scene->mNumMaterials);
 
+	// Set all materials to the default material
+	for (auto& materialRef : m_materialStack) {
+		materialRef-> = defaultMaterial;
+	}
+
 	// Log the success of the model
 	EDebug::Log("Model successfully imported with (" + std::to_string(meshesCreated) + ") meshes: " + 
 		filePath, LT_SUCCESS);
@@ -62,9 +67,6 @@ void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<
 	for (const auto& mesh : m_meshStack) {
 		mesh->Render(shader, m_transform, lights, m_materialStack[mesh->materialIndex]);
 	}
-
-	// DEBUG
-	// EDebug::Log("Index " + toEString(m_spawnID) + " from: " + m_path);
 }
 
 void EModel::SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& material)

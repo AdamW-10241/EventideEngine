@@ -2,6 +2,7 @@
 #include "Game/GameObjects/EObject.h"
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/EShaderProgram.h"
+#include "Game/GameObjects/EWorldObject.h"
 
 // External Livsd
 #include <random>
@@ -10,6 +11,8 @@
 std::default_random_engine RandGenerator;
 
 // DEBUG
+#include "Game/GameObjects/CustomObjects/Helmet.h"
+
 #include "Game/GameObjects/EPteraObject.h"
 #include "Game/GameObjects/ELightObject.h"
 
@@ -46,17 +49,17 @@ void EGameEngine::DestroyObject(const TShared<EObject>& object)
 
 TWeak<EModel> EGameEngine::ImportModel(const EString& path)
 {
-	return m_window->GetGraphicsEngine().lock()->ImportModel(path);
+	return m_window->GetGraphicsEngine()->ImportModel(path);
 }
 
 TShared<ESMaterial> EGameEngine::CreateMaterial()
 {
-	return m_window->GetGraphicsEngine().lock()->CreateMaterial();
+	return m_window->GetGraphicsEngine()->CreateMaterial();
 }
 
 TShared<ESMaterial> EGameEngine::CreateMaterialB(float brightness)
 {
-	return m_window->GetGraphicsEngine().lock()->CreateMaterialB(brightness);
+	return m_window->GetGraphicsEngine()->CreateMaterialB(brightness);
 }
 
 EGameEngine::EGameEngine()
@@ -124,6 +127,8 @@ void EGameEngine::Start()
 {
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
+
+	CreateObject<Helmet>();
 
 	// Spawn Ptera Objects
 	for (int i = 0; i <= 10; i++)
@@ -239,7 +244,7 @@ void EGameEngine::Tick()
 	// Randomly change brightness if flag set (LEFT CTRL)
 	if (m_window->m_randomlyChangeBrightness) {
 		float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
-		m_window->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(randBrightness);
+		m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
 	}
 
 	// Create random light after time
@@ -303,8 +308,8 @@ void EGameEngine::PreLoop()
 void EGameEngine::PostLoop()
 {
 	// Get stacks stack
-	TArray<TShared<EModel>>& eModelStack = m_window->GetGraphicsEngine().lock()->GetModels();
-	TArray<TShared<ESLight>>& eLightStack = m_window->GetGraphicsEngine().lock()->GetLights();
+	TArray<TWeak<EModel>>& eModelStack = m_window->GetGraphicsEngine()->GetModels();
+	TArray<TShared<ESLight>>& eLightStack = m_window->GetGraphicsEngine()->GetLights();
 	
 	// Loop through all objects pending destroy
 	// Remove their references from the object stack
@@ -314,18 +319,18 @@ void EGameEngine::PostLoop()
 		if (it == m_objectStack.end())
 			continue;
 		
-		// Cleanup models from the model stack (otherwise they stay forever)
-		if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
-			// Get the model
-			const auto& eModel = eModelObjectRef->GetModel();
-			
-			// Find the model objects model
-			auto modelIt = std::find(eModelStack.begin(), eModelStack.end(), eModel.lock());
-			
-			// If it was found then erase it
-			if (modelIt != eModelStack.end())
-				eModelStack.erase(modelIt);
-		}
+		//// Cleanup models from the model stack (otherwise they stay forever)
+		//if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
+		//	// Get the model
+		//	const auto& eModel = eModelObjectRef->GetModel();
+		//	
+		//	// Find the model objects model
+		//	auto modelIt = std::find(eModelStack.begin(), eModelStack.end(), eModel.lock());
+		//	
+		//	// If it was found then erase it
+		//	if (modelIt != eModelStack.end())
+		//		eModelStack.erase(modelIt);
+		//}
 
 		// Cleanup lights from the lights stack (otherwise they stay forever)
 		if (const auto& eLightObjectRef = std::dynamic_pointer_cast<ELightObject>(eObjectRef)) {

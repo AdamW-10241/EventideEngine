@@ -55,7 +55,7 @@ public:
 	TWeak<ESDirLight> CreateDirLight();
 
 	// Import a model and return a weak pointer
-	TWeak<EModel> ImportModel(const EString& path);
+	TShared<EModel> ImportModel(const EString& path);
 
 	// Create a material for the engine
 	TShared<ESMaterial> CreateMaterial();
@@ -76,7 +76,7 @@ public:
 	void ResetTextureDepth();
 
 	// Get the models stack
-	TArray<TShared<EModel>>& GetModels() { return m_models; }
+	TArray<TWeak<EModel>>& GetModels() { return m_models; }
 
 	// Get the lights stack
 	TArray<TShared<ESLight>>& GetLights() { return m_lights; }
@@ -95,8 +95,11 @@ private:
 	TArray<TShared<ESLight>> m_lights;
 
 	// Stores all the models in the engine
-	TArray<TShared<EModel>> m_models;
+	TArray<TWeak<EModel>> m_models;
 
 	// Store the background color
 	EEBackgroundColor m_backgroundColor;
+
+	// Store a default material
+	TShared<ESMaterial> m_defaultMaterial;
 };

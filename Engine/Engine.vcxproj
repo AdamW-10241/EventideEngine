@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EModelObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EMovingObject.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
     <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Private\Listeners\EInput.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp" />
     <ClCompile Include="Source\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -119,11 +121,13 @@
     <ClInclude Include="Source\Public\Debug\EDebug.h" />
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EModelObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EMovingObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EPteraObject.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\EWorldObject.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
@@ -135,6 +139,8 @@
     <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Listeners\EInput.h" />
     <ClInclude Include="Source\Public\Listeners\EEvents.h" />
+    <ClInclude Include="Source\Public\Math\ESBox.h" />
+    <ClInclude Include="Source\Public\Math\ESCollision.h" />
     <ClInclude Include="Source\Public\Math\ESTransform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

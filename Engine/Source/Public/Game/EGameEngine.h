@@ -67,7 +67,7 @@ public:
 	TShared<ESMaterial> CreateMaterialB(float brightness);
 
 	// Get a reference to the graphics engine
-	TWeak<EGraphicsEngine> GetGraphicsEngine() { return m_window->GetGraphicsEngine(); }
+	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_window->GetGraphicsEngine(); }
 
 private:
 	// Constructor and destructor are private to ensure only 1 game engine

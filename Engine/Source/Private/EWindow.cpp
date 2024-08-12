@@ -75,7 +75,7 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 	}
 
 	// Create the graphics engine objects
-	m_graphicsEngine = TMakeShared<EGraphicsEngine>();
+	m_graphicsEngine = TMakeUnique<EGraphicsEngine>();
 
 	// Initialise the graphics engine and test if it failed
 	if (!m_graphicsEngine->InitEngine(m_sdlWindow, m_params.vsync)) {
@@ -203,7 +203,7 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_LCTRL) {
 			m_randomlyChangeBrightness = false;
 			// Reset to default 1.0f
-			EGameEngine::GetGameEngine()->GetGraphicsEngine().lock()->GetShader().lock()->SetBrightness(1.0f);
+			EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetShader().lock()->SetBrightness(1.0f);
 		}
 		
 		// Rotate camera up

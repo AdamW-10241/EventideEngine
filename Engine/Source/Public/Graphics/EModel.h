@@ -20,7 +20,7 @@ public:
 
 	// Import a 3D model from file
 	// Uses the ASSIMP import library, check docs to know which file types are accepted
-	void ImportModel(const EString& filePath);
+	void ImportModel(const EString& filePath, const ESMaterial& defaultMaterial);
 	
 	// Render all of the meshes within the model
 	// Transform of meshes will be based on models transform

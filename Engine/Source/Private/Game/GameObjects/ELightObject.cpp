@@ -7,7 +7,7 @@
 void ELightObject::AddPointLight(glm::vec3 colour, float intensity, glm::vec3 position, float linear, float quadratic)
 {
 	// Create point 
-	m_pointLight = EGameEngine::GetGameEngine()->GetGraphicsEngine().lock()->CreatePointLight();
+	m_pointLight = EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreatePointLight();
 	m_transform.position = position;
 
 	// Copy point light values

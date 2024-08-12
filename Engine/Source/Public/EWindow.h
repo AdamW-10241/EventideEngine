@@ -61,7 +61,7 @@ public:
 	void Render();
 
 	// Get a weak reference to the graphics engine
-	TWeak<EGraphicsEngine> GetGraphicsEngine() { return m_graphicsEngine; }
+	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_graphicsEngine; }
 
 public:
 	// Flag to randomly change brightness
@@ -78,7 +78,7 @@ private:
 	bool m_shouldClose;
 
 	// Store the graphics engine
-	TShared<EGraphicsEngine> m_graphicsEngine;
+	TUnique<EGraphicsEngine> m_graphicsEngine;
 
 	// Direction to move the camera
 	glm::vec3 m_cameraDirection;
