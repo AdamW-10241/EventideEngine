@@ -101,6 +101,7 @@
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EModelObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EMovingObject.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EModelObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EMovingObject.h" />

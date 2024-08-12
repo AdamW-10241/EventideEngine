@@ -10,6 +10,9 @@ struct ESBox {
 		halfSize = glm::vec3(0.0f);
 	}
 
+	ESBox(glm::vec3 position, glm::vec3 halfSize) :
+		position(position), halfSize(halfSize) {}
+
 	// Detect if two boxes are overlapping
 	static bool BoxOverlap(const ESBox& box1, const ESBox& box2) {
 		// Ensure that a zero size always returns false

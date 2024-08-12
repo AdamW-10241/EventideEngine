@@ -6,12 +6,19 @@
 #include <ASSIMP/postprocess.h>
 #include <ASSIMP/mesh.h>
 
+EModel::EModel(unsigned int spawnID, EString path)
+{
+	m_spawnID = spawnID;
+	m_path = path;
+	m_offset.scale = glm::vec3(0.0f);
+}
+
 EModel::~EModel()
 {
 	EDebug::Log("Model destroyed: " + m_path);
 }
 
-void EModel::ImportModel(const EString& filePath, const ESMaterial& defaultMaterial)
+void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& defaultMaterial)
 {
 	// Create an ASSIMP model importer
 	Assimp::Importer importer;
@@ -54,7 +61,7 @@ void EModel::ImportModel(const EString& filePath, const ESMaterial& defaultMater
 
 	// Set all materials to the default material
 	for (auto& materialRef : m_materialStack) {
-		materialRef-> = defaultMaterial;
+		materialRef = defaultMaterial;
 	}
 
 	// Log the success of the model
@@ -65,7 +72,7 @@ void EModel::ImportModel(const EString& filePath, const ESMaterial& defaultMater
 void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)
 {
 	for (const auto& mesh : m_meshStack) {
-		mesh->Render(shader, m_transform, lights, m_materialStack[mesh->materialIndex]);
+		mesh->Render(shader, m_transform + m_offset, lights, m_materialStack[mesh->materialIndex]);
 	}
 }
 

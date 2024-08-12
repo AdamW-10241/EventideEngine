@@ -8,8 +8,8 @@ struct ESCamera {
 		aspectRatio = 1.0f;
 		nearClip = 0.01f;
 		farClip = 10000.0f;
-		moveSpeed = 3.0f;
-		rotateSpeed = 70.0f;
+		moveSpeed = 50.0f;
+		rotateSpeed = 125.0f;
 		zoomSpeed = 3.0f;
 	}
 

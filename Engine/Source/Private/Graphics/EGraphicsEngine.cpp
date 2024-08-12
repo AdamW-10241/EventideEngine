@@ -216,7 +216,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	if (const auto& lightRef = dirLight.lock()) {
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 1.0f);
 		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
-		lightRef->ambient = glm::vec3(0.1f);
+		lightRef->ambient = glm::vec3(0.5f);
 		lightRef->intensity = 0.3f;
 	}
 
@@ -224,7 +224,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	const auto& pointLight = CreatePointLight();
 	if (const auto& lightRef = pointLight.lock()) {
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
-		lightRef->intensity = 0.3f;
+		lightRef->intensity = 1.0f;
 		lightRef->position.x = 0.0f;
 	}
 
@@ -240,10 +240,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// DEBUG Rotate model
-	// float rotationRate = 10.0f;
-	// m_models.at(0).lock()->GetTransform().rotation.y += EGameEngine::GetGameEngine()->DeltaTimeF() * rotationRate;
-
+	// DEBUG Rotate light
 	static float lightTimer = 0.0f;
 	const float timeToRotate = 1.0f;
 	lightTimer += EGameEngine::GetGameEngine()->DeltaTimeF();
@@ -303,7 +300,7 @@ TShared<EModel> EGraphicsEngine::ImportModel(const EString& path)
 
 	// Create model
 	const auto& newModel = TMakeShared<EModel>(spawnID, path);
-	newModel->ImportModel(path);
+	newModel->ImportModel(path, m_defaultMaterial);
 	m_models.push_back(newModel);
 	
 	return newModel;

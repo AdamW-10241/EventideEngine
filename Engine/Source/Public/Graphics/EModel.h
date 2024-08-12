@@ -15,12 +15,12 @@ struct ESMaterial;
 
 class EModel {
 public:
-	EModel(unsigned int spawnID, EString path) { m_spawnID = spawnID; m_path = path; }
+	EModel(unsigned int spawnID, EString path);
 	~EModel();
 
 	// Import a 3D model from file
 	// Uses the ASSIMP import library, check docs to know which file types are accepted
-	void ImportModel(const EString& filePath, const ESMaterial& defaultMaterial);
+	void ImportModel(const EString& filePath, const TShared<ESMaterial>& defaultMaterial);
 	
 	// Render all of the meshes within the model
 	// Transform of meshes will be based on models transform
@@ -40,6 +40,10 @@ public:
 
 	// Get the models mesh stack
 	TArray<TUnique<EMesh>>& GetMeshStack() { return m_meshStack; }
+
+public:
+	// Transform offset
+	ESTransform m_offset;
 
 private:
 	// Find all of the meshes in a scene and convert them to an EMesh
