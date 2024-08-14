@@ -13,6 +13,8 @@ std::default_random_engine RandGenerator;
 // DEBUG
 #include "Game/GameObjects/CustomObjects/Helmet.h"
 #include "Game/GameObjects/CustomObjects/Player.h"
+#include "Game/GameObjects/CustomObjects/Floor.h"
+#include "Game/GameObjects/CustomObjects/Grass.h"
 
 #include "Game/GameObjects/EPteraObject.h"
 #include "Game/GameObjects/ELightObject.h"
@@ -130,55 +132,18 @@ void EGameEngine::Start()
 	m_window->RegisterInput(m_input);
 
 	CreateObject<Helmet>().lock()->GetTransform().position.z += 50.0f;
+
+	// Spawn Player
 	CreateObject<Player>();
 
-	//// Spawn Ptera Objects
-	//for (int i = 0; i <= 10; i++)
-	//	CreateObject<EPteraObject>();
+	// Spawn Floor and get the floor model
+	TWeak<EModel> floorModel = CreateObject<Floor>().lock()->GetModels().at(0);
 
-	//// Spawn Grid
-	//TWeak<EModelObject> gridModel = CreateObject<EModelObject>();
-	//gridModel.lock()->AddModel("Models/Grid/grid.fbx");
-	//// Grid base color texture
-	//TShared<ETexture> gridBaseTex = TMakeShared<ETexture>();
-	//gridBaseTex->LoadTexture("Grid Base Colour", "Models/Remains/textures/Ground_baseColor.png");
-	//TShared<ETexture> gridNormal = TMakeShared<ETexture>();
-	//gridNormal->LoadTexture("Grid Base Colour", "Models/Remains/textures/Ground_normal.png");
-	//// Grid material
-	//TShared<ESMaterial> gridMat = CreateMaterial();
-	//gridMat->m_baseColourMap = gridBaseTex;
-	//gridMat->m_normalMap = gridNormal;
-	//// Setting the grid material to the material slot
-	//gridModel.lock()->GetModel().lock()->SetMaterialBySlot(0, gridMat);
-	//// Adjust placement and size
-	//gridModel.lock()->GetTransform().scale = glm::vec3(0.02f, 1.0f, 0.02f);
-	//gridModel.lock()->GetTransform().position.y = -1.6f;
-
-	//// Spawn grass at a random position on the floor grid based on the mesh
-	//for (int i = 0; i < 10; i++) {
-	//	// Spawn Grass
-	//	TWeak<EModelObject> grassModel = CreateObject<EModelObject>();
-	//	grassModel.lock()->AddModel("Models/Grass/Grass_green.fbx");
-	//	// Grid base color texture
-	//	TShared<ETexture> grassBaseTex = TMakeShared<ETexture>();
-	//	grassBaseTex->LoadTexture("Grass Base Colour", "Models/Grass/textures/Grass_green.png");
-	//	TShared<ETexture> grassNormal = TMakeShared<ETexture>();
-	//	grassNormal->LoadTexture("Grass Normals", "Models/Grass/textures/Normal_grass.png");
-	//	// Grid material
-	//	TShared<ESMaterial> grassMat = CreateMaterial();
-	//	grassMat->m_baseColourMap = grassBaseTex;
-	//	grassMat->m_normalMap = grassNormal;
-	//	// Setting the grid material to the material slot
-	//	grassModel.lock()->GetModel().lock()->SetMaterialBySlot(0, grassMat);
-	//	// Adjust size
-	//	grassModel.lock()->GetTransform().scale = glm::vec3(0.01f);
-
-	//	// Get a random position on the model from its mesh and set a new object to that position
-	//	glm::vec3 randomPositionOnModel = gridModel.lock()->GetModel().lock()->GetMeshStack().at(0)->GetRandomVertexPosition();
-	//	grassModel.lock()->GetTransform().position = randomPositionOnModel;
-	//	// Adjust to height of grid
-	//	grassModel.lock()->GetTransform().position.y -= 1.6f;
-	//}
+	// Spawn Grass on Floor Randomly
+	for (int i = 0; i < 10; i++) {
+		// Spawn Grass
+		CreateObject<Grass>(floorModel.lock());
+	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());

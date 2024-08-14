@@ -15,6 +15,9 @@ public:
 	// Import a model and return a weak reference
 	TWeak<EModel> ImportModel(const EString& path);
 
+	// Get the world objects models
+	TArray<TShared<EModel>> GetModels() const { return m_objectModels; }
+
 	// Add a collision to the object
 	TWeak<ESCollision> AddCollision(const ESBox& box, const bool& debug = false);
 
