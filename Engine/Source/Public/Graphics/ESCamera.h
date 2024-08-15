@@ -11,6 +11,7 @@ struct ESCamera {
 		moveSpeed = 50.0f;
 		rotateSpeed = 0.5f;
 		zoomSpeed = 3.0f;
+		lastMovement = glm::vec3(0.0f);
 	}
 
 	// Rotate the camera based on the passed rotation
@@ -44,8 +45,10 @@ struct ESCamera {
 			deltaTime = ge->DeltaTimeF();
 		}
 
+		lastMovement = direction * moveSpeed * deltaTime;
+
 		// Adjust position
-		transform.position += direction * moveSpeed * deltaTime;
+		transform.position += lastMovement;
 	};
 
 	// Zoom in the fov based on the amount added
@@ -73,4 +76,5 @@ struct ESCamera {
 	float moveSpeed;
 	float rotateSpeed;
 	float zoomSpeed;
+	glm::vec3 lastMovement;
 };

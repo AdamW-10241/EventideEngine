@@ -70,6 +70,22 @@ public:
 	// Get a reference to the graphics engine
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_window->GetGraphicsEngine(); }
 
+	// Find an object of type T from the object stack
+	template<typename T, std::enable_if_t<std::is_base_of_v<EObject, T>, T>* = nullptr>
+	TWeak<T> FindObjectOfType() {
+		// Find an object within the object stack=
+		for (const auto& eObjectRef : m_objectStack) {
+			if (const auto& cast = std::dynamic_pointer_cast<T>(eObjectRef)) {
+				// Match
+				return cast;
+			}
+				
+		}
+
+		// Else no match, return empty
+		return {};
+	}
+
 private:
 	// Constructor and destructor are private to ensure only 1 game engine
 	EGameEngine();

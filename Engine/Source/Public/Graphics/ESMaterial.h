@@ -27,4 +27,7 @@ struct ESMaterial {
 
 	// Brightness of the material
 	float m_brightness = 1.0f;
+
+	// Texture depth of the material
+	float m_textureDepth = 1.0f;
 };

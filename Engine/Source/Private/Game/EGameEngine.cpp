@@ -131,14 +131,19 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	TWeak<Helmet> helmet = CreateObject<Helmet>();
-	helmet.lock()->GetTransform().position = glm::vec3(0.0f, 0.0f, 25.0f);
-
-	// Spawn Floor
-	CreateObject<Floor>(20);
+	CreateObject<Helmet>().lock()->GetTransform().position = glm::vec3(0.0f, 10.0f, 25.0f);
 
 	// Spawn Player
-	CreateObject<Player>();
+	CreateObject<Player>().lock()->SetDefaultCamPosition({0.0f, 20.0f, 0.0f});
+
+	// Spawn Floor
+	CreateObject<Floor>();
+
+	// Spawn Grass
+	for (EUi32 i = 0; i < 20; i++) {
+		// Spawn grass
+		CreateObject<Grass>();
+	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
@@ -209,10 +214,15 @@ void EGameEngine::Tick()
 				for (const auto& otherObj : m_objectStack) {
 					// Test if the other object is also a world object
 					if (const auto& otherWoRef = std::dynamic_pointer_cast<EWorldObject>(otherObj)) {
+						// Skip colliding self
+						if (woRef == otherWoRef)
+							continue;
+
+						// Check if other ref has collisions
 						if (!otherWoRef->HasCollisions())
 							continue;
 
-						// If all is good test if collisions are overlapping
+						// If all is good then test if their collisions are overlapping
 						woRef->TestCollision(otherWoRef);
 					}
 				}
@@ -279,8 +289,7 @@ void EGameEngine::PreLoop()
 {
 	// Running through all objects to be spawned
 	// Run their start logic and add to game object stack
-	for (EUi32 i = 0; i < m_objectsToBeSpawned.size(); i++) {
-		TShared<EObject>& eObjectRef = m_objectsToBeSpawned[i];
+	for (auto& eObjectRef : m_objectsToBeSpawned) {
 		eObjectRef->Start();
 		m_objectStack.push_back(std::move(eObjectRef));
 	}

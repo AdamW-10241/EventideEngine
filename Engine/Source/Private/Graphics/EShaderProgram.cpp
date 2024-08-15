@@ -324,6 +324,12 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 	varID = glGetUniformLocation(m_programID, "material.brightness");
 	// Update the shader
 	glUniform1f(varID, material->m_brightness);
+
+	// --------- MATERIAL TEXTURE DEPTH
+	// Get the material texture depth ID
+	varID = glGetUniformLocation(m_programID, "materialTextureDepth");
+	// Update the shader
+	glUniform1f(varID, material->m_textureDepth);
 }
 
 void EShaderProgram::SetWireColour(const glm::vec3& colour)

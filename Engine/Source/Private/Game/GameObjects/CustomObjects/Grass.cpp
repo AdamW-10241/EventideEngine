@@ -1,8 +1,12 @@
 #include "Game/GameObjects/CustomObjects/Grass.h"
 #include "Graphics/EMesh.h"
+#include "Game/GameObjects/CustomObjects/Floor.h"
 
 void Grass::OnStart()
-{
+{	
+	// Adjust scale
+	GetTransform().scale = glm::vec3(0.2f);
+	
 	// Add model
 	auto model = ImportModel("Models/Grass/Grass_green.fbx");
 
@@ -22,13 +26,29 @@ void Grass::OnStart()
 
 	// Add materials to the model
 	model.lock()->SetMaterialBySlot(0, grassMat);
+	model.lock()->SetMaterialBySlot(1, grassMat);
+	model.lock()->SetMaterialBySlot(2, grassMat);
+	model.lock()->SetMaterialBySlot(3, grassMat);
+	model.lock()->SetMaterialBySlot(4, grassMat);
+	model.lock()->SetMaterialBySlot(5, grassMat);
+	model.lock()->SetMaterialBySlot(6, grassMat);
+	model.lock()->SetMaterialBySlot(7, grassMat);
+	model.lock()->SetMaterialBySlot(8, grassMat);
+	model.lock()->SetMaterialBySlot(9, grassMat);
+	model.lock()->SetMaterialBySlot(10, grassMat);
+	model.lock()->SetMaterialBySlot(11, grassMat);
+	model.lock()->SetMaterialBySlot(12, grassMat);
+	model.lock()->SetMaterialBySlot(13, grassMat);
 
-	// Adjust size
-	// model.lock()->GetTransform().scale = glm::vec3(1.0f);
+	// Place grass randomly on floor mesh
+	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
+		PlaceOnFloorRandomly(floor, 75.0f);
+	}
 }
 
-void Grass::PlaceOnMeshRandomly(TUnique<EMesh>& meshToPlaceOn)
+void Grass::PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale)
 {
 	// Set the position to a random vertex position on the mesh
-	GetTransform().position += meshToPlaceOn->GetRandomVertexPosition();
+	GetTransform().position = floor->GetTransform().position +
+		(floor->GetModel(0).lock()->GetMesh(0)->GetRandomVertexPosition() * placementScale);
 }
