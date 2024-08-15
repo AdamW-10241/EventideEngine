@@ -48,6 +48,9 @@ public:
 	// Set the material in the shader
 	void SetMaterial(const TShared<ESMaterial>& material);
 
+	// Only works for wireframe shader
+	void SetWireColour(const glm::vec3& colour);
+
 	// Set the brightness in the shader
 	void SetBrightness(const float& brightness = 1.0f);
 

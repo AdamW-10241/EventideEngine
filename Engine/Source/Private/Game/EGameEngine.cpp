@@ -131,19 +131,14 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	CreateObject<Helmet>().lock()->GetTransform().position.z += 50.0f;
+	TWeak<Helmet> helmet = CreateObject<Helmet>();
+	helmet.lock()->GetTransform().position = glm::vec3(0.0f, 0.0f, 25.0f);
+
+	// Spawn Floor
+	CreateObject<Floor>(20);
 
 	// Spawn Player
 	CreateObject<Player>();
-
-	// Spawn Floor and get the floor model
-	TWeak<EModel> floorModel = CreateObject<Floor>().lock()->GetModels().at(0);
-
-	// Spawn Grass on Floor Randomly
-	for (int i = 0; i < 10; i++) {
-		// Spawn Grass
-		CreateObject<Grass>(floorModel.lock());
-	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
@@ -284,7 +279,8 @@ void EGameEngine::PreLoop()
 {
 	// Running through all objects to be spawned
 	// Run their start logic and add to game object stack
-	for (auto& eObjectRef : m_objectsToBeSpawned) {
+	for (EUi32 i = 0; i < m_objectsToBeSpawned.size(); i++) {
+		TShared<EObject>& eObjectRef = m_objectsToBeSpawned[i];
 		eObjectRef->Start();
 		m_objectStack.push_back(std::move(eObjectRef));
 	}

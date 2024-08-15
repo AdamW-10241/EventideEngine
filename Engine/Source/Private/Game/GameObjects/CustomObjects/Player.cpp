@@ -4,11 +4,9 @@
 
 #define Super EWorldObject
 
-Player::Player() {}
-
 void Player::OnStart()
 {
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(10.0f) }).lock()) {
+	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f) }, false).lock()) {
 		colRef->type = EECollisionType::PLAYER;
 	}
 }

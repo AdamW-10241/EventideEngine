@@ -1,7 +1,5 @@
 #include "Game/GameObjects/CustomObjects/Grass.h"
-#include "Graphics/EModel.h"
-
-Grass::Grass(TWeak<EModel>& modelToPlaceOn) { PositionRandomlyOnMesh(modelToPlaceOn); }
+#include "Graphics/EMesh.h"
 
 void Grass::OnStart()
 {
@@ -29,9 +27,8 @@ void Grass::OnStart()
 	// model.lock()->GetTransform().scale = glm::vec3(1.0f);
 }
 
-void Grass::PositionRandomlyOnMesh(TWeak<EModel>& modelToPlaceOn)
+void Grass::PlaceOnMeshRandomly(TUnique<EMesh>& meshToPlaceOn)
 {
-	// Get a random position from the first mesh in the stack
-	glm::vec3 randomPositionOnModel = modelToPlaceOn.lock()->GetMeshStack().at(0)->GetRandomVertexPosition();
-	GetTransform().position = randomPositionOnModel;
+	// Set the position to a random vertex position on the mesh
+	GetTransform().position += meshToPlaceOn->GetRandomVertexPosition();
 }

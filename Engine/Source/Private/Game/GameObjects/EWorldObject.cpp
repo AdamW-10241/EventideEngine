@@ -21,7 +21,9 @@ TWeak<ESCollision> EWorldObject::AddCollision(const ESBox& box, const bool& debu
     // Set the position and size
     newCol->box = box;
 
-    // TODO: DEBUG COLLISION
+    // Add a debug collision mesh if debugging
+    if (debug)
+        EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreateCollisionMesh(newCol);
     
     // Add the collision the the array
     m_objectCollisions.push_back(newCol);
@@ -37,7 +39,7 @@ void EWorldObject::TestCollision(const TShared<EWorldObject>& other)
         for (const auto& otherCol : other->m_objectCollisions) {
             // Check for overlap between collisions
             if (ESCollision::IsOverlapping(*col, *otherCol)) {
-                OnOverlap(other, otherCol);
+                OnOverlap(other, col, otherCol);
             }
         }
     }

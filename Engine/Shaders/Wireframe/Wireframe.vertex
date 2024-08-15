@@ -1,0 +1,17 @@
+#version 460 core
+
+layout (location = 0) in vec3 vPosition;
+
+uniform mat4 mesh = mat4(1.0f);
+uniform mat4 model = mat4(1.0);
+uniform mat4 view = mat4(1.0);
+uniform mat4 projection = mat4(1.0);
+
+void main() {
+	// Combine the model and mesh to get the correct relative position from the model
+	mat4 relPos = model * mesh;
+
+	// gl_Position is the position of the vertex
+	// based on screen and then offset
+	gl_Position = projection * view * relPos * vec4(vPosition, 1.0);
+}

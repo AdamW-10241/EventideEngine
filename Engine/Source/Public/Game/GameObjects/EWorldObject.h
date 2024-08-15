@@ -15,8 +15,8 @@ public:
 	// Import a model and return a weak reference
 	TWeak<EModel> ImportModel(const EString& path);
 
-	// Get the world objects models
-	TArray<TShared<EModel>> GetModels() const { return m_objectModels; }
+	// Get the world objects model at an index
+	TWeak<EModel> GetModel(const int& index) const { return m_objectModels.at(index); }
 
 	// Add a collision to the object
 	TWeak<ESCollision> AddCollision(const ESBox& box, const bool& debug = false);
@@ -36,7 +36,8 @@ protected:
 	// On collision overlap
 	// Detect every frame a collision is overlapped
 	// Can add a flag for enter / exit
-	virtual void OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& otherCol) {}
+	virtual void OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, 
+		const TShared<ESCollision>& otherCol) {}
 
 private:
 	// Transform in world space

@@ -1,16 +1,38 @@
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/EModel.h"
+#include "Graphics/EMesh.h"
 #include "Graphics/EShaderProgram.h"
 #include "Math/ESTransform.h"
 #include "Graphics/ETexture.h"
 #include "Graphics/ESCamera.h"
 #include "Graphics/ESLight.h"
 #include "Game/EGameEngine.h"
+#include "Math/ESCollision.h"
 
 // External Libs
 #include <GLEW/glew.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
+
+// Collision cube vertices
+const std::vector<ESVertexData> colMeshVData = {
+//       x      y      z 
+	{ {	-1.0f, -1.0f,  1.0f } }, // bl f
+	{ {	 1.0f, -1.0f,  1.0f } }, // br f
+	{ {  1.0f,  1.0f,  1.0f } }, // tr f
+	{ { -1.0f,  1.0f,  1.0f } }, // tl f
+	{ {	-1.0f, -1.0f, -1.0f } }, // bl b
+	{ {	 1.0f, -1.0f, -1.0f } }, // br b
+	{ {  1.0f,  1.0f, -1.0f } }, // tr b
+	{ { -1.0f,  1.0f, -1.0f } }, // tl b
+};
+
+// Collision cube indices
+const std::vector<EUi32> colMeshIData = {
+	0, 1, 1, 2, 2, 3, 3, 0, // front
+	4, 5, 5, 6, 6, 7, 7, 4, // back
+	0, 4, 1, 5, 2, 6, 3, 7  // sides
+};
 
 EGraphicsEngine::EGraphicsEngine()
 {
@@ -70,13 +92,25 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Enable depth to be tested
 	glEnable(GL_DEPTH_TEST);
 
-	// Creater the shader objectss
+	// Create the shader object
 	m_shader = TMakeShared<EShaderProgram>();
 
 	// Attempt to init shader and test if failed
 	if (!m_shader->InitShader(
 		"Shaders/SimpleShader/SimpleShader.vertex",
 		"Shaders/SimpleShader/SimpleShader.frag"
+	)) {
+		EDebug::Log("Graphics engine failed to initialise due to shader failure.");
+		return false;
+	}
+
+	// Creater the wire shader object
+	m_wireShader = TMakeShared<EShaderProgram>();
+
+	// Attempt to init shader and test if failed
+	if (!m_wireShader->InitShader(
+		"Shaders/Wireframe/Wireframe.vertex",
+		"Shaders/Wireframe/Wireframe.frag"
 	)) {
 		EDebug::Log("Graphics engine failed to initialise due to shader failure.");
 		return false;
@@ -253,6 +287,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 		lightRef->position.z = cos(lightTimer / timeToRotate * 2 * PI) * 2.0f;
 	}
 
+	// ---------- NORMAL SHADER
 	// Activate shader
 	m_shader->Activate();
 
@@ -270,6 +305,36 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 		else {
 			// Erase from the array if there is no reference
 			m_models.erase(m_models.begin() + i);
+		}
+	}
+
+	// ---------- WIRE SHADER
+	if (m_collisions.size() > 0) {
+		// Activate shader
+		m_wireShader->Activate();
+
+		// Set the world transformations based on the camera
+		m_wireShader->SetWorldTransform(m_camera);
+
+		// Render custom graphics
+		for (int i = m_collisions.size() - 1; i >= 0; --i) {
+			// Detecting if the reference still exists
+			if (const auto& colRef = m_collisions[i].lock()) {
+				// Convert position of collision into transform'
+				ESTransform transform;
+				transform.position = colRef->box.position;
+				transform.scale = colRef->box.halfSize;
+
+				// Set the colour of the collision
+				m_wireShader->SetWireColour(colRef->debugColour);
+
+				// Render if there is a reference
+				colRef->debugMesh->WireRender(m_wireShader, transform);
+			}
+			else {
+				// Erase from the array if there is no reference
+				m_collisions.erase(m_collisions.begin() + i);
+			}
 		}
 	}
 
@@ -316,6 +381,22 @@ TShared<ESMaterial> EGraphicsEngine::CreateMaterialB(float brightness)
 	TShared<ESMaterial> material = CreateMaterial();
 	material->m_brightness = brightness;
 	return material;
+}
+
+void EGraphicsEngine::CreateCollisionMesh(const TWeak<ESCollision>& col)
+{
+	if (const auto& colRef = col.lock()) {
+		TShared<EMesh> newMesh = TMakeShared<EMesh>();
+
+		// Create a box of lines
+		newMesh->CreateMesh(colMeshVData, colMeshIData);
+
+		// Store the shared mesh into the collision
+		colRef->debugMesh = newMesh;
+
+		// Add the collision to the stack
+		m_collisions.push_back(col);
+	}
 }
 
 void EGraphicsEngine::AdjustTextureDepth(float delta)

@@ -3,12 +3,13 @@
 
 class Helmet : public EWorldObject {
 public:
-	Helmet();
+	Helmet() = default;
 
 protected:
 	virtual void OnStart() override;
 
 	virtual void OnTick(float deltaTime) override;
 
-	virtual void OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& otherCol) override;
+	virtual void OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, 
+		const TShared<ESCollision>& otherCol) override;
 };

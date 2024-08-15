@@ -326,6 +326,15 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 	glUniform1f(varID, material->m_brightness);
 }
 
+void EShaderProgram::SetWireColour(const glm::vec3& colour)
+{
+	// Get the wire colour variable from the shader
+	int varID = glGetUniformLocation(m_programID, "wireColour");
+
+	// Change the colour
+	glUniform3fv(varID, 1, glm::value_ptr(colour));
+}
+
 void EShaderProgram::SetBrightness(const float& brightness)
 {
 	// Get the brightness ID

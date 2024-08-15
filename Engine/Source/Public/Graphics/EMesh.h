@@ -45,8 +45,11 @@ public:
 		const std::vector<uint32_t>& indices);
 
 	// Draw the mesh to the renderer
-	void Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
+	void Render(const TShared<EShaderProgram>& shader, const ESTransform& transform,
 		const TArray<TShared<ESLight>>& lights, const TShared<ESMaterial>& material);
+
+	// Draw a wireframe of the mesh
+	void WireRender(const TShared<EShaderProgram>& shader, const ESTransform& transform);
 
 	// Set the transform of the mesh relative to the model
 	void SetRelativeTransform(const glm::mat4 &transform) { m_matTransform = transform; }

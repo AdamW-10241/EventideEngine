@@ -39,7 +39,7 @@ public:
 	EString GetPath() const { return m_path; }
 
 	// Get the models mesh stack
-	TArray<TUnique<EMesh>>& GetMeshStack() { return m_meshStack; }
+	TUnique<EMesh>& GetMesh(const int& index) { return m_meshStack.at(index); }
 
 public:
 	// Transform offset

@@ -7,6 +7,7 @@ struct SDL_Window;
 class EShaderProgram;
 struct ESCamera;
 class EModel;
+struct ESCollision;
 struct ESLight;
 struct ESPointLight;
 struct ESDirLight;
@@ -63,6 +64,9 @@ public:
 	// Create a material for the engine
 	TShared<ESMaterial> CreateMaterialB(float brightness);
 
+	// Creates a collision mesh to be rendered as a wireframe
+	void CreateCollisionMesh(const TWeak<ESCollision>& col);
+
 	// Get a weak reference to the shader
 	TWeak<EShaderProgram> GetShader() { return m_shader; }
 
@@ -88,6 +92,9 @@ private:
 	// Store the shader for the engine
 	TShared<EShaderProgram> m_shader;
 
+	// Store the wireframe shader for the engine
+	TShared<EShaderProgram> m_wireShader;
+
 	// Store the camera
 	TShared<ESCamera> m_camera;
 
@@ -96,6 +103,9 @@ private:
 
 	// Stores all the models in the engine
 	TArray<TWeak<EModel>> m_models;
+
+	// Stores all of the collision meshes
+	TArray<TWeak<ESCollision>> m_collisions;
 
 	// Store the background color
 	EEBackgroundColor m_backgroundColor;

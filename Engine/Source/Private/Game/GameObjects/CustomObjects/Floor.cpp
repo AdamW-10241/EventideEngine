@@ -1,6 +1,17 @@
 #include "Game/GameObjects/CustomObjects/Floor.h"
+#include "Game/GameObjects/CustomObjects/Grass.h"
 
-Floor::Floor() {}
+void Floor::SpawnGrass()
+{
+	// Loop
+	for (EUi32 i = 0; i < m_grassToSpawn; i++) {
+		// Spawn grass
+		if (const auto& grass = EGameEngine::GetGameEngine()->CreateObject<Grass>().lock()) {
+			// Place on floor randomly
+			grass->PlaceOnMeshRandomly(GetModel(0).lock()->GetMesh(0));
+		}
+	}
+}
 
 void Floor::OnStart()
 {
@@ -29,4 +40,7 @@ void Floor::OnStart()
 
 	// Add collision
 	AddCollision({ GetTransform().position, GetTransform().scale / 2.0f });
+
+	// Spawn grass
+	SpawnGrass();
 }

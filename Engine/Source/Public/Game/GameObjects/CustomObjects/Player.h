@@ -3,7 +3,7 @@
 
 class Player : public EWorldObject {
 public:
-	Player();
+	Player() = default;
 
 protected:
 	virtual void OnStart() override;

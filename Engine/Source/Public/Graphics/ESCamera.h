@@ -9,18 +9,16 @@ struct ESCamera {
 		nearClip = 0.01f;
 		farClip = 10000.0f;
 		moveSpeed = 50.0f;
-		rotateSpeed = 125.0f;
+		rotateSpeed = 0.5f;
 		zoomSpeed = 3.0f;
 	}
 
 	// Rotate the camera based on the passed rotation
 	void Rotate(glm::vec3 rotation, glm::vec3 scale = glm::vec3(1.0f)) {
+		// Adjust rotation
+		transform.rotation += rotation * scale * rotateSpeed;
 
-		if (glm::length(rotation) != 0.0f)
-			rotation = glm::normalize(rotation);
-
-		transform.rotation += rotation * scale * rotateSpeed * EGameEngine::GetGameEngine()->DeltaTimeF();
-
+		// Cap rotation range
 		if (transform.rotation.x < -89.0f)
 			transform.rotation.x = -89.0f;
 
@@ -38,7 +36,16 @@ struct ESCamera {
 		if (glm::length(moveDir) != 0.0f)
 			moveDir = glm::normalize(moveDir);
 
-		transform.position += moveDir * scale * moveSpeed * EGameEngine::GetGameEngine()->DeltaTimeF();
+		glm::vec3 direction = moveDir * scale;
+
+		// Get delta time
+		float deltaTime = 1.0f;
+		if (const auto& ge = EGameEngine::GetGameEngine()) {
+			deltaTime = ge->DeltaTimeF();
+		}
+
+		// Adjust position
+		transform.position += direction * moveSpeed * deltaTime;
 	};
 
 	// Zoom in the fov based on the amount added

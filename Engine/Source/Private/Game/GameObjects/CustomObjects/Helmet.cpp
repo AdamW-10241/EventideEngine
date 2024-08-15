@@ -1,13 +1,8 @@
 #include "Game/GameObjects/CustomObjects/Helmet.h"
 #include "Graphics/EModel.h"
 
-Helmet::Helmet() {}
-
 void Helmet::OnStart()
 {
-	// Adjust scale
-	GetTransform().rotation.y = 90.0f;
-
 	// Add model
 	auto model = ImportModel("Models/Helmet/Helmet3.fbx");
 
@@ -50,7 +45,7 @@ void Helmet::OnStart()
 	model.lock()->SetMaterialBySlot(1, faceMat);
 
 	// Add collision
-	AddCollision({ GetTransform().position, glm::vec3(5.0f) });
+	AddCollision({ GetTransform().position, glm::vec3(7.0f) }, true);
 }
 
 void Helmet::OnTick(float deltaTime)
@@ -60,9 +55,9 @@ void Helmet::OnTick(float deltaTime)
 	GetTransform().rotation.y += deltaTime * rotationSpeed;
 }
 
-void Helmet::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& otherCol)
+void Helmet::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, const TShared<ESCollision>& otherCol)
 {
 	if (otherCol->type == EECollisionType::PLAYER) {
-		Destroy();
+		col->debugColour = glm::vec3(1.0f, 0.0f, 0.0f);
 	}
 }

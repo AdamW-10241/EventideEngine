@@ -175,7 +175,30 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	return true;
 }
 
-void EMesh::Render(const std::shared_ptr<EShaderProgram>& shader, const ESTransform& transform, 
+void EMesh::WireRender(const TShared<EShaderProgram>& shader, const ESTransform& transform)
+{
+	// Update the transform of the mesh based on the model transform
+	shader->SetModelTransform(transform);
+
+	// Set the relative transform for the mesh in the shader
+	shader->SetMeshTransform(m_matTransform);
+
+	// Binding this mesh as the active VAO
+	glBindVertexArray(m_vao);
+
+	// Render the VAO
+	glDrawElements(
+		GL_LINE_LOOP, // Draw the mesh as lines
+		static_cast<GLsizei>(m_indices.size()), // How many vertices are there
+		GL_UNSIGNED_INT, // What type of data is the index array
+		nullptr // How many vertices are skipped
+	);
+
+	// Clear the VAO
+	glBindVertexArray(0);
+}
+
+void EMesh::Render(const TShared<EShaderProgram>& shader, const ESTransform& transform,
 	const TArray<TShared<ESLight>>& lights, const TShared<ESMaterial>& material)
 {
 	// Update the material in the shader
