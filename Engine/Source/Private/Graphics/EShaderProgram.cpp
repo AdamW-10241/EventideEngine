@@ -17,6 +17,7 @@
 // Constant value for light amounts
 const EUi32 maxDirLights = 2;
 const EUi32 maxPointLights = 20;
+const EUi32 maxSpotLights = 20;
 
 #define EGET_GLEW_ERROR reinterpret_cast<const char*>(glewGetErrorString(glGetError()))
 
@@ -135,11 +136,12 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 {	
 	// Set number of lights in the shader
 	// Max out to ensure lights can be added
-	SetNumberOfLights((int)maxDirLights, (int)maxPointLights);
+	SetNumberOfLights((int)maxDirLights, (int)maxPointLights, (int)maxSpotLights);
 	
 	// Number of created lights
 	EUi32 dirLights = 0;
 	EUi32 pointLights = 0;
+	EUi32 spotLights = 0;
 
 	// Name of the variable array. Will set in the loop depending on light type
 	EString lightIndexStr = "";
@@ -193,6 +195,7 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 			continue;
 		}
 
+		// ----------- POINT LIGHTS
 		if (const auto& lightRef = std::dynamic_pointer_cast<ESPointLight>(lights[i])) {
 			// Ensure only max lights
 			if (pointLights >= maxPointLights) {
@@ -246,13 +249,76 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 			++pointLights;
 			continue;
 		}
+
+		// ----------- SPOT LIGHTS
+		if (const auto& lightRef = std::dynamic_pointer_cast<ESSpotLight>(lights[i])) {
+			// Ensure only max lights
+			if (spotLights >= maxSpotLights) {
+				continue;
+			}
+
+			// Add a spot light and use as index
+			lightIndexStr = "spotLights[" + std::to_string(spotLights) + "]";
+
+			// --------- COLOR
+			// Get the colour variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".colour").c_str());
+
+			// Change the colour
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->colour));
+
+			// --------- POSITION
+			// Get the position variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".position").c_str());
+
+			// Change the position
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->position));
+
+			// --------- DIRECTION
+			// Get the direction variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".direction").c_str());
+
+			// Change the direction
+			glUniform3fv(varID, 1, glm::value_ptr(lightRef->direction));
+
+			// --------- INTENSITY
+			// Get the intensity variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".intensity").c_str());
+
+			// Change the intensity
+			glUniform1f(varID, lightRef->intensity);
+
+			// --------- LINEAR ATTENUATION
+			// Get the linear variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".linear").c_str());
+
+			// Change the linear attenuation
+			glUniform1f(varID, lightRef->linear);
+
+			// --------- QUADRATIC ATTENUATION
+			// Get the quadratic variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".quadratic").c_str());
+
+			// Change the quadratic attenuation
+			glUniform1f(varID, lightRef->quadratic);
+
+			// Increment the number of spotLights
+			++spotLights;
+			continue;
+		}
 	}
 
 	// Cap the values so unused lights are not drawn to the shader
-	SetNumberOfLights((int)dirLights, (int)pointLights);
+	SetNumberOfLights((int)dirLights, (int)pointLights, (int)spotLights);
 }
 
-void EShaderProgram::SetNumberOfLights(const int& dirLights, const int& pointLights)
+void EShaderProgram::SetNumberOfLights(const int& dirLights, const int& pointLights, const int& spotLights)
 {
 	int varID = 0;
 	
@@ -267,6 +333,12 @@ void EShaderProgram::SetNumberOfLights(const int& dirLights, const int& pointLig
 	varID = glGetUniformLocation(m_programID, "addedPointLights");
 	// Set the number of added Point Lights
 	glUniform1i(varID, pointLights);
+
+	//  ---------- Set number of spot lights in shader
+	// Get the addedSpotLight variable in the shader
+	varID = glGetUniformLocation(m_programID, "addedSpotLights");
+	// Set the number of added Spot Lights
+	glUniform1i(varID, spotLights);
 }
 
 void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)

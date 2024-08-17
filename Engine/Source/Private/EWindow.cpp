@@ -301,20 +301,22 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	});
 }
 
+void EWindow::MoveCamera()
+{
+	// Test if there is a camera
+	if (const auto& camRef = GetGraphicsEngine()->GetCamera().lock()) {
+		if (!m_inputMode) {
+			// Translate the camera based on input direction
+			camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
+			// Rotate the camera based on input direction
+			camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
+		}
+	}
+}
+
 void EWindow::Render()
 {
 	// Render the graphics engine if exists
-	if (m_graphicsEngine) {
-		// Test if there is a camera
-		if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-			if (!m_inputMode) {
-				// Translate the camera based on input direction
-				camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
-				// Rotate the camera based on input direction
-				camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
-			}
-		}
-
+	if (m_graphicsEngine)
 		m_graphicsEngine->Render(m_sdlWindow);
-	}
 }

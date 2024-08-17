@@ -57,6 +57,9 @@ public:
 	// Listen for input
 	void RegisterInput(const TShared<EInput>& m_input);
 
+	// Move Camera
+	void MoveCamera();
+
 	// Render the graphics engine to the window
 	void Render();
 

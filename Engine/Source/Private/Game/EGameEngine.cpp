@@ -15,8 +15,9 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Player.h"
 #include "Game/GameObjects/CustomObjects/Floor.h"
 #include "Game/GameObjects/CustomObjects/Grass.h"
+#include "Game/GameObjects/CustomObjects/Weapon.h"
+#include "Game/GameObjects/CustomObjects/Bullet.h"
 
-#include "Game/GameObjects/EPteraObject.h"
 #include "Game/GameObjects/ELightObject.h"
 
 EGameEngine* EGameEngine::GetGameEngine()
@@ -134,7 +135,15 @@ void EGameEngine::Start()
 	CreateObject<Helmet>().lock()->GetTransform().position = glm::vec3(0.0f, 10.0f, 25.0f);
 
 	// Spawn Player
-	CreateObject<Player>().lock()->SetDefaultCamPosition({0.0f, 20.0f, 0.0f});
+	if (const auto& player = CreateObject<Player>().lock()) {
+		// Set default camera position
+		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
+
+		// Add weapon
+		if (TShared<Weapon> weapon = CreateObject<Weapon>(1.0f, 0.1f, 0.2f, false).lock()) {
+			player->AddWeapon(weapon);
+		}
+	}
 
 	// Spawn Floor
 	CreateObject<Floor>();
@@ -202,6 +211,10 @@ void EGameEngine::Cleanup()
 
 void EGameEngine::Tick()
 {
+	// Move Camera
+	if (m_window)
+		m_window->MoveCamera();
+
 	// Run through all EObjects in the game and run their ticks
 	for (const auto& eObjectRef : m_objectStack) {
 		eObjectRef->Tick(DeltaTimeF());
@@ -234,37 +247,10 @@ void EGameEngine::Tick()
 
 	// ----------- TEST CODE
 	// Randomly change brightness if flag set (LEFT CTRL)
-	if (m_window->m_randomlyChangeBrightness) {
-		float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
-		m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
-	}
-
-	// Create random light after time
-	static float timeUntilNextLight = 0.0f;
-	timeUntilNextLight -= m_deltaTime;
-
-	if (timeUntilNextLight <= 0.0f) {
-		TWeak<ELightObject> light = CreateObject<ELightObject>();
-
-		// Get random values
-		glm::vec3 randColour = glm::vec3(
-			GetRandomFloatRange(0.0f, 1.0f),
-			GetRandomFloatRange(0.0f, 1.0f), 
-			GetRandomFloatRange(0.0f, 1.0f)
-		);
-		glm::vec3 randPosition = glm::vec3(
-			GetRandomFloatRange(-10.0f, 10.0f),
-			GetRandomFloatRange(-10.0f, 10.0f),
-			GetRandomFloatRange(-10.0f, 10.0f)
-		);
-		float randIntensity = GetRandomFloatRange(0.5, 2.0f);
-		float randLifeTime = GetRandomFloatRange(1.0f, 5.0f);
-		 
-		light.lock()->AddPointLight(randColour, randIntensity, randPosition);
-		light.lock()->SetLifeTime(randLifeTime);
-
-		timeUntilNextLight = GetRandomFloatRange(0.5f, 4.0f);
-	}
+	//if (m_window->m_randomlyChangeBrightness) {
+	//	float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
+	//	m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
+	//}
 }
 
 void EGameEngine::ProcessInput()
@@ -310,19 +296,6 @@ void EGameEngine::PostLoop()
 
 		if (it == m_objectStack.end())
 			continue;
-		
-		//// Cleanup models from the model stack (otherwise they stay forever)
-		//if (const auto& eModelObjectRef = std::dynamic_pointer_cast<EModelObject>(eObjectRef)) {
-		//	// Get the model
-		//	const auto& eModel = eModelObjectRef->GetModel();
-		//	
-		//	// Find the model objects model
-		//	auto modelIt = std::find(eModelStack.begin(), eModelStack.end(), eModel.lock());
-		//	
-		//	// If it was found then erase it
-		//	if (modelIt != eModelStack.end())
-		//		eModelStack.erase(modelIt);
-		//}
 
 		// Cleanup lights from the lights stack (otherwise they stay forever)
 		if (const auto& eLightObjectRef = std::dynamic_pointer_cast<ELightObject>(eObjectRef)) {
@@ -351,7 +324,7 @@ float EGameEngine::GetRandomFloatRange(float min, float max) const
 	return RandNum(RandGenerator);
 }
 
-float EGameEngine::GetRandomIntRange(int min, int max) const
+int EGameEngine::GetRandomIntRange(int min, int max) const
 {
 	std::uniform_int_distribution<int> RandNum(min, max);
 

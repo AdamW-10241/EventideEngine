@@ -8,9 +8,11 @@ class EShaderProgram;
 struct ESCamera;
 class EModel;
 struct ESCollision;
+
 struct ESLight;
 struct ESPointLight;
 struct ESDirLight;
+struct ESSpotLight;
 
 enum EEBackgroundColor : EUi8 {
 	BC_DEFAULT = 0U,
@@ -54,6 +56,9 @@ public:
 
 	// Create a directional light and return a weak pointer
 	TWeak<ESDirLight> CreateDirLight();
+
+	// Create a spot light and return a weak pointer
+	TWeak<ESSpotLight> CreateSpotLight();
 
 	// Import a model and return a weak pointer
 	TShared<EModel> ImportModel(const EString& path);

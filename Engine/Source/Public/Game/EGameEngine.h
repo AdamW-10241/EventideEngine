@@ -50,7 +50,7 @@ public:
 	float GetRandomFloatRange(float min = 0.0f, float max = 1.0f) const;
 
 	// Get a random int value between 2 ints
-	float GetRandomIntRange(int min = 0, int max = 1) const;
+	int GetRandomIntRange(int min = 0, int max = 1) const;
 
 	// Set the frame rate
 	void SetFrameRate(unsigned int frameRate) { m_frameRate = frameRate; }

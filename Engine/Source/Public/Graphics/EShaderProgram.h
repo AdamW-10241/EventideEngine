@@ -43,7 +43,7 @@ public:
 	void SetLights(const TArray<TShared<ESLight>>& lights);
 
 	// Set the number of lights in the shader
-	void SetNumberOfLights(const int& dirLights, const int& pointLights);
+	void SetNumberOfLights(const int& dirLights, const int& pointLights, const int& spotLights);
 
 	// Set the material in the shader
 	void SetMaterial(const TShared<ESMaterial>& material);

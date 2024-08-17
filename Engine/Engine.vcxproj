@@ -100,15 +100,14 @@
   <ItemGroup>
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Bullet.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Floor.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Grass.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Weapon.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
-    <ClCompile Include="Source\Private\Game\GameObjects\EModelObject.cpp" />
-    <ClCompile Include="Source\Private\Game\GameObjects\EMovingObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EObject.cpp" />
-    <ClCompile Include="Source\Private\Game\GameObjects\EPteraObject.cpp" />
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
@@ -124,15 +123,14 @@
     <ClInclude Include="Source\Public\Debug\EDebug.h" />
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Bullet.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Floor.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Grass.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Weapon.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
-    <ClInclude Include="Source\Public\Game\GameObjects\EModelObject.h" />
-    <ClInclude Include="Source\Public\Game\GameObjects\EMovingObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
-    <ClInclude Include="Source\Public\Game\GameObjects\EPteraObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EWorldObject.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />

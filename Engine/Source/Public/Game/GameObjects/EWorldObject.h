@@ -27,6 +27,12 @@ public:
 	// Run a test to see if another object is overlapping
 	void TestCollision(const TShared<EWorldObject>& other);
 
+	// Rotate locally based on rotation
+	void Rotate(float deltaTime, glm::vec3 rotation, glm::vec3 scale = glm::vec3(1.0f));
+
+	// Translate locally based on translation
+	void TranslateLocal(float deltaTime, glm::vec3 translation, glm::vec3 scale = glm::vec3(1.0f));
+
 	// Does the object have collisions
 	bool HasCollisions() const { return m_objectCollisions.size() > 0; }
 

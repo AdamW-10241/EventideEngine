@@ -18,7 +18,15 @@ struct ESCollision {
 		debugColour = glm::vec3(0.0f, 1.0f, 0.0f);
 		type = EECollisionType::ALL;
 		tag = "";
-	} 
+	}
+
+	ESCollision(const ESBox& newBox) {
+		box.position = newBox.position;
+		box.halfSize = newBox.halfSize;
+		debugColour = glm::vec3(0.0f, 1.0f, 0.0f);
+		type = EECollisionType::ALL;
+		tag = "";
+	}
 
 	// Determine if two collisions are overlapping
 	static bool IsOverlapping(const ESCollision& col1, const ESCollision& col2) {

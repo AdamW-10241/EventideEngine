@@ -16,10 +16,8 @@ TWeak<EModel> EWorldObject::ImportModel(const EString& path)
 
 TWeak<ESCollision> EWorldObject::AddCollision(const ESBox& box, const bool& debug)
 {
-    // Create the collision
-    const TShared<ESCollision>& newCol = TMakeShared<ESCollision>();
-    // Set the position and size
-    newCol->box = box;
+    // Create the collisionm, also set the position and size
+    const TShared<ESCollision>& newCol = TMakeShared<ESCollision>(box);
 
     // Add a debug collision mesh if debugging
     if (debug)
@@ -27,6 +25,7 @@ TWeak<ESCollision> EWorldObject::AddCollision(const ESBox& box, const bool& debu
     
     // Add the collision the the array
     m_objectCollisions.push_back(newCol);
+
     // Return a weak version
     return newCol;
 }
@@ -43,6 +42,30 @@ void EWorldObject::TestCollision(const TShared<EWorldObject>& other)
             }
         }
     }
+}
+
+void EWorldObject::Rotate(float deltaTime, glm::vec3 rotation, glm::vec3 scale)
+{
+    GetTransform().rotation += rotation * scale * deltaTime;
+
+    if (m_transform.rotation.x < -89.0f)
+        m_transform.rotation.x = -89.0f;
+
+    if (m_transform.rotation.x > 89.0f)
+        m_transform.rotation.x = 89.0f;
+}
+
+void EWorldObject::TranslateLocal(float deltaTime, glm::vec3 translation, glm::vec3 scale)
+{
+    // Move the input direction forward if required
+    glm::vec3 moveDir = m_transform.Forward() * translation.z;
+    moveDir += m_transform.Right() * translation.x;
+    moveDir.y += translation.y;
+
+    if (glm::length(moveDir) != 0.0f)
+        moveDir = glm::normalize(moveDir);
+
+    m_transform.position += moveDir * scale * deltaTime;
 }
 
 void EWorldObject::OnPostTick(float deltaTime)

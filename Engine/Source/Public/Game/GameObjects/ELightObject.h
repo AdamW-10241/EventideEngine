@@ -1,8 +1,8 @@
 #pragma once
-#include "Game/GameObjects/EMovingObject.h"
+#include "Game/GameObjects/EWorldObject.h"
 #include "Graphics/ESLight.h"
 
-class ELightObject : public EMovingObject {
+class ELightObject : public EWorldObject {
 public:
 	ELightObject() = default;
 	~ELightObject() = default;

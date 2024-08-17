@@ -33,6 +33,15 @@ struct PointLight {
 	float quadratic;
 };
 
+struct SpotLight {
+	vec3 colour;
+	vec3 position;
+	vec3 direction;
+	float intensity;
+	float linear;
+	float quadratic;
+};
+
 #define NUM_DIR_LIGHTS 2
 uniform DirLight dirLights[NUM_DIR_LIGHTS];
 uniform int addedDirLights = 0;
@@ -40,6 +49,10 @@ uniform int addedDirLights = 0;
 #define NUM_POINT_LIGHTS 20
 uniform PointLight pointLights[NUM_POINT_LIGHTS];
 uniform int addedPointLights = 0;
+
+#define NUM_SPOT_LIGHTS 20
+uniform SpotLight spotLights[NUM_SPOT_LIGHTS];
+uniform int addedSpotLights = 0;
 
 out vec4 finalColour;
 
@@ -143,6 +156,52 @@ void main() {
 		vec3 specular = specularColour * specPower;
 		specular *= material.specularStrength;
 		specular *= pointLights[i].intensity;
+
+		// Add our light values together to get the results
+		result += lightColour + specular;
+	}
+
+	// ------------ POINT LIGHTS
+	for (int i = 0; i < addedSpotLights; ++i) {
+		// Light direction from the point light to the vertex
+		vec3 lightDir = normalize(spotLights[i].position);
+
+		// Get the reflection light value
+		vec3 reflectDir = reflect(-lightDir, normals);
+
+		// How much light should show colour based on direction of normal facing the light
+		float diff = max(dot(normals, lightDir), 0.0f);
+
+		// Distance between the lights position and vertex position
+		float distance = length(spotLights[i].position - fVertPos);
+
+		// Actual attenuation calculation
+		float attenCalc = 1.0f 
+			+ spotLights[i].linear * distance 
+			+ spotLights[i].quadratic * (distance * distance);
+		
+		// Distance that the light can reach
+		// Value between 1 and 0, 1 is full light and 0 is no light
+		float attenuation = 0.0f;
+
+		// Ensure no division by 0
+		if (attenCalc != 0.0f) {
+			attenuation = 1.0f / attenCalc;
+		}
+
+		// Light colour algorithm
+		// Adjusts how much colour you can see based on the normal direction
+		vec3 lightColour = baseColour * spotLights[i].colour;
+		lightColour *= diff;
+		lightColour *= attenuation;
+		lightColour *= spotLights[i].intensity;
+
+		// Specular power algorithm
+		// Caulculate the shininess of the model
+		float specPower = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+		vec3 specular = specularColour * specPower;
+		specular *= material.specularStrength;
+		specular *= spotLights[i].intensity;
 
 		// Add our light values together to get the results
 		result += lightColour + specular;
