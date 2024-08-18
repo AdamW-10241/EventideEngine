@@ -15,5 +15,5 @@ protected:
 
 private:
 	// Store the coins point value
-	float m_points = 1.0f;
+	int m_points = 1;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/GameObjects/CustomObjects/Character.h"
 
+struct ESSpotLight;
 class Weapon;
 
 class Player : public Character {
@@ -35,4 +36,6 @@ private:
 	// Store if the player is currently pressing left mouse
 	bool m_leftMouseHeld;
 
+	// Store the spotlight attached to the player
+	TShared<ESSpotLight> m_light;
 };

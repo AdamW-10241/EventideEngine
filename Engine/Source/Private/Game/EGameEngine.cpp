@@ -20,6 +20,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Enemy.h"
 #include "Game/GameObjects/CustomObjects/Skybox.h"
 #include "Game/GameObjects/CustomObjects/Wall.h"
+#include "Game/GameObjects/CustomObjects/InvisibleWalls.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -134,14 +135,20 @@ bool EGameEngine::Init()
 
 void EGameEngine::Start()
 {
+	// Loading log
+	EDebug::Log("\nLoading...\n");
+	
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
+
+	// Spawn Skybox
+	CreateObject<Skybox>();
 
 	// Spawn Floor
 	CreateObject<Floor>();
 
-	// Spawn Skybox
-	CreateObject<Skybox>();
+	// Spawn Invisble Walls (edge of map)
+	CreateObject<InvisibleWalls>();
 
 	// Spawn Walls
 	for (EUi32 i = 0; i < 15; i++) {

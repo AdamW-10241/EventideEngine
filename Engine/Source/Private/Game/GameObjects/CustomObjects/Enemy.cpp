@@ -13,7 +13,7 @@ Enemy::Enemy(TWeak<Player> playerRef)
 	
 	m_health = 3.0f;
 
-	m_weaponOffset = { 0.0f, 5.0f, 0.0f };
+	m_weaponOffset = { 0.0f, 10.0f, 0.0f };
 	m_coinSpawnOffset = { 0.0f, 5.0f, 0.0f };
 }
 
@@ -49,7 +49,7 @@ void Enemy::OnStart()
 	model.lock()->SetMaterialBySlot(0, enemyMat);
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, true).lock()) {
+	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, false).lock()) {
 		colRef->type = EECollisionType::ENEMY;
 	}
 }

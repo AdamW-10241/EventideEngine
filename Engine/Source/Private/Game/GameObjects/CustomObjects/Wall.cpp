@@ -27,7 +27,7 @@ void Wall::OnStart()
 	}
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, wallCollisionSize }, true).lock()) {
+	if (const auto& colRef = AddCollision({ GetTransform().position, wallCollisionSize }, false).lock()) {
 		colRef->type = EECollisionType::WALL;
 	}
 
@@ -43,6 +43,7 @@ void Wall::OnStart()
 
 	// Creating materials
 	auto wallMat = EGameEngine::GetGameEngine()->CreateMaterial();
+	wallMat->m_specularStrength = 0.0f;
 
 	// Assigning textures to the materials
 	wallMat->m_baseColourMap = wallBase;

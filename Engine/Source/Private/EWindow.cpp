@@ -134,6 +134,20 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 
 			m_inputMode = !m_input->IsCursorHidden();
 		}
+		// Toggle camera vertical status
+		if (key == SDL_SCANCODE_COMMA) {
+			// Get and toggle the status
+			bool& status = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()->GetVerticalMovementStatus();
+			status = !status;
+
+			// Debug logs
+			if (status) {
+				EDebug::Log("Can move vertically.");
+			}
+			else {
+				EDebug::Log("Can no longer move vertically.");
+			}
+		}
 		// Double camera speed
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = true;

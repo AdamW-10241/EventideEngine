@@ -118,7 +118,6 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the camera
 	m_camera = TMakeShared<ESCamera>();
-	m_camera->transform.position.z -= 5.0f;
 
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
@@ -137,7 +136,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Create the dir light
 	const auto& dirLight = CreateDirLight();
 	if (const auto& lightRef = dirLight.lock()) {
-		lightRef->colour = glm::vec3(0.16f, 0.06f, 0.35f);
+		lightRef->colour = glm::vec3(0.16f, 0.06f, 0.65f);
 		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
 		lightRef->ambient = glm::vec3(0.3f);
 		lightRef->intensity = 0.6f;

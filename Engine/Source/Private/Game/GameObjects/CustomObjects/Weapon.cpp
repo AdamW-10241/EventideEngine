@@ -1,5 +1,6 @@
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Game/GameObjects/CustomObjects/Bullet.h"
+#include "Graphics/EGraphicsEngine.h"
 
 #define Super EWorldObject
 
@@ -46,7 +47,7 @@ void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation)
 
 void Weapon::Reload()
 {
-
+	// Would reload and use magazine if UI was developed to visualise it
 }
 
 void Weapon::OnStart()

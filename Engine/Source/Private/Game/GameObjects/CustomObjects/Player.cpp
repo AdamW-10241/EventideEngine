@@ -2,6 +2,7 @@
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/ESCamera.h"
 #include "Game/GameObjects/CustomObjects/Weapon.h"
+#include "Graphics/ESLight.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <GLM/gtx/euler_angles.hpp>
@@ -39,8 +40,20 @@ void Player::OnStart()
 	}
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f) }, false).lock()) {
+	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 10.0f, 5.0f) }, false).lock()) {
 		colRef->type = EECollisionType::PLAYER;
+	}
+
+	// Add light
+	if (const auto& lightRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreateSpotLight().lock()) {
+		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
+		lightRef->intensity = 10.0f;
+		lightRef->outerCutOff = 45.0f;
+		lightRef->innerCutOff = 30.0f;
+		lightRef->linear *= 1.0f;
+		lightRef->quadratic *= 1.0f;
+
+		m_light = lightRef;
 	}
 }
 
@@ -74,7 +87,7 @@ void Player::OnTick(float deltaTime)
 
 		// If weapon exists,
 		if (m_weapon) {
-			// Move to offset
+			// Move to offset in front of the camera at all times
 			// Get camera rotation in radians
 			glm::vec3 cameraRotationRadians = glm::radians(camRef->transform.rotation);
 
@@ -98,15 +111,6 @@ void Player::OnTick(float deltaTime)
 void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, const TShared<ESCollision>& otherCol)
 {	
 	Super::OnOverlap(other, col, otherCol);
-	
-	// Delete wall if colliding with player on spawn
-	if (otherCol->type == EECollisionType::WALL) {
-		// If wall has no model
-		if (!other->GetModel(0).lock()) {
-			// Destroy wall
-			other->Destroy();
-		}
-	}
 
 	if (otherCol->type != EECollisionType::BULLET_PLAYER) {
 		// Set collide flag
@@ -126,6 +130,10 @@ void Player::OnPostTick(float deltaTime)
 			// Reset player position to before collision
 			GetTransform().position = m_oldPosition;
 		}
+
+		// Adjust light relative to player
+		m_light->position = camRef->transform.position + camRef->transform.Forward() * 5.0f;
+		m_light->direction = camRef->transform.Forward();
 	}
 
 	// Store old position (old for next loop)

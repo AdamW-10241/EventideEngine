@@ -15,7 +15,7 @@ EModel::EModel(unsigned int spawnID, EString path)
 
 EModel::~EModel()
 {
-	EDebug::Log("Model destroyed: " + m_path);
+	// EDebug::Log("Model destroyed: " + m_path);
 }
 
 void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& defaultMaterial)
@@ -65,8 +65,8 @@ void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& def
 	}
 
 	// Log the success of the model
-	EDebug::Log("Model successfully imported with (" + std::to_string(meshesCreated) + ") meshes: " + 
-		filePath, LT_SUCCESS);
+	//EDebug::Log("Model successfully imported with (" + std::to_string(meshesCreated) + ") meshes: " + 
+	//	filePath, LT_SUCCESS);
 }
 
 void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)

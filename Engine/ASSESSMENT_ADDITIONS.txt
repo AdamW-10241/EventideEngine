@@ -1,26 +1,28 @@
 Added:
 -	Shader texture normal maps
--	Real-time brightness changing (EGameEngine)
 -	Material brightness setting
--	Many models with normals
--	ModelObject and PterosaurObject classes
--	ModelObject class can manipulate and use models
--	Can delete models from modelStack when the ModelObject is deleted (EGameEngine PostLoop)
--	ModelObjects can move in local space
--	PterosaurObjects spawn with random positions and speeds and can scale randomly based on spawn flag
 -	Framerate limits
--	Fixed issue where, due to load lag, massive delta would be processed on the first frame
 -	Random generatorm for int and float values
-- 	Shader uniforms to limit the number of drawn lights (lights were still being drawn if unset)
--	Randomly generating light objects with random values
 -	Functions to get the position of a random vertex of a mesh as a vec3
--	Randomly placed grass EModelObjects across a mesh based on random mesh vertex positions 
+-	Randomly placed objects across a mesh based on random mesh vertex positions (Grass, Walls, Enemies)
+-	Spotlight light type that has a cone projection (also attached to player)
+-	Many object classes - Walls, InvisibleWalls, Skybox, Floor, Grass, Character, Player, Enemy, Weapon,Bullet, Coin
+-	Weapons and bullets that deal damage and can defeat enemies to drop a coin
+-	Enemies rotate toward player and shoot.
+-	Weapon model moves around as player moves.
+-	Physical collisions that stop player movement.
+-	Health system for enemies
+-	Object classes can bind their own inputs (used for player shooting)
+-	Score (coins add score and it is shown on the console)
 
--	KEYS 1-6:	Change background colour
+
+-	KEYS 1-6:	Change background colour (outside skybox)
 -	ARROW KEYS:	Adjust camera view
 -	LEFT SCROLL:	Adjust texture depth
 -	TAB:		Lower framerate to 10 fps 
--	LEFT CTRL:	Randomly change brightness (SEIZURE WARNING)
+-	COMMA:		Allow camera to move vertically
 
-I wanted to add some more than this because I find this stuff really fun.
-I did not have as much time as I would like but I added some really cool stuff.
+-	LEFT CLICK:	Shoot weapon
+
+There are other function things that I added and changed across the program.
+I went overscope and I had little time to develop this but I added a lot of stuff to the engine.

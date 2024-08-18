@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Game/GameObjects/EWorldObject.h"
 
 class Weapon : public EWorldObject {

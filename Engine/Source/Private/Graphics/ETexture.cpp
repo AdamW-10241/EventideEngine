@@ -17,7 +17,7 @@ ETexture::~ETexture()
     if (m_ID > 0)
         glDeleteTextures(1, &m_ID);
 
-    EDebug::Log("Texture destroyed: " + m_fileName);
+    // EDebug::Log("Texture destroyed: " + m_fileName);
 }
 
 bool ETexture::LoadTexture(const EString& fileName, const EString& path)
@@ -111,7 +111,7 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path)
     stbi_image_free(data);
 
     // Log the success of the import
-    EDebug::Log("Successfully imported texture - " + m_fileName, LT_SUCCESS);
+    // EDebug::Log("Successfully imported texture - " + m_fileName, LT_SUCCESS);
 
     return true;
 }

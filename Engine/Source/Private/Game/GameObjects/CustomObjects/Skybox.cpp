@@ -19,6 +19,7 @@ void Skybox::OnStart()
 
 	// Creating materials
 	auto skyboxMat = EGameEngine::GetGameEngine()->CreateMaterial();
+	skyboxMat->m_specularStrength = 0.0f;
 
 	// Assigning textures to the materials
 	skyboxMat->m_baseColourMap = skyboxBase;

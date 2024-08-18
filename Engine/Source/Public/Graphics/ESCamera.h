@@ -11,6 +11,7 @@ struct ESCamera {
 		moveSpeed = 50.0f;
 		rotateSpeed = 0.5f;
 		zoomSpeed = 3.0f;
+		canMoveVertical = false;
 	}
 
 	// Rotate the camera based on the passed rotation
@@ -37,6 +38,10 @@ struct ESCamera {
 			moveDir = glm::normalize(moveDir);
 
 		glm::vec3 direction = moveDir * scale;
+
+		// Cancel out vertical movements if flag set
+		if (!canMoveVertical)
+			direction.y = 0.0f;
 
 		// Get delta time
 		float deltaTime = 1.0f;
@@ -67,6 +72,9 @@ struct ESCamera {
 		defaultFov = newFov;
 	}
 
+	// Get the vertical movement status for the camera
+	bool& GetVerticalMovementStatus() { return canMoveVertical; }
+
 	ESTransform transform;
 	float defaultFov;
 	float fov;
@@ -76,4 +84,5 @@ struct ESCamera {
 	float moveSpeed;
 	float rotateSpeed;
 	float zoomSpeed;
+	bool canMoveVertical;
 };

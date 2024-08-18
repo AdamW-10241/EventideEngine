@@ -36,7 +36,7 @@ void Bullet::OnStart()
 	model.lock()->SetMaterialBySlot(0, bulletMat);
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(4.0f, 4.0f, 4.0f) }, true).lock()) {
+	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(4.0f, 4.0f, 4.0f) }, false).lock()) {
 		colRef->type == m_collisionType;
 	}
 }
