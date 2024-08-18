@@ -284,6 +284,22 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 			// Change the direction
 			glUniform3fv(varID, 1, glm::value_ptr(lightRef->direction));
 
+			// --------- INNER CUT OFF
+			// Get the inner cut off variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".innerCutOff").c_str());
+
+			// Change the inner cut off
+			glUniform1f(varID, glm::cos(glm::radians(lightRef->innerCutOff)));
+
+			// --------- OUTER CUT OFF
+			// Get the outer cut off variable from the spotLight struct in the shader
+			varID = glGetUniformLocation(m_programID,
+				(lightIndexStr + ".outerCutOff").c_str());
+
+			// Change the outer cut off
+			glUniform1f(varID, glm::cos(glm::radians(lightRef->outerCutOff)));
+
 			// --------- INTENSITY
 			// Get the intensity variable from the spotLight struct in the shader
 			varID = glGetUniformLocation(m_programID,

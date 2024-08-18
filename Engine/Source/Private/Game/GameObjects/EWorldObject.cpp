@@ -1,6 +1,8 @@
 #include "Game/GameObjects/EWorldObject.h"
 #include "Graphics/EGraphicsEngine.h"
 
+#include "Game/GameObjects/CustomObjects/Floor.h"
+
 #define Super EObject
 
 TWeak<EModel> EWorldObject::ImportModel(const EString& path)
@@ -66,6 +68,13 @@ void EWorldObject::TranslateLocal(float deltaTime, glm::vec3 translation, glm::v
         moveDir = glm::normalize(moveDir);
 
     m_transform.position += moveDir * scale * deltaTime;
+}
+
+void EWorldObject::PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale)
+{
+    // Set the position to a random vertex position on the mesh
+    GetTransform().position = floor->GetTransform().position +
+        (floor->GetModel(0).lock()->GetMesh(0)->GetRandomVertexPosition() * placementScale);
 }
 
 void EWorldObject::OnPostTick(float deltaTime)

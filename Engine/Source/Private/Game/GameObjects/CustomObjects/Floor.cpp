@@ -3,7 +3,7 @@
 void Floor::OnStart()
 {
 	// Scale floor
-	GetTransform().scale = glm::vec3(1.0f);
+	GetTransform().scale = glm::vec3(0.3f);
 
 	// Add model
 	auto model = ImportModel("Models/Grid/grid.fbx");
@@ -31,5 +31,5 @@ void Floor::OnStart()
 	model.lock()->SetMaterialBySlot(0, gridMat);
 
 	// Add collision
-	AddCollision({ GetTransform().position, glm::vec3(100.0f, 1.0f, 100.0f) }, true);
+	AddCollision({ GetTransform().position, glm::vec3(300.0f, 1.0f, 300.0f) }, false);
 }

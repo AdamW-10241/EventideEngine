@@ -4,6 +4,10 @@ Victor Gordon 2021, OpenGL Tutorial 17 - Transparency & Blending, viewed August 
 // Found normal map implementation code from:
 LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advanced-Lighting/Normal-Mapping
 
+// Found spot light implementation code from:
+LearnOpenGL 2024, Light Casters, viewed August 18, https://learnopengl.com/Lighting/Light-casters
+
+
 
 
 // MEDIEVAL HELMET MODEL
@@ -14,3 +18,14 @@ LearnOpenGL 2024, Normal Mapping, viewed August 9, https://learnopengl.com/Advan
 
 // GRID GRASS TEXTURES - I MADE THE GRID MODEL
 ‘Snabisch’ 2015, 3 Seamless Grass Textures, Textures, OpenGameArt, viewed August 16 2024, available https://opengameart.org/content/3-seamless-grass-textures
+
+// GUN MODEL
+‘wburton’ 2018, SG533 Assault Rifle, 3D model, Sketchfab, available
+https://sketchfab.com/3d-models/sg553-assault-rifle-92a2efa3086b4eec8ee93b910ce7
+7aa1
+
+// SKY BOX
+"Sky Pano - Milkyway" (https://skfb.ly/6BZ67) by MozillaHubs is licensed under CC Attribution-NonCommercial-ShareAlike (http://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+// WALL
+"Wall low poly" (https://skfb.ly/oQE9B) by Mehdi Shahsavan is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).

@@ -135,30 +135,32 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// ----------- LIGHTS
 	// Create the dir light
-	//const auto& dirLight = CreateDirLight();
-	//if (const auto& lightRef = dirLight.lock()) {
-	//	lightRef->colour = glm::vec3(1.0f, 1.0f, 1.0f);
-	//	lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
-	//	lightRef->ambient = glm::vec3(0.5f);
-	//	lightRef->intensity = 0.3f;
-	//}
+	const auto& dirLight = CreateDirLight();
+	if (const auto& lightRef = dirLight.lock()) {
+		lightRef->colour = glm::vec3(0.16f, 0.06f, 0.35f);
+		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
+		lightRef->ambient = glm::vec3(0.3f);
+		lightRef->intensity = 0.6f;
+	}
 
-	//// Create the point light
+	// Create the point light
 	//const auto& pointLight = CreatePointLight();
 	//if (const auto& lightRef = pointLight.lock()) {
-	//	lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
-	//	lightRef->intensity = 1.0f;
-	//	lightRef->position.x = 0.0f;
+	//	lightRef->colour = glm::vec3(0.3f, 0.3f, 0.7f);
+	//	lightRef->intensity = 5.0f;
+	//	lightRef->position.y = 200.0f;
 	//}
 
 	// Create the spot light
-	const auto& spotLight = CreateSpotLight();
-	if (const auto& lightRef = spotLight.lock()) {
-		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
-		lightRef->direction = glm::vec3(0.0f, -1.0f, 0.0f);
-		lightRef->position.y = 50.0f;
-		lightRef->intensity = 10.0f;
-	}
+	//const auto& spotLight = CreateSpotLight();
+	//if (const auto& lightRef = spotLight.lock()) {
+	//	lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
+	//	lightRef->direction = glm::vec3(0.0f, -1.0f, -1.0f);
+	//	lightRef->position.y = 50.0f;
+	//	lightRef->intensity = 1.0f;
+	//	lightRef->outerCutOff = 180.0f;
+	//	lightRef->innerCutOff = 150.0f;
+	//}
 
 	return true;
 }
@@ -171,19 +173,6 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Clear the back buffer with a solid color
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// DEBUG Rotate light
-	static float lightTimer = 0.0f;
-	const float timeToRotate = 1.0f;
-	lightTimer += EGameEngine::GetGameEngine()->DeltaTimeF();
-
-	if (lightTimer > timeToRotate)
-		lightTimer = 0.0f;
-
-	if (const auto& lightRef = std::dynamic_pointer_cast<ESPointLight>(m_lights[1])) {
-		lightRef->position.x = sin(lightTimer / timeToRotate * 2 * PI) * 2.0f;
-		lightRef->position.z = cos(lightTimer / timeToRotate * 2 * PI) * 2.0f;
-	}
 
 	// ---------- NORMAL SHADER
 	// Activate shader

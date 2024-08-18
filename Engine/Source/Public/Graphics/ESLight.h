@@ -49,6 +49,9 @@ struct ESSpotLight : public ESLight {
 		direction = glm::vec3(0.0f);
 		position = glm::vec3(0.0f);
 
+		innerCutOff = 12.5f;
+		outerCutOff = 17.5f;
+
 		linear = 0.045f;
 		quadratic = 0.0075f;
 	};
@@ -57,6 +60,9 @@ struct ESSpotLight : public ESLight {
 
 	glm::vec3 position;
 	glm::vec3 direction;
+
+	float innerCutOff;
+	float outerCutOff;
 
 	// Fall off values for how far the light can reach
 	float linear;

@@ -66,6 +66,9 @@ public:
 	// Get a weak reference to the graphics engine
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_graphicsEngine; }
 
+	// Get the input mode
+	bool GetInputMode() const { return m_inputMode; }
+
 public:
 	// Flag to randomly change brightness
 	bool m_randomlyChangeBrightness;

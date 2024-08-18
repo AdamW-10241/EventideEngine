@@ -6,7 +6,9 @@ enum class EECollisionType {
 	ALL,
 	COLLECTABLE,
 	PLAYER,
-	ENEMY
+	ENEMY,
+	BULLET_PLAYER,
+	BULLET_ENEMY
 };
 
 class EMesh;

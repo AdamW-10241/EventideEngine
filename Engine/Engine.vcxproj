@@ -101,10 +101,13 @@
     <ClCompile Include="ExternalLibs\Includes\STB_IMAGE\stb_image.cpp" />
     <ClCompile Include="Source\Private\Game\EGameEngine.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Bullet.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Character.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Enemy.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Floor.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Grass.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Skybox.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Weapon.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EObject.cpp" />
@@ -124,10 +127,13 @@
     <ClInclude Include="Source\Public\EngineTypes.h" />
     <ClInclude Include="Source\Public\Game\EGameEngine.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Bullet.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Character.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Enemy.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Floor.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Grass.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Skybox.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Weapon.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />

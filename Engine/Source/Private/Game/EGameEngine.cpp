@@ -17,6 +17,8 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Grass.h"
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Game/GameObjects/CustomObjects/Bullet.h"
+#include "Game/GameObjects/CustomObjects/Enemy.h"
+#include "Game/GameObjects/CustomObjects/Skybox.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -71,7 +73,7 @@ EGameEngine::EGameEngine()
 	m_lastTickTime = 0.0f;
 	m_deltaTime = 0.0f;
 
-	m_defaultFrameRate = 240;
+	m_defaultFrameRate = 120;
 	m_frameRate = m_defaultFrameRate;
 
 	m_timeToLoad = 0.0f;
@@ -140,13 +142,31 @@ void EGameEngine::Start()
 		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
 
 		// Add weapon
-		if (TShared<Weapon> weapon = CreateObject<Weapon>(1.0f, 0.1f, 0.2f, false).lock()) {
+		if (TShared<Weapon> weapon = CreateObject<Weapon>(true, 1.0f, 500.0f, 0.2f, false).lock()) {
 			player->AddWeapon(weapon);
 		}
 	}
 
 	// Spawn Floor
 	CreateObject<Floor>();
+
+	// Spawn Skybox
+	CreateObject<Skybox>();
+
+	// Spawn Enemies
+	float fireRate;
+
+	for (EUi32 i = 0; i < 5; i++) {
+		// Spawn enemy
+		if (const auto& enemy = CreateObject<Enemy>().lock()) {
+			// Random fire rate
+			fireRate = GetRandomFloatRange(0.8f, 1.2f);
+			// Add weapon
+			if (TShared<Weapon> weapon = CreateObject<Weapon>(false, 1.0f, 20.0f, fireRate, true).lock()) {
+				enemy->AddWeapon(weapon);
+			}
+		}
+	}
 
 	// Spawn Grass
 	for (EUi32 i = 0; i < 20; i++) {
@@ -211,6 +231,12 @@ void EGameEngine::Cleanup()
 
 void EGameEngine::Tick()
 {
+	// Randomly change brightness if flag set (LEFT CTRL)
+	if (m_window->m_randomlyChangeBrightness) {
+		float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
+		m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
+	}
+	
 	// Move Camera
 	if (m_window)
 		m_window->MoveCamera();
@@ -244,13 +270,6 @@ void EGameEngine::Tick()
 
 		eObjectRef->PostTick(DeltaTimeF());
 	}
-
-	// ----------- TEST CODE
-	// Randomly change brightness if flag set (LEFT CTRL)
-	//if (m_window->m_randomlyChangeBrightness) {
-	//	float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
-	//	m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
-	//}
 }
 
 void EGameEngine::ProcessInput()
@@ -258,7 +277,7 @@ void EGameEngine::ProcessInput()
 	if (!m_input)
 		return;
 
-	// Handle inputs
+	// Update input events
 	m_input->UpdateInputs();
 }
 
@@ -277,6 +296,7 @@ void EGameEngine::PreLoop()
 	// Run their start logic and add to game object stack
 	for (auto& eObjectRef : m_objectsToBeSpawned) {
 		eObjectRef->Start();
+		eObjectRef->RegisterInputs(m_input);
 		m_objectStack.push_back(std::move(eObjectRef));
 	}
 

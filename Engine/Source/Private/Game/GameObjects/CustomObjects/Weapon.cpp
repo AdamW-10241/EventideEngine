@@ -1,8 +1,12 @@
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Game/GameObjects/CustomObjects/Bullet.h"
 
-Weapon::Weapon(float damage, float moveSpeed, float attackCooldownTime, bool unlimitedAmmo)
+#define Super EWorldObject
+
+Weapon::Weapon(bool addModel, float damage, float moveSpeed, float attackCooldownTime, bool unlimitedAmmo)
 {
+	m_addModel = addModel;
+
 	m_bulletDamage = damage;
 	m_bulletMoveSpeed = moveSpeed;
 	m_attackCooldownTime = attackCooldownTime;
@@ -15,12 +19,28 @@ Weapon::Weapon(float damage, float moveSpeed, float attackCooldownTime, bool unl
 	m_reserveAmmo = 64;
 }
 
-void Weapon::Fire()
+void Weapon::TryFire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation)
 {
-	// Summon bullet
-	if (const auto& bullet = EGameEngine::GetGameEngine()->CreateObject<Bullet>(GetTransform().rotation, m_bulletDamage, m_bulletMoveSpeed).lock()) {
-		// Set position to gun
+	// If timer expired,
+	if (m_attackTimer <= 0.0f) {
+		// Fire gun
+		Fire(bulletCollisionType, bulletRotation);
+		// Reset timer
+		m_attackTimer = m_attackCooldownTime;
+	}
+}
+
+void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation)
+{
+	// Set movement vector (forward)
+	glm::vec3 movementVector = { 0.0f, 0.0f, 1.0f };
+
+	// Spawn bullet
+	if (const auto& bullet = EGameEngine::GetGameEngine()->CreateObject<Bullet>(bulletCollisionType, movementVector, m_bulletDamage, m_bulletMoveSpeed).lock()) {
+		// Set position, rotation and lifetime
 		bullet->GetTransform().position = GetTransform().position;
+		bullet->GetTransform().rotation = bulletRotation;
+		bullet->SetLifeTime(3.0f);
 	}
 }
 
@@ -31,11 +51,16 @@ void Weapon::Reload()
 
 void Weapon::OnStart()
 {
-	// Scale floor
+	Super::OnStart();
+	
+	// Return if not adding model
+	if (!m_addModel) return;
+
+	// Scale gun
 	GetTransform().scale = glm::vec3(0.01f);
 
 	// Add model
-	auto model = ImportModel("Models/Gun/sg553.fbx");
+	auto model = ImportModel("Models/Gun/sg553_flipped.fbx");
 
 	// Gun base
 	auto gunBase = TMakeShared<ETexture>();
@@ -57,4 +82,13 @@ void Weapon::OnStart()
 
 	// Add materials to the model
 	model.lock()->SetMaterialBySlot(0, gunMat);
+}
+
+void Weapon::OnTick(float deltaTime)
+{
+	Super::OnTick(deltaTime);
+
+	// Decrement timer by delta time
+	if (m_attackTimer > 0.0f)
+		m_attackTimer -= deltaTime;
 }

@@ -1,20 +1,19 @@
 #pragma once
-#include "Game/GameObjects/EWorldObject.h"
+#include "Game/GameObjects/CustomObjects/Character.h"
 
 class Weapon;
 
-class Player : public EWorldObject {
+class Player : public Character {
 public:
-	Player() { m_collided = false; m_oldPosition = glm::vec3(0.0f); m_weaponOffset = glm::vec3(-5.0f, 0.0f, 0.0f); }
+	Player();
 
 	// Set the cameras default position
 	void SetDefaultCamPosition(glm::vec3 position);
 
-	// Add a weapon to the player
-	void AddWeapon(TShared<Weapon>& weapon) { m_weapon = weapon; }
-
 protected:
 	virtual void OnStart() override;
+
+	virtual void OnRegisterInputs(const TShared<EInput>& m_input) override;
 
 	virtual void OnTick(float deltaTime) override;
 
@@ -30,10 +29,10 @@ private:
 	// Store the old position to restore the camera and object
 	glm::vec3 m_oldPosition;
 
-	// Store the weapon
-	TShared<Weapon> m_weapon;
-
 	// Store the weapon offset from the player
 	glm::vec3 m_weaponOffset;
+
+	// Store if the player is currently pressing left mouse
+	bool m_leftMouseHeld;
 
 };

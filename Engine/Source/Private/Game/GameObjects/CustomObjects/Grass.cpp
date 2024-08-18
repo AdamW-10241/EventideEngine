@@ -42,13 +42,6 @@ void Grass::OnStart()
 
 	// Place grass randomly on floor mesh
 	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
-		PlaceOnFloorRandomly(floor, 75.0f);
+		PlaceOnFloorRandomly(floor, 25.0f);
 	}
-}
-
-void Grass::PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale)
-{
-	// Set the position to a random vertex position on the mesh
-	GetTransform().position = floor->GetTransform().position +
-		(floor->GetModel(0).lock()->GetMesh(0)->GetRandomVertexPosition() * placementScale);
 }

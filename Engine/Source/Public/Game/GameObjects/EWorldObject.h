@@ -7,6 +7,8 @@
 #include "Graphics/ETexture.h"
 #include "Graphics/ESMaterial.h"
 
+class Floor;
+
 class EWorldObject : public EObject {
 public:
 	EWorldObject() = default;
@@ -35,6 +37,9 @@ public:
 
 	// Does the object have collisions
 	bool HasCollisions() const { return m_objectCollisions.size() > 0; }
+
+	// Place on a random vertex of a floor
+	void PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale);
 
 protected:
 	virtual void OnPostTick(float deltaTime) override;

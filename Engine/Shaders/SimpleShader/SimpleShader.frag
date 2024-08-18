@@ -37,6 +37,11 @@ struct SpotLight {
 	vec3 colour;
 	vec3 position;
 	vec3 direction;
+
+	float coneAngle;
+	float innerCutOff;
+	float outerCutOff;
+
 	float intensity;
 	float linear;
 	float quadratic;
@@ -161,10 +166,17 @@ void main() {
 		result += lightColour + specular;
 	}
 
-	// ------------ POINT LIGHTS
+	// ------------ SPOT LIGHTS
 	for (int i = 0; i < addedSpotLights; ++i) {
 		// Light direction from the point light to the vertex
-		vec3 lightDir = normalize(spotLights[i].position);
+		vec3 lightDir = normalize(spotLights[i].position - fVertPos);
+
+		// Get spot light values
+		// Found spot light implementation code from:
+		// LearnOpenGL 2024, Light Casters, viewed August 18, https://learnopengl.com/Lighting/Light-casters
+		float theta = dot(lightDir, normalize(-spotLights[i].direction));
+		float epsilon = spotLights[i].innerCutOff - spotLights[i].outerCutOff;
+		float spotLightIntensity = clamp((theta - spotLights[i].outerCutOff) / epsilon, 0.0, 1.0);
 
 		// Get the reflection light value
 		vec3 reflectDir = reflect(-lightDir, normals);
@@ -195,13 +207,15 @@ void main() {
 		lightColour *= diff;
 		lightColour *= attenuation;
 		lightColour *= spotLights[i].intensity;
+		lightColour *= spotLightIntensity;
 
 		// Specular power algorithm
 		// Caulculate the shininess of the model
 		float specPower = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
 		vec3 specular = specularColour * specPower;
 		specular *= material.specularStrength;
-		specular *= spotLights[i].intensity;
+		specular *= spotLights[i].intensity * spotLightIntensity;
+		specular *= spotLightIntensity;
 
 		// Add our light values together to get the results
 		result += lightColour + specular;

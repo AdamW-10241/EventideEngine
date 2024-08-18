@@ -19,6 +19,11 @@ void EObject::Start()
 	OnStart();
 }
 
+void EObject::RegisterInputs(const TShared<EInput>& m_input)
+{
+	OnRegisterInputs(m_input);
+}
+
 void EObject::Tick(float deltaTime)
 {
 	OnTick(deltaTime);

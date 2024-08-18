@@ -2,6 +2,8 @@
 #include "EngineTypes.h"
 #include "Game/EGameEngine.h"
 
+class Floor;
+
 class EObject : public std::enable_shared_from_this<EObject> {
 public:
 	EObject();
@@ -9,6 +11,9 @@ public:
 
 	// Run when the object spawns in
 	void Start();
+
+	// Run after the start for adding inputs
+	void RegisterInputs(const TShared<EInput>& m_input);
 
 	// Run every frame, passes in deltaTime
 	void Tick(float deltaTime);
@@ -31,6 +36,9 @@ public:
 protected:
 	// Run when the object spawns in
 	virtual void OnStart() {}
+
+	// Run when the object spawns in
+	virtual void OnRegisterInputs(const TShared<EInput>& m_input) {}
 
 	// Run every frame, passes in deltaTime
 	virtual void OnTick(float deltaTime) {}

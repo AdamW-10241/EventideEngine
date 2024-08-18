@@ -29,3 +29,16 @@ void ELightObject::OnTick(float deltaTime)
 
 	Super::OnTick(deltaTime);
 }
+
+// DEBUG Rotate light
+//static float lightTimer = 0.0f;
+//const float timeToRotate = 1.0f;
+//lightTimer += EGameEngine::GetGameEngine()->DeltaTimeF();
+//
+//if (lightTimer > timeToRotate)
+//lightTimer = 0.0f;
+//
+//if (const auto& lightRef = std::dynamic_pointer_cast<ESPointLight>(m_lights[1])) {
+//	lightRef->position.x = sin(lightTimer / timeToRotate * 2 * PI) * 2.0f;
+//	lightRef->position.z = cos(lightTimer / timeToRotate * 2 * PI) * 2.0f;
+//}
