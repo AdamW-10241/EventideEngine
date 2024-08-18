@@ -99,6 +99,15 @@ void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 {	
 	Super::OnOverlap(other, col, otherCol);
 	
+	// Delete wall if colliding with player on spawn
+	if (otherCol->type == EECollisionType::WALL) {
+		// If wall has no model
+		if (!other->GetModel(0).lock()) {
+			// Destroy wall
+			other->Destroy();
+		}
+	}
+
 	if (otherCol->type != EECollisionType::BULLET_PLAYER) {
 		// Set collide flag
 		m_collided = true;

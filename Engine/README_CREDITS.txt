@@ -29,3 +29,12 @@ https://sketchfab.com/3d-models/sg553-assault-rifle-92a2efa3086b4eec8ee93b910ce7
 
 // WALL
 "Wall low poly" (https://skfb.ly/oQE9B) by Mehdi Shahsavan is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+// ENEMY
+"Scrap Auto Turret [Low-poly]" (https://skfb.ly/oCRyJ) by fizikoldun is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+// COIN
+‘monster’ 2020, Coin, 3D model, Sketchfab, available
+https://sketchfab.com/3d-models/coin-7d9b49c9ede348eab0a4ccaf46b3a44f
+
+I had to change some models from my design doc because they did not work well and had issues.

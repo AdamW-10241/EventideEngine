@@ -81,6 +81,12 @@
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Wall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Coin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Public\EWindow.h">
@@ -171,6 +177,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Wall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Coin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,8 @@ enum class EECollisionType {
 	PLAYER,
 	ENEMY,
 	BULLET_PLAYER,
-	BULLET_ENEMY
+	BULLET_ENEMY,
+	WALL
 };
 
 class EMesh;

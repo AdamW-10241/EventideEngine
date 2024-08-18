@@ -1,0 +1,11 @@
+Model Information:
+* title:	Scrap Auto Turret [Low-poly]
+* source:	https://sketchfab.com/3d-models/scrap-auto-turret-low-poly-806af5c7f80f43eca295cec403f4868a
+* author:	fizikoldun (https://sketchfab.com/Maks48)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Scrap Auto Turret [Low-poly]" (https://sketchfab.com/3d-models/scrap-auto-turret-low-poly-806af5c7f80f43eca295cec403f4868a) by fizikoldun (https://sketchfab.com/Maks48) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

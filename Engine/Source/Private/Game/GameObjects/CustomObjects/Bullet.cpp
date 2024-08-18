@@ -68,6 +68,7 @@ void Bullet::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 	// On overlap,
 	switch (otherCol->type)	{
 	case EECollisionType::ALL:
+	case EECollisionType::WALL:
 		Destroy();
 		break;
 	}

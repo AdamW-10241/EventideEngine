@@ -23,6 +23,9 @@ public:
 	// Run the game
 	bool Run();
 
+	// Get the games points
+	float& GetPoints() { return m_points; }
+
 	// Return the delta time between frames
 	double DeltaTime() const { return m_deltaTime; }
 
@@ -148,4 +151,7 @@ private:
 	// Store time taken to load so it can be subtracted
 	// Otherwise massive delta on first frame
 	float m_timeToLoad;
+
+	// Store the games points
+	float m_points;
 };

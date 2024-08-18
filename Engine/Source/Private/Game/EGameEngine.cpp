@@ -19,6 +19,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Bullet.h"
 #include "Game/GameObjects/CustomObjects/Enemy.h"
 #include "Game/GameObjects/CustomObjects/Skybox.h"
+#include "Game/GameObjects/CustomObjects/Wall.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -78,6 +79,8 @@ EGameEngine::EGameEngine()
 
 	m_timeToLoad = 0.0f;
 
+	m_points = 0.0f;
+
 	// Set random seed
 	RandGenerator.seed(time(0));
 	
@@ -134,7 +137,16 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	CreateObject<Helmet>().lock()->GetTransform().position = glm::vec3(0.0f, 10.0f, 25.0f);
+	// Spawn Floor
+	CreateObject<Floor>();
+
+	// Spawn Skybox
+	CreateObject<Skybox>();
+
+	// Spawn Walls
+	for (EUi32 i = 0; i < 15; i++) {
+		CreateObject<Wall>();
+	}
 
 	// Spawn Player
 	if (const auto& player = CreateObject<Player>().lock()) {
@@ -145,26 +157,11 @@ void EGameEngine::Start()
 		if (TShared<Weapon> weapon = CreateObject<Weapon>(true, 1.0f, 500.0f, 0.2f, false).lock()) {
 			player->AddWeapon(weapon);
 		}
-	}
 
-	// Spawn Floor
-	CreateObject<Floor>();
-
-	// Spawn Skybox
-	CreateObject<Skybox>();
-
-	// Spawn Enemies
-	float fireRate;
-
-	for (EUi32 i = 0; i < 5; i++) {
-		// Spawn enemy
-		if (const auto& enemy = CreateObject<Enemy>().lock()) {
-			// Random fire rate
-			fireRate = GetRandomFloatRange(0.8f, 1.2f);
-			// Add weapon
-			if (TShared<Weapon> weapon = CreateObject<Weapon>(false, 1.0f, 20.0f, fireRate, true).lock()) {
-				enemy->AddWeapon(weapon);
-			}
+		// Spawn Enemies
+		for (EUi32 i = 0; i < 8; i++) {
+			// Spawn enemy
+			Enemy::SpawnEnemy(player);
 		}
 	}
 
@@ -253,7 +250,7 @@ void EGameEngine::Tick()
 				for (const auto& otherObj : m_objectStack) {
 					// Test if the other object is also a world object
 					if (const auto& otherWoRef = std::dynamic_pointer_cast<EWorldObject>(otherObj)) {
-						// Skip colliding self
+						// Skip colliding with self
 						if (woRef == otherWoRef)
 							continue;
 
