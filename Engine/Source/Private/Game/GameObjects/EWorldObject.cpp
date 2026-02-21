@@ -5,42 +5,57 @@
 
 #define Super EObject
 
-TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const EString& texturePath)
+TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const ETexturePaths& texturePaths)
 {
     // Import model
     auto modelRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->ImportModel(modelPath);
+    if (!modelRef->HasMaterials()) return modelRef;
 
     // Assign materials once per model
-    if (!modelRef->HasMaterials()) return modelRef;
     bool isDefaultTexture = modelRef->GetMaterials().at(0)->m_baseColourMap->GetImportPath() == "Textures/T_DefaultGrid.png";
+    if (isDefaultTexture) {
+        // Get static cache
+        static std::unordered_map<EString, TShared<ETexture>> textureCache;
+        static std::unordered_map<EString, TShared<ESMaterial>> materialCache;
 
-    // Static cache
-    static std::unordered_map<EString, TShared<ETexture>> textureCache;
-    static std::unordered_map<EString, TShared<ESMaterial>> materialCache;
+        // Create texture if not in cache
+        if (!textureCache.count(texturePaths.base)) {
+            auto texBase = TMakeShared<ETexture>();
+            texBase->LoadTexture("Model: " + modelPath, texturePaths.base);
+            textureCache[texturePaths.base] = texBase;
 
-    // Create texture if not in cache
-    if (!textureCache.count(texturePath)) {
-        auto tex = TMakeShared<ETexture>();
-        tex->LoadTexture("Model: " + modelPath, texturePath);
-        textureCache[texturePath] = tex;
+            if (!texturePaths.normal.empty()) {
+                auto texNormal = TMakeShared<ETexture>();
+                texNormal->LoadTexture("Model: " + modelPath, texturePaths.normal);
+                textureCache[texturePaths.normal] = texNormal;
+            }
+
+            if (!texturePaths.specular.empty()) {
+                auto texSpecular = TMakeShared<ETexture>();
+                texSpecular->LoadTexture("Model: " + modelPath, texturePaths.specular);
+                textureCache[texturePaths.specular] = texSpecular;
+            }
+        }
+
+        // Create material if not in cache
+        if (!materialCache.count(texturePaths.base)) {
+            auto mat = EGameEngine::GetGameEngine()->CreateMaterial();
+            mat->m_baseColourMap = textureCache[texturePaths.base];
+            if (!texturePaths.normal.empty()) mat->m_normalMap = textureCache[texturePaths.normal];
+            if (!texturePaths.specular.empty()) mat->m_specularMap = textureCache[texturePaths.specular];
+            materialCache[texturePaths.base] = mat;
+        }
+
+        // Add material to the model
+        modelRef->SetMaterialBySlot(0, materialCache[texturePaths.base]);
     }
-
-    // Create material if not in cache
-    if (!materialCache.count(texturePath)) {
-        auto mat = EGameEngine::GetGameEngine()->CreateMaterial();
-        mat->m_baseColourMap = textureCache[texturePath];
-        materialCache[texturePath] = mat;
-    }
-
-    // Add material to the model
-    modelRef->SetMaterialBySlot(0, materialCache[texturePath]);
 
     // Cache and return
     m_objectModels.push_back(modelRef);
     return modelRef;
 }
 
-TWeak<EModel> EWorldObject::LoadModel(const EString& modelPath, const EString& texturePath)
+TWeak<EModel> EWorldObject::LoadModel(const EString& modelPath, const ETexturePaths& texturePaths)
 {
     auto& models = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetModels();
 
@@ -53,7 +68,7 @@ TWeak<EModel> EWorldObject::LoadModel(const EString& modelPath, const EString& t
     }
 
     // Else import if not cached
-    return ImportModel(modelPath, texturePath);
+    return ImportModel(modelPath, texturePaths);
 }
 
 TWeak<ESCollision> EWorldObject::AddCollision(const ESBox& box, const bool& debug)

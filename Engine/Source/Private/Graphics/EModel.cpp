@@ -1,4 +1,6 @@
 #include "Graphics/EModel.h"
+#include "Graphics/ESMaterial.h"
+#include "Graphics/ETexture.h"
 
 // External Libss
 #include <ASSIMP/Importer.hpp>

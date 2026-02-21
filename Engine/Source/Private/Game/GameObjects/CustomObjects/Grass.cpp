@@ -9,25 +9,12 @@ void Grass::OnStart()
 	
 	// Add model
 	EString modelPath = "Models/Grass/Grass_green.fbx";
-	EString texturePath = "Models/Grass/textures/Grass_green.png";
-	auto model = LoadModel(modelPath, texturePath);
-	//grassNorm->LoadTexture("Grass Normal", "Models/Grass/textures/Normal_grass.png");
+	ETexturePaths texturePaths = {
+		"Models/Grass/textures/Grass_green.png",
+		"Models/Grass/textures/Normal_grass.png"
+	};
+	auto model = LoadModel(modelPath, texturePaths);
 	// need to set materials on slots 0-13
-	// Add materials to the model
-	//model.lock()->SetMaterialBySlot(0, grassMat);
-	//model.lock()->SetMaterialBySlot(1, grassMat);
-	//model.lock()->SetMaterialBySlot(2, grassMat);
-	//model.lock()->SetMaterialBySlot(3, grassMat);
-	//model.lock()->SetMaterialBySlot(4, grassMat);
-	//model.lock()->SetMaterialBySlot(5, grassMat);
-	//model.lock()->SetMaterialBySlot(6, grassMat);
-	//model.lock()->SetMaterialBySlot(7, grassMat);
-	//model.lock()->SetMaterialBySlot(8, grassMat);
-	//model.lock()->SetMaterialBySlot(9, grassMat);
-	//model.lock()->SetMaterialBySlot(10, grassMat);
-	//model.lock()->SetMaterialBySlot(11, grassMat);
-	//model.lock()->SetMaterialBySlot(12, grassMat);
-	//model.lock()->SetMaterialBySlot(13, grassMat);
 
 	// Place grass randomly on floor mesh
 	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {

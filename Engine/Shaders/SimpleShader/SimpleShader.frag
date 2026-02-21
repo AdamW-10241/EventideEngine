@@ -17,6 +17,8 @@ struct Material {
 
 // Material for the shader to interface with our engine material
 uniform Material material;
+uniform bool hasNormalMap = false;
+uniform bool hasSpecularMap = false;
 
 struct DirLight {
 	vec3 colour;
@@ -79,11 +81,14 @@ void main() {
 	vec3 specularColour = texture(material.specularMap, fTexCoords).rgb;
 
 	// Normal colour map value that the object starts as
-	vec3 normalColour = texture(material.normalMap, fTexCoords).rgb;
-	vec3 normals = normalize(normalColour * 2.0f - 1.0f);
-
-	// Normalise the texture normals based on the TBN matrix
-	normals = normalize(fTBN * normals);
+	vec3 normals;
+	if (hasNormalMap) {
+		vec3 normalColour = texture(material.normalMap, fTexCoords).rgb;
+		normals = normalize(normalColour * 2.0f - 1.0f);
+		normals = normalize(fTBN * normals);
+	} else {
+		normals = normalize(fTBN * vec3(0.0f, 0.0f, 1.0f));
+	}
 
 	// Get the view direction
 	vec3 viewDir = normalize(fViewPos - fVertPos);
@@ -117,7 +122,8 @@ void main() {
 		specular *= dirLights[i].intensity;
 
 		// Add our light values together to get the results
-		result += ambientLight + lightColour + specular;
+		result += ambientLight + lightColour;
+		if (hasSpecularMap) result += specular;
 	}
 
 	// ------------ POINT LIGHTS
@@ -163,7 +169,8 @@ void main() {
 		specular *= pointLights[i].intensity;
 
 		// Add our light values together to get the results
-		result += lightColour + specular;
+		result += lightColour;
+		if (hasSpecularMap) result += specular;
 	}
 
 	// ------------ SPOT LIGHTS
@@ -218,7 +225,8 @@ void main() {
 		specular *= spotLightIntensity;
 
 		// Add our light values together to get the results
-		result += lightColour + specular;
+		result += lightColour;
+		if (hasSpecularMap) result += specular;
 	}
 	
 	finalColour = vec4(result * brightness, 1.0f);

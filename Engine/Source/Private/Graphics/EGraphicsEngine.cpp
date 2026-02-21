@@ -274,7 +274,7 @@ TShared<EModel> EGraphicsEngine::ImportModel(const EString& path)
 	const auto& newModel = TMakeShared<EModel>(spawnID, path);
 	newModel->ImportModel(path, m_defaultMaterial);
 	m_models.push_back(newModel);
-	
+
 	return newModel;
 }
 

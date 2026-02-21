@@ -3,6 +3,12 @@
 
 class ETexture;
 
+struct ETexturePaths {
+	EString base;
+	EString normal = "";	// optional
+	EString specular = "";  // optional
+};
+
 struct ESMaterial {
 	ESMaterial() = default;
 

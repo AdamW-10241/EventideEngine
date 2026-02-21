@@ -7,10 +7,12 @@ void Floor::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Grid/grid.fbx";
-	EString texturePath = "Models/Grid/textures/grass01.jpg";
-	auto model = LoadModel(modelPath, texturePath);
-	//gridNorm->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_n.jpg");
-	//gridSpec->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_s.jpg");
+	ETexturePaths texturePaths = { 
+		"Models/Grid/textures/grass01.jpg", 
+		"Models/Grid/textures/grass01_n.jpg", 
+		"Models/Grid/textures/grass01_s.jpg"
+	};
+	auto model = LoadModel(modelPath, texturePaths);
 
 	// Add collision
 	AddCollision({ GetTransform().position, glm::vec3(300.0f, 1.0f, 300.0f) }, false);

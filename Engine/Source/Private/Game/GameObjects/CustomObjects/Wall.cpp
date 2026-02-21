@@ -33,9 +33,11 @@ void Wall::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Wall/CustomWall.fbx";
-	EString texturePath = "Models/Wall/textures/default_baseColor.png";
-	auto model = LoadModel(modelPath, texturePath);
-	//wallNorm->LoadTexture("Wall Normal", "Models/Wall/textures/default_normal.png");
+	ETexturePaths texturePaths = {
+		"Models/Wall/textures/default_baseColor.png",
+		"Models/Wall/textures/default_normal.png"
+	};
+	auto model = LoadModel(modelPath, texturePaths);
 
 	// Place randomly on floor mesh
 	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {

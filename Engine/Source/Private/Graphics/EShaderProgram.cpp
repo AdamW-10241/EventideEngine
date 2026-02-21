@@ -418,6 +418,28 @@ void EShaderProgram::SetMaterial(const TShared<ESMaterial>& material)
 	varID = glGetUniformLocation(m_programID, "materialTextureDepth");
 	// Update the shader
 	glUniform1f(varID, material->m_textureDepth);
+
+	// --------- HAS NORMAL MAP
+	varID = glGetUniformLocation(m_programID, "hasNormalMap");
+	if (material->m_normalMap) {
+		material->m_normalMap->BindTexture(2);
+		glUniform1i(glGetUniformLocation(m_programID, "material.normalMap"), 2);
+		glUniform1i(varID, true);
+	}
+	else {
+		glUniform1i(varID, false);
+	}
+
+	// --------- HAS SPECULAR MAP
+	varID = glGetUniformLocation(m_programID, "hasSpecularMap");
+	if (material->m_specularMap) {
+		material->m_specularMap->BindTexture(2);
+		glUniform1i(glGetUniformLocation(m_programID, "material.specularMap"), 2);
+		glUniform1i(varID, true);
+	}
+	else {
+		glUniform1i(varID, false);
+	}
 }
 
 void EShaderProgram::SetWireColour(const glm::vec3& colour)
