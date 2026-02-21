@@ -6,29 +6,11 @@ void Floor::OnStart()
 	GetTransform().scale = glm::vec3(0.3f);
 
 	// Add model
-	auto model = ImportModel("Models/Grid/grid.fbx");
-
-	// Grass base
-	auto gridBase = TMakeShared<ETexture>();
-	gridBase->LoadTexture("Grid Base", "Models/Grid/textures/grass01.jpg");
-	// Grass normal
-	auto gridNorm = TMakeShared<ETexture>();
-	gridNorm->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_n.jpg");
-	// Grass specular
-	auto gridSpec = TMakeShared<ETexture>();
-	gridSpec->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_s.jpg");
-
-	// Creating materials
-	auto gridMat = EGameEngine::GetGameEngine()->CreateMaterial();
-	gridMat->m_textureDepth = 10.0f;
-
-	// Assigning textures to the materials
-	gridMat->m_baseColourMap = gridBase;
-	gridMat->m_normalMap = gridNorm;
-	gridMat->m_specularMap = gridSpec;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, gridMat);
+	EString modelPath = "Models/Grid/grid.fbx";
+	EString texturePath = "Models/Grid/textures/grass01.jpg";
+	auto model = LoadModel(modelPath, texturePath);
+	//gridNorm->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_n.jpg");
+	//gridSpec->LoadTexture("Grid Normal", "Models/Grid/textures/grass01_s.jpg");
 
 	// Add collision
 	AddCollision({ GetTransform().position, glm::vec3(300.0f, 1.0f, 300.0f) }, false);

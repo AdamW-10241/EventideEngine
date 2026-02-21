@@ -4,6 +4,7 @@
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Game/GameObjects/CustomObjects/Player.h"
 #include "Game/GameObjects/CustomObjects/Coin.h"
+#include "Graphics/EGraphicsEngine.h"
 
 #define Super Character
 
@@ -20,7 +21,7 @@ Enemy::Enemy(TWeak<Player> playerRef)
 void Enemy::OnStart()
 {
 	Super::OnStart();
-	
+
 	// Place randomly on floor mesh
 	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
 		PlaceOnFloorRandomly(floor, 25.0f);
@@ -33,20 +34,9 @@ void Enemy::OnStart()
 	GetTransform().scale = glm::vec3(15.0f);
 
 	// Add model
-	auto model = ImportModel("Models/Enemy/scene.gltf");
-
-	// Enemy base
-	auto enemyBase = TMakeShared<ETexture>();
-	enemyBase->LoadTexture("Enemy Base", "Models/Enemy/textures/m_828990a1-ca37-b194-653d-836ec5c4f93b_baseColor.png");
-
-	// Creating materials
-	auto enemyMat = EGameEngine::GetGameEngine()->CreateMaterial();
-
-	// Assigning textures to the materials
-	enemyMat->m_baseColourMap = enemyBase;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, enemyMat);
+	EString modelPath = "Models/Enemy/scene.gltf";
+	EString texturePath = "Models/Enemy/textures/m_828990a1-ca37-b194-653d-836ec5c4f93b_baseColor.png";
+	auto model = LoadModel(modelPath, texturePath);
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, false).lock()) {

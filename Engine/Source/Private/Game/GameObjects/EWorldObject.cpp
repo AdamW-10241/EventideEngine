@@ -5,15 +5,55 @@
 
 #define Super EObject
 
-TWeak<EModel> EWorldObject::ImportModel(const EString& path)
+TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const EString& texturePath)
 {
-    if (const auto& modelRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->ImportModel(path)) {
-        m_objectModels.push_back(modelRef);
-        modelRef->GetTransform() = m_transform;
-        return modelRef;
+    // Import model
+    auto modelRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->ImportModel(modelPath);
+
+    // Assign materials once per model
+    if (!modelRef->HasMaterials()) return modelRef;
+    bool isDefaultTexture = modelRef->GetMaterials().at(0)->m_baseColourMap->GetImportPath() == "Textures/T_DefaultGrid.png";
+
+    // Static cache
+    static std::unordered_map<EString, TShared<ETexture>> textureCache;
+    static std::unordered_map<EString, TShared<ESMaterial>> materialCache;
+
+    // Create texture if not in cache
+    if (!textureCache.count(texturePath)) {
+        auto tex = TMakeShared<ETexture>();
+        tex->LoadTexture("Model: " + modelPath, texturePath);
+        textureCache[texturePath] = tex;
     }
-    
-    return {};
+
+    // Create material if not in cache
+    if (!materialCache.count(texturePath)) {
+        auto mat = EGameEngine::GetGameEngine()->CreateMaterial();
+        mat->m_baseColourMap = textureCache[texturePath];
+        materialCache[texturePath] = mat;
+    }
+
+    // Add material to the model
+    modelRef->SetMaterialBySlot(0, materialCache[texturePath]);
+
+    // Cache and return
+    m_objectModels.push_back(modelRef);
+    return modelRef;
+}
+
+TWeak<EModel> EWorldObject::LoadModel(const EString& modelPath, const EString& texturePath)
+{
+    auto& models = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetModels();
+
+    // Find cached model
+    for (const auto& modelRef : models) {
+        if (modelRef->GetPath().compare(modelPath) == 0) {
+            m_objectModels.push_back(modelRef);
+            return modelRef;
+        }
+    }
+
+    // Else import if not cached
+    return ImportModel(modelPath, texturePath);
 }
 
 TWeak<ESCollision> EWorldObject::AddCollision(const ESBox& box, const bool& debug)
@@ -73,18 +113,14 @@ void EWorldObject::TranslateLocal(float deltaTime, glm::vec3 translation, glm::v
 void EWorldObject::PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale)
 {
     // Set the position to a random vertex position on the mesh
-    GetTransform().position = floor->GetTransform().position +
-        (floor->GetModel(0).lock()->GetMesh(0)->GetRandomVertexPosition() * placementScale);
+    if (auto model = floor->GetModel(0).lock()) {
+        GetTransform().position = floor->GetTransform().position + (model->GetMesh(0)->GetRandomVertexPosition() * placementScale);
+    }
 }
 
 void EWorldObject::OnPostTick(float deltaTime)
 {
     Super::OnPostTick(deltaTime);
-
-    // All models will follow the world object
-    for (const auto& modelRef : m_objectModels) {
-        modelRef->GetTransform() = GetTransform();
-    }
 
     // All collisions will follow the world object
     for (const auto& colRef : m_objectCollisions) {

@@ -20,20 +20,9 @@ void Bullet::OnStart()
 	GetTransform().scale = glm::vec3(0.01f);
 
 	// Add model
-	auto model = ImportModel("Models/Bullet/CubeBullet.fbx");
-
-	// Gun base
-	auto bulletBase = TMakeShared<ETexture>();
-	bulletBase->LoadTexture("Bullet Base", "Textures/T_Brass.png");
-
-	// Creating materials
-	auto bulletMat = EGameEngine::GetGameEngine()->CreateMaterial();
-
-	// Assigning textures to the materials
-	bulletMat->m_baseColourMap = bulletBase;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, bulletMat);
+	EString modelPath = "Models/Bullet/CubeBullet.fbx";
+	EString texturePath = "Textures/T_Brass.png";
+	auto model = LoadModel(modelPath, texturePath);
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(4.0f, 4.0f, 4.0f) }, false).lock()) {

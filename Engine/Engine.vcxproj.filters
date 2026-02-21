@@ -54,9 +54,6 @@
     <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\Game\GameObjects\EWorldObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h">

@@ -15,10 +15,19 @@ public:
 	virtual ~EWorldObject() = default;
 
 	// Import a model and return a weak reference
-	TWeak<EModel> ImportModel(const EString& path);
+	TWeak<EModel> ImportModel(const EString& modelPath, const EString& texturePath);
+
+	// Load a model, processing cache first, and return a weak reference
+	TWeak<EModel> LoadModel(const EString& modelPath, const EString& texturePaths);
 
 	// Get the world objects model at an index
 	TWeak<EModel> GetModel(const int& index) const { return m_objectModels.at(index); }
+
+	// Get the world objects models
+	TArray<TWeak<EModel>> GetModels() const { return m_objectModels; }
+
+	// Get the count of world object models
+	EUi32 GetModelCount() const { return m_objectModels.size(); }
 
 	// Add a collision to the object
 	TWeak<ESCollision> AddCollision(const ESBox& box, const bool& debug = false);
@@ -55,7 +64,7 @@ private:
 	ESTransform m_transform;
 
 	// Store any models attached to this object
-	TArray<TShared<EModel>> m_objectModels;
+	TArray<TWeak<EModel>> m_objectModels;
 
 	// Store the collisions for the model
 	TArray<TShared<ESCollision>> m_objectCollisions;

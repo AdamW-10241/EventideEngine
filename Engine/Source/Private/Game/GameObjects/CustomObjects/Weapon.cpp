@@ -61,28 +61,11 @@ void Weapon::OnStart()
 	GetTransform().scale = glm::vec3(0.01f);
 
 	// Add model
-	auto model = ImportModel("Models/Gun/sg553_flipped.fbx");
-
-	// Gun base
-	auto gunBase = TMakeShared<ETexture>();
-	gunBase->LoadTexture("Gun Base", "Models/Gun/textures/sg553_BaseColor.tga.png");
-	// Gun normal
-	auto gunNorm = TMakeShared<ETexture>();
-	gunNorm->LoadTexture("Gun Normal", "Models/Gun/textures/sg553_Normal.tga.png");
-	// Gun specular
-	auto gunSpec = TMakeShared<ETexture>();
-	gunSpec->LoadTexture("Gun Normal", "Models/Gun/textures/sg553_Metalness.tga.png");
-
-	// Creating materials
-	auto gunMat = EGameEngine::GetGameEngine()->CreateMaterial();
-
-	// Assigning textures to the materials
-	gunMat->m_baseColourMap = gunBase;
-	gunMat->m_normalMap = gunNorm;
-	gunMat->m_specularMap = gunSpec;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, gunMat);
+	EString modelPath = "Models/Gun/sg553_flipped.fbx";
+	EString texturePath = "Models/Gun/textures/sg553_BaseColor.tga.png";
+	auto model = LoadModel(modelPath, texturePath);
+	//gunNorm->LoadTexture("Gun Normal", "Models/Gun/textures/sg553_Normal.tga.png");
+	//gunSpec->LoadTexture("Gun Normal", "Models/Gun/textures/sg553_Metalness.tga.png");
 }
 
 void Weapon::OnTick(float deltaTime)

@@ -106,7 +106,6 @@
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Enemy.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Floor.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Grass.cpp" />
-    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Helmet.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\InvisibleWalls.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Skybox.cpp" />
@@ -135,7 +134,6 @@
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Enemy.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Floor.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Grass.h" />
-    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Helmet.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Skybox.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Wall.h" />

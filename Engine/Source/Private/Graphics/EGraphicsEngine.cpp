@@ -7,6 +7,7 @@
 #include "Graphics/ESCamera.h"
 #include "Graphics/ESLight.h"
 #include "Game/EGameEngine.h"
+#include "Game/GameObjects/EWorldObject.h"
 #include "Math/ESCollision.h"
 
 // External Libs
@@ -182,15 +183,21 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Render custom graphics
 	// Models will update their own positions in the mesh based on the transform
-	for (int i = m_models.size() - 1; i >= 0; --i) {
-		// Detecting if the reference still exists
-		if (const auto& modelRef = m_models[i].lock()) {
-			// Render if there is a reference
-			modelRef->Render(m_shader, m_lights);
-		}
-		else {
-			// Erase from the array if there is no reference
-			m_models.erase(m_models.begin() + i);
+	const auto& worldObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EWorldObject>();
+	for (const auto& weakObject : worldObjects) {
+		if (auto worldObjectRef = weakObject.lock()) {
+			// Check models exist			
+			if (worldObjectRef->GetModelCount() <= 0) {
+				//EDebug::Log("Meshes in model: 0", LT_WARNING);
+				continue;
+			}
+			//EDebug::Log("Meshes in model: " + toEString(worldObjectRef->GetModelCount()), LT_LOG);
+			// Render all models
+			for (int model = 0; model < worldObjectRef->GetModelCount(); ++model) {
+				if (auto modelRef = worldObjectRef->GetModel(model).lock()) {
+					modelRef->Render(worldObjectRef->GetTransform(), m_shader, m_lights);
+				}
+			}
 		}
 	}
 
@@ -219,7 +226,13 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 			}
 			else {
 				// Erase from the array if there is no reference
-				m_collisions.erase(m_collisions.begin() + i);
+				auto& collisions = m_collisions;
+				for (int i = collisions.size() - 1; i >= 0; --i) {
+					if (collisions[i].expired()) {
+						std::swap(collisions[i], collisions.back());
+						collisions.pop_back();
+					}
+				}
 			}
 		}
 	}

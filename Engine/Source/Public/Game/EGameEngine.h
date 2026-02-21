@@ -74,9 +74,9 @@ public:
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_window->GetGraphicsEngine(); }
 
 	// Find an object of type T from the object stack
-	template<typename T, std::enable_if_t<std::is_base_of_v<EObject, T>, T>* = nullptr>
+	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
 	TWeak<T> FindObjectOfType() {
-		// Find an object within the object stack=
+		// Find an object within the object stack
 		for (const auto& eObjectRef : m_objectStack) {
 			if (const auto& cast = std::dynamic_pointer_cast<T>(eObjectRef)) {
 				// Match
@@ -87,6 +87,23 @@ public:
 
 		// Else no match, return empty
 		return {};
+	}
+
+	// Find all objects of type T from the object stack
+	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
+	TArray<TWeak<T>> FindAllObjectsOfType() {
+		TArray<TWeak<T>> objectsOfType = {};
+		// Find an object within the object stack
+		for (const auto& eObjectRef : m_objectStack) {
+			if (const auto& cast = std::dynamic_pointer_cast<T>(eObjectRef)) {
+				// Match
+				objectsOfType.push_back(cast);
+			}
+
+		}
+
+		// Return found objects of type
+		return objectsOfType;
 	}
 
 private:

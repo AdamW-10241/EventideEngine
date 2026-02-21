@@ -24,10 +24,7 @@ public:
 	
 	// Render all of the meshes within the model
 	// Transform of meshes will be based on models transform
-	void Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights);
-
-	// Get the transform of the model
-	ESTransform& GetTransform() { return m_transform; }
+	void Render(const ESTransform& transform, const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights);
 
 	// Set a material by the slot number
 	void SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& material);
@@ -40,6 +37,12 @@ public:
 
 	// Get the models mesh stack
 	TUnique<EMesh>& GetMesh(const int& index) { return m_meshStack.at(index); }
+
+	// Get whether model has materials
+	const bool HasMaterials() const { return m_materialStack.size() > 0; }
+
+	// Get model materials
+	const TArray<TShared<ESMaterial>>& GetMaterials() const { return m_materialStack; }
 
 public:
 	// Transform offset
@@ -56,9 +59,6 @@ private:
 
 	// Array of materials for the model
 	TArray<TShared<ESMaterial>> m_materialStack;
-
-	// Transform for the model in 3D space
-	ESTransform m_transform;
 
 	// Spawn ID
 	unsigned int m_spawnID;

@@ -85,7 +85,7 @@ public:
 	void ResetTextureDepth();
 
 	// Get the models stack
-	TArray<TWeak<EModel>>& GetModels() { return m_models; }
+	TArray<TShared<EModel>>& GetModels() { return m_models; }
 
 	// Get the lights stack
 	TArray<TShared<ESLight>>& GetLights() { return m_lights; }
@@ -107,7 +107,7 @@ private:
 	TArray<TShared<ESLight>> m_lights;
 
 	// Stores all the models in the engine
-	TArray<TWeak<EModel>> m_models;
+	TArray<TShared<EModel>> m_models;
 
 	// Stores all of the collision meshes
 	TArray<TWeak<ESCollision>> m_collisions;

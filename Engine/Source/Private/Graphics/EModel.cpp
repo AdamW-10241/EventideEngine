@@ -69,10 +69,10 @@ void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& def
 	//	filePath, LT_SUCCESS);
 }
 
-void EModel::Render(const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)
+void EModel::Render(const ESTransform& transform, const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)
 {
 	for (const auto& mesh : m_meshStack) {
-		mesh->Render(shader, m_transform + m_offset, lights, m_materialStack[mesh->materialIndex]);
+		mesh->Render(shader, transform + m_offset, lights, m_materialStack[mesh->materialIndex]);
 	}
 }
 

@@ -11,7 +11,6 @@
 std::default_random_engine RandGenerator;
 
 // DEBUG
-#include "Game/GameObjects/CustomObjects/Helmet.h"
 #include "Game/GameObjects/CustomObjects/Player.h"
 #include "Game/GameObjects/CustomObjects/Floor.h"
 #include "Game/GameObjects/CustomObjects/Grass.h"
@@ -140,6 +139,14 @@ void EGameEngine::Start()
 	
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
+
+	// Create Models
+	TWeak<EModel> enemyModel = ImportModel("Models/Enemy/scene.gltf");
+	TShared<ETexture> enemyTexture = TMakeShared<ETexture>();
+	enemyTexture->LoadTexture("Enemy Base", "Models/Enemy/textures/m_828990a1-ca37-b194-653d-836ec5c4f93b_baseColor.png");
+	TShared<ESMaterial> enemyMaterial = CreateMaterial();
+	enemyMaterial->m_baseColourMap = enemyTexture;
+	enemyModel.lock()->SetMaterialBySlot(0, enemyMaterial);
 
 	// Spawn Skybox
 	CreateObject<Skybox>();
@@ -310,7 +317,6 @@ void EGameEngine::PreLoop()
 void EGameEngine::PostLoop()
 {
 	// Get stacks stack
-	TArray<TWeak<EModel>>& eModelStack = m_window->GetGraphicsEngine()->GetModels();
 	TArray<TShared<ESLight>>& eLightStack = m_window->GetGraphicsEngine()->GetLights();
 	
 	// Loop through all objects pending destroy

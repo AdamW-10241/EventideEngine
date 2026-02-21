@@ -32,25 +32,10 @@ void Wall::OnStart()
 	}
 
 	// Add model
-	auto model = ImportModel("Models/Wall/CustomWall.fbx");
-
-	// Wall base
-	auto wallBase = TMakeShared<ETexture>();
-	wallBase->LoadTexture("Wall Base", "Models/Wall/textures/default_baseColor.png");
-	// Wall normal
-	auto wallNorm = TMakeShared<ETexture>();
-	wallNorm->LoadTexture("Wall Normal", "Models/Wall/textures/default_normal.png");
-
-	// Creating materials
-	auto wallMat = EGameEngine::GetGameEngine()->CreateMaterial();
-	wallMat->m_specularStrength = 0.0f;
-
-	// Assigning textures to the materials
-	wallMat->m_baseColourMap = wallBase;
-	wallMat->m_normalMap = wallNorm;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, wallMat);
+	EString modelPath = "Models/Wall/CustomWall.fbx";
+	EString texturePath = "Models/Wall/textures/default_baseColor.png";
+	auto model = LoadModel(modelPath, texturePath);
+	//wallNorm->LoadTexture("Wall Normal", "Models/Wall/textures/default_normal.png");
 
 	// Place randomly on floor mesh
 	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {

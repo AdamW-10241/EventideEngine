@@ -10,24 +10,10 @@ void Coin::OnStart()
 	GetTransform().scale = glm::vec3(200.0f);
 
 	// Add model
-	auto model = ImportModel("Models/Coin/scene.gltf");
-
-	// Coin base
-	auto coinBase = TMakeShared<ETexture>();
-	coinBase->LoadTexture("Coin Base", "Models/Coin/textures/TB_coin_mat_baseColor.jpeg");
-	// Coin normal
-	auto coinNorm = TMakeShared<ETexture>();
-	coinNorm->LoadTexture("Coin Normal", "Models/Coin/textures/TB_coin_mat_normal.jpeg");
-
-	// Creating materials
-	auto coinMat = EGameEngine::GetGameEngine()->CreateMaterial();
-
-	// Assigning textures to the materials
-	coinMat->m_baseColourMap = coinBase;
-	coinMat->m_normalMap = coinNorm;
-
-	// Add materials to the model
-	model.lock()->SetMaterialBySlot(0, coinMat);
+	EString modelPath = "Models/Coin/scene.gltf";
+	EString texturePath = "Models/Coin/textures/TB_coin_mat_baseColor.jpeg";
+	auto model = LoadModel(modelPath, texturePath);
+	//coinNorm->LoadTexture("Coin Normal", "Models/Coin/textures/TB_coin_mat_normal.jpeg");
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(8.0f) }, false).lock()) {
