@@ -11,11 +11,13 @@ void Coin::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Coin/scene.gltf";
-	ETexturePaths texturePaths = {
-		"Models/Coin/textures/TB_coin_mat_baseColor.jpeg",
-		"Models/Coin/textures/TB_coin_mat_normal.jpeg"
+	TArray<ESMaterialSlot> materials = { 
+		{ {0}, ESMaterialDesc{
+			{"Models/Coin/textures/TB_coin_mat_baseColor.jpeg", 
+			"Models/Coin/textures/TB_coin_mat_normal.jpeg"}
+		} } 
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(8.0f) }, false).lock()) {

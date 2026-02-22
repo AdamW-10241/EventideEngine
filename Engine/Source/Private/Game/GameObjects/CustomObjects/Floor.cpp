@@ -7,12 +7,13 @@ void Floor::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Grid/grid.fbx";
-	ETexturePaths texturePaths = { 
-		"Models/Grid/textures/grass01.jpg", 
-		"Models/Grid/textures/grass01_n.jpg", 
-		"Models/Grid/textures/grass01_s.jpg"
+	TArray<ESMaterialSlot> materials = {
+		{ {0}, ESMaterialDesc{
+			{"Models/Grid/textures/grass01.jpg",
+			 "Models/Grid/textures/grass01_n.jpg"}
+		}.withTextureDepth(10.0f)}
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 
 	// Add collision
 	AddCollision({ GetTransform().position, glm::vec3(300.0f, 1.0f, 300.0f) }, false);

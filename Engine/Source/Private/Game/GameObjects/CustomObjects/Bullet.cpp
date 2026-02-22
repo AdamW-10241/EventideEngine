@@ -21,10 +21,12 @@ void Bullet::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Bullet/CubeBullet.fbx";
-	ETexturePaths texturePaths = {
-		"Textures/T_Brass.png"
+	TArray<ESMaterialSlot> materials = {
+		{ {0}, ESMaterialDesc{
+			{"Textures/T_Brass.png"}
+		} }
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(4.0f, 4.0f, 4.0f) }, false).lock()) {

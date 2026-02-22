@@ -35,10 +35,12 @@ void Enemy::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Enemy/scene.gltf";
-	ETexturePaths texturePaths = {
-		"Models/Enemy/textures/m_828990a1-ca37-b194-653d-836ec5c4f93b_baseColor.png"
+	TArray<ESMaterialSlot> materials = { 
+		{ {0}, ESMaterialDesc{
+			{"Models/Enemy/textures/m_828990a1-ca37-b194-653d-836ec5c4f93b_baseColor.png"}
+		} }
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, false).lock()) {

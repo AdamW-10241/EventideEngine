@@ -172,7 +172,7 @@ void EGameEngine::Start()
 	}
 
 	// Spawn Grass
-	for (EUi32 i = 0; i < 20; i++) {
+	for (EUi32 i = 0; i < 30; i++) {
 		// Spawn grass
 		CreateObject<Grass>();
 	}

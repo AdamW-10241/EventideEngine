@@ -15,10 +15,10 @@ public:
 	virtual ~EWorldObject() = default;
 
 	// Import a model and return a weak reference
-	TWeak<EModel> ImportModel(const EString& modelPath, const ETexturePaths& texturePaths);
+	TWeak<EModel> ImportModel(const EString& modelPath, const TArray<ESMaterialSlot>& materials);
 
 	// Load a model, processing cache first, and return a weak reference
-	TWeak<EModel> LoadModel(const EString& modelPath, const ETexturePaths& texturePaths);
+	TWeak<EModel> LoadModel(const EString& modelPath, const TArray<ESMaterialSlot>& materials);
 
 	// Get the world objects model at an index
 	TWeak<EModel> GetModel(const int& index) const { return m_objectModels.at(index); }

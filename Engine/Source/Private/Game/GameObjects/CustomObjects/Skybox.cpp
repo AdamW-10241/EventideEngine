@@ -12,8 +12,10 @@ void Skybox::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Skybox/SkyPano_Milkyway.fbx";
-	ETexturePaths texturePaths = {
-		"Models/Skybox/textures/Milkyway_BG.jpg"
+	TArray<ESMaterialSlot> materials = { 
+		{ {0}, ESMaterialDesc{
+			{"Models/Skybox/textures/Milkyway_BG.jpg"}
+		} } 
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 }

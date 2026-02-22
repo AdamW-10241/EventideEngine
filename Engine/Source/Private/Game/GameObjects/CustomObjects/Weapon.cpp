@@ -62,12 +62,14 @@ void Weapon::OnStart()
 
 	// Add model
 	EString modelPath = "Models/Gun/sg553_flipped.fbx";
-	ETexturePaths texturePaths = {
-		"Models/Gun/textures/sg553_BaseColor.tga.png",
-		"Models/Gun/textures/sg553_Normal.tga.png",
-		"Models/Gun/textures/sg553_Metalness.tga.png"
+	TArray<ESMaterialSlot> materials = {
+		{ {0}, ESMaterialDesc{
+			{"Models/Gun/textures/sg553_BaseColor.tga.png",
+			 "Models/Gun/textures/sg553_Normal.tga.png",
+			 "Models/Gun/textures/sg553_Metalness.tga.png"}
+		} } 
 	};
-	auto model = LoadModel(modelPath, texturePaths);
+	auto model = LoadModel(modelPath, materials);
 }
 
 void Weapon::OnTick(float deltaTime)
