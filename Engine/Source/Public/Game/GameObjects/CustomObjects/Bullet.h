@@ -3,7 +3,7 @@
 
 class Bullet : public EWorldObject {
 public:
-	Bullet(EECollisionType collisionType, glm::vec3 moveVector, float damage, float moveSpeed);
+	Bullet(EECollisionType collisionType, glm::vec3 moveVector, float damage, float moveSpeed, float lifetime, glm::vec3 spawnPos, glm::vec3 spawnRot);
 
 protected:
 	virtual void OnStart() override;

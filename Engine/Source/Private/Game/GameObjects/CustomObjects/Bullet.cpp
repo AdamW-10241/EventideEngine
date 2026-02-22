@@ -4,12 +4,15 @@
 
 #define Super EWorldObject
 
-Bullet::Bullet(EECollisionType collisionType, glm::vec3 moveVector, float damage, float moveSpeed)
+Bullet::Bullet(EECollisionType collisionType, glm::vec3 moveVector, float damage, float moveSpeed, float lifetime, glm::vec3 spawnPos, glm::vec3 spawnRot)
 {
 	m_collisionType = collisionType;
 	m_moveVector = moveVector;
 	m_damage = damage;
 	m_moveSpeed = moveSpeed;
+	SetLifeTime(lifetime);
+	GetTransform().position = spawnPos;
+	GetTransform().rotation = spawnRot;
 }
 
 void Bullet::OnStart()
@@ -30,7 +33,7 @@ void Bullet::OnStart()
 
 	// Add a collision
 	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(4.0f, 4.0f, 4.0f) }, false).lock()) {
-		colRef->type == m_collisionType;
+		colRef->type = m_collisionType;
 	}
 }
 

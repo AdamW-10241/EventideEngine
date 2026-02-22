@@ -30,11 +30,11 @@ private:
 	// Store the old position to restore the camera and object
 	glm::vec3 m_oldPosition;
 
-	// Store the weapon offset from the player
-	glm::vec3 m_weaponOffset;
-
 	// Store if the player is currently pressing left mouse
 	bool m_leftMouseHeld;
+
+	// Store if the player is currently pressing right mouse
+	bool m_rightMouseHeld;
 
 	// Store the spotlight attached to the player
 	TShared<ESSpotLight> m_light;

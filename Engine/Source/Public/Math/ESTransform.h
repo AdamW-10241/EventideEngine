@@ -24,13 +24,13 @@ struct ESTransform {
 		// Get the forward x value by * sin of y by cos of x
 		forward.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 		// Get the forward y value by from sin of x
-		forward.y = sin(glm::radians(rotation.x));
+		forward.y = sin(glm::radians(-rotation.x));
 		// Get the forward z value by * cos of y by cos of x
 		forward.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 
 		// Make sure we don't normalise 0
 		if (glm::length(forward) != 0.0f)
-			glm::normalize(forward);
+			forward = glm::normalize(forward);
 
 		return forward;
 	}
@@ -41,7 +41,7 @@ struct ESTransform {
 
 		// Make sure we don't normalise 0
 		if (glm::length(right) != 0.0f)
-			glm::normalize(right);
+			right = glm::normalize(right);
 
 		return right;
 	}
@@ -52,7 +52,7 @@ struct ESTransform {
 
 		// Make sure we don't normalise 0
 		if (glm::length(up) != 0.0f)
-			glm::normalize(up);
+			up = glm::normalize(up);
 
 		return up;
 	}

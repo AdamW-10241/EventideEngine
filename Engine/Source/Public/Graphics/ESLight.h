@@ -85,7 +85,7 @@ struct ESSpotLight : public ESLight {
 
 		// Make sure we don't normalise 0
 		if (glm::length(forward) != 0.0f)
-			glm::normalize(forward);
+			forward = glm::normalize(forward);
 
 		return forward;
 	}
@@ -97,7 +97,7 @@ struct ESSpotLight : public ESLight {
 
 		// Make sure we don't normalise 0
 		if (glm::length(right) != 0.0f)
-			glm::normalize(right);
+			right = glm::normalize(right);
 
 		return right;
 	}
@@ -109,7 +109,7 @@ struct ESSpotLight : public ESLight {
 
 		// Make sure we don't normalise 0
 		if (glm::length(up) != 0.0f)
-			glm::normalize(up);
+			up = glm::normalize(up);
 
 		return up;
 	}

@@ -1,12 +1,13 @@
 #pragma once
 #include "Game/GameObjects/EWorldObject.h"
+#include "Game/GameObjects/CustomObjects/Character.h"
 
 class Weapon : public EWorldObject {
 public:
-	Weapon(bool addModel = true, float damage = 1.0f, float moveSpeed = 0.1f, float attackCooldownTime = 1.0f, bool unlimitedAmmo = false);
+	Weapon(TWeak<Character> owner, bool addModel = true, float damage = 1.0f, float moveSpeed = 0.1f, float attackCooldownTime = 1.0f, bool unlimitedAmmo = false);
 
 	// Try to fire
-	void TryFire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation);
+	void TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
 
 	// Reload the weapon and adjust ammo stocks
 	void Reload();
@@ -24,11 +25,17 @@ protected:
 
 private:
 	// Fire the gun to spawn and bullet
-	void Fire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation);
+	void Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
 
 private:
+	// Weapon owner
+	TWeak<Character> m_owner;
+
 	// Store whether the model should be added
 	bool m_addModel;
+
+	// Distance bullet spawns from gun
+	float m_barrelLength;
 
 	// Damage dealt by the fired bullet
 	float m_bulletDamage;

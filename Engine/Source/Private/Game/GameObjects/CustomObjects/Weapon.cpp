@@ -4,10 +4,12 @@
 
 #define Super EWorldObject
 
-Weapon::Weapon(bool addModel, float damage, float moveSpeed, float attackCooldownTime, bool unlimitedAmmo)
+Weapon::Weapon(TWeak<Character> owner, bool addModel, float damage, float moveSpeed, float attackCooldownTime, bool unlimitedAmmo)
 {
+	m_owner = owner;
 	m_addModel = addModel;
 
+	m_barrelLength = 8.0f;
 	m_bulletDamage = damage;
 	m_bulletMoveSpeed = moveSpeed;
 	m_attackCooldownTime = attackCooldownTime;
@@ -20,29 +22,26 @@ Weapon::Weapon(bool addModel, float damage, float moveSpeed, float attackCooldow
 	m_reserveAmmo = 64;
 }
 
-void Weapon::TryFire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation)
+void Weapon::TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
 {
 	// If timer expired,
 	if (m_attackTimer <= 0.0f) {
 		// Fire gun
-		Fire(bulletCollisionType, bulletRotation);
+		Fire(bulletCollisionType, shootDirection);
 		// Reset timer
 		m_attackTimer = m_attackCooldownTime;
 	}
 }
 
-void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 bulletRotation)
+void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
 {
-	// Set movement vector (forward)
-	glm::vec3 movementVector = { 0.0f, 0.0f, 1.0f };
+	glm::vec3 spawnPos = GetTransform().position + shootDirection * m_barrelLength;
+	float pitch = glm::degrees(asin(shootDirection.y));
+	float yaw = glm::degrees(atan2(shootDirection.x, shootDirection.z));
+	glm::vec3 spawnRot = glm::vec3(-pitch, yaw, 0.0f);
+	float lifetime = 3.0f;
 
-	// Spawn bullet
-	if (const auto& bullet = EGameEngine::GetGameEngine()->CreateObject<Bullet>(bulletCollisionType, movementVector, m_bulletDamage, m_bulletMoveSpeed).lock()) {
-		// Set position, rotation and lifetime
-		bullet->GetTransform().position = GetTransform().position;
-		bullet->GetTransform().rotation = bulletRotation;
-		bullet->SetLifeTime(3.0f);
-	}
+	EGameEngine::GetGameEngine()->CreateObject<Bullet>(bulletCollisionType, glm::vec3(0, 0, 1), m_bulletDamage, m_bulletMoveSpeed, lifetime, spawnPos, spawnRot);
 }
 
 void Weapon::Reload()

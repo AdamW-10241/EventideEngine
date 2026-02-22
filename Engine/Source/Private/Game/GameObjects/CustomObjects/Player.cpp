@@ -15,9 +15,11 @@ Player::Player()
 	
 	m_collided = false;
 	m_oldPosition = glm::vec3(0.0f);
-	m_weaponOffset = glm::vec3(2.0f, -3.0f, 2.0f);
+	m_weaponBaseOffset = glm::vec3(0.3f, -2.0f, 1.0f);
+	m_weaponADSOffset = glm::vec3(0.0f, -1.8f, -2.0f);
 
 	m_leftMouseHeld = false;
+	m_rightMouseHeld = false;
 }
 
 void Player::SetDefaultCamPosition(glm::vec3 position)
@@ -66,10 +68,22 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 	});
 
+	m_input->OnMousePressed->Bind([this](const EUi8& button) {
+		if (button == SDL_BUTTON_RIGHT) {
+			m_rightMouseHeld = true;
+		}
+	});
+
 	// Mouse released
 	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
 		if (button == SDL_BUTTON_LEFT) {
 			m_leftMouseHeld = false;
+		}
+	});
+
+	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
+		if (button == SDL_BUTTON_RIGHT) {
+			m_rightMouseHeld = false;
 		}
 	});
 }
@@ -83,27 +97,26 @@ void Player::OnTick(float deltaTime)
 
 	// Move to camera
 	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
-		GetTransform().position = camRef->transform.position;
+		if (camRef) {
+			// If weapon exists
+			GetTransform().position = camRef->transform.position;
+			if (m_weapon) {
+				glm::vec3 forward = camRef->transform.Forward();
+				glm::vec3 right = camRef->transform.Right();
+				glm::vec3 up = camRef->transform.Up();
 
-		// If weapon exists,
-		if (m_weapon) {
-			// Move to offset in front of the camera at all times
-			// Get camera rotation in radians
-			glm::vec3 cameraRotationRadians = glm::radians(camRef->transform.rotation);
+				glm::vec3 rotatedWeaponOffset =
+					forward * m_weaponOffset.z +
+					right * m_weaponOffset.x +
+					up * m_weaponOffset.y;
 
-			// Get camera rotation as a matrix to calculate local offset with rotation
-			glm::mat4 cameraRotationMatrix = glm::eulerAngleXYZ(cameraRotationRadians.x, cameraRotationRadians.y, cameraRotationRadians.z);
+				m_weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
+				m_weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
 
-			// Get rotated offset
-			glm::vec3 rotatedWeaponOffset = glm::vec3(glm::inverse(cameraRotationMatrix) * glm::vec4(m_weaponOffset, 0.0f));
-
-			// Set position and rotation
-			m_weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
-			m_weapon->GetTransform().rotation = camRef->transform.rotation;
-
-			// Fire weapon is holding left mouse
-			if (m_leftMouseHeld)
-				m_weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.rotation);
+				// Fire weapon is holding left mouse
+				if (m_leftMouseHeld)
+					m_weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
+			}
 		}
 	}
 }
@@ -138,4 +151,7 @@ void Player::OnPostTick(float deltaTime)
 
 	// Store old position (old for next loop)
 	m_oldPosition = GetTransform().position;
+
+	// Toggle ADS
+	m_toBeWeaponOffset = m_rightMouseHeld ? m_weaponADSOffset : m_weaponBaseOffset;
 }

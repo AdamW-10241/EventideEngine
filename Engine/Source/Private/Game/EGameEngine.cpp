@@ -160,7 +160,7 @@ void EGameEngine::Start()
 		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
 
 		// Add weapon
-		if (TShared<Weapon> weapon = CreateObject<Weapon>(true, 1.0f, 500.0f, 0.2f, false).lock()) {
+		if (TShared<Weapon> weapon = CreateObject<Weapon>(player, true, 1.0f, 500.0f, 0.2f, false).lock()) {
 			player->AddWeapon(weapon);
 		}
 

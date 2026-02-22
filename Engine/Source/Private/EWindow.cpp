@@ -163,11 +163,11 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 
 		// Rotate camera up
 		if (key == SDL_SCANCODE_UP) {
-			m_cameraRotation.x += 1.0f;
+			m_cameraRotation.x += -1.0f;
 		}
 		// Rotate camera down
 		if (key == SDL_SCANCODE_DOWN) {
-			m_cameraRotation.x += -1.0f;
+			m_cameraRotation.x += 1.0f;
 		}
 		// Rotate camera left
 		if (key == SDL_SCANCODE_RIGHT) {
@@ -222,11 +222,11 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		
 		// Rotate camera up
 		if (key == SDL_SCANCODE_UP) {
-			m_cameraRotation.x += -1.0f;
+			m_cameraRotation.x += 1.0f;
 		}
 		// Rotate camera down
 		if (key == SDL_SCANCODE_DOWN) {
-			m_cameraRotation.x += 1.0f;
+			m_cameraRotation.x += -1.0f;
 		}
 		// Rotate camera left
 		if (key == SDL_SCANCODE_RIGHT) {
@@ -266,8 +266,8 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	// On mouse move rotate the camera
 	m_input->OnMouseMoved->Bind([this](const float& x, const float& y,
 		const float& xrel, const float& yrel) {
-			m_cameraRotation.y = -xrel;
-			m_cameraRotation.x = -yrel;
+			m_cameraRotation.y += -xrel;
+			m_cameraRotation.x += yrel;
 	});
 
 	// On mouse scroll
@@ -323,7 +323,10 @@ void EWindow::MoveCamera()
 			// Translate the camera based on input direction
 			camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
 			// Rotate the camera based on input direction
-			camRef->Rotate(m_cameraRotation, glm::abs(m_cameraRotation));
+			camRef->Rotate(m_cameraRotation);
+			// Reset rotations
+			m_cameraRotation.x = 0.0f;
+			m_cameraRotation.y = 0.0f;
 		}
 	}
 }

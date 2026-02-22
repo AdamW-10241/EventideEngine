@@ -73,19 +73,24 @@ void Enemy::OnPostTick(float deltaTime)
 	
 	// Look at player
 	if (const auto& player = m_playerRef.lock()) {
-		// Calculate target angle with atan2 from enemy and player positions
-		float targetAngle = glm::degrees(atan2(player->GetTransform().position.x - GetTransform().position.x,
-			player->GetTransform().position.z - GetTransform().position.z));
+		if (player) {
+			// Calculate target angle with atan2 from enemy and player positions
+			float targetAngle = glm::degrees(atan2(player->GetTransform().position.x - GetTransform().position.x,
+				player->GetTransform().position.z - GetTransform().position.z));
 
-		// Get the closest difference with mod
-		float angleDifference = fmod(targetAngle - GetTransform().rotation.y + 180.0f, 360.0f) - 180.0f;
+			// Get the closest difference with mod
+			float angleDifference = fmod(targetAngle - GetTransform().rotation.y + 180.0f, 360.0f) - 180.0f;
 
-		// Add the angle difference and look at the player
-		GetTransform().rotation.y += angleDifference + 180.0f;
+			// Add the angle difference and look at the player
+			GetTransform().rotation.y += angleDifference + 180.0f;
+
+			// Keep attempting to fire
+			glm::vec3 shootDirection = player->GetTransform().position - GetTransform().position;
+			shootDirection.y = 0.0f;
+			shootDirection = glm::normalize(shootDirection);
+			m_weapon->TryFire(EECollisionType::BULLET_ENEMY, shootDirection);
+		}
 	}
-
-	// Keep attempting to fire
-	m_weapon->TryFire(EECollisionType::BULLET_ENEMY, {0.0f, GetTransform().rotation.y + 180.0f, 0.0f });
 }
 
 void Enemy::OnTakeDamage(float damage)
@@ -114,7 +119,7 @@ void Enemy::SpawnEnemy(TWeak<Player> playerRef)
 		// Random fire rate
 		float fireRate = EGameEngine::GetGameEngine()->GetRandomFloatRange(0.8f, 1.2f);
 		// Add weapon
-		if (TShared<Weapon> weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(false, 1.0f, 100.0f, fireRate, true).lock()) {
+		if (TShared<Weapon> weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(newEnemy, false, 1.0f, 100.0f, fireRate, true).lock()) {
 			newEnemy->AddWeapon(weapon);
 		}
 	}

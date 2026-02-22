@@ -9,7 +9,7 @@ struct ESCamera {
 		nearClip = 0.01f;
 		farClip = 10000.0f;
 		moveSpeed = 50.0f;
-		rotateSpeed = 0.5f;
+		rotateSpeed = 0.3f;
 		zoomSpeed = 3.0f;
 		canMoveVertical = false;
 	}
