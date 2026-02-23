@@ -7,12 +7,17 @@ struct ESLight {
 	ESLight() {
 		colour = glm::vec3(1.0f);
 		intensity = 0.0f;
+		isLightOn = true;
 	}
+
+	void ToggleLight() { isLightOn = !isLightOn;  }
+	void SetIsLightOn(bool newLightState) { isLightOn = newLightState; }
 
  	virtual ~ESLight() = default;
 
 	glm::vec3 colour;
 	float intensity;
+	bool isLightOn;
 };
 
 struct ESDirLight : public ESLight {

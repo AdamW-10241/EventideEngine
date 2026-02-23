@@ -27,13 +27,14 @@ public:
 	TArray<TWeak<EModel>> GetModels() const { return m_objectModels; }
 
 	// Get the count of world object models
-	EUi32 GetModelCount() const { return m_objectModels.size(); }
+	EUi32 GetModelCount() const { return (EUi32)m_objectModels.size(); }
 
 	// Add a collision to the object
 	TWeak<ESCollision> AddCollision(const ESBox& box, const bool& debug = false);
 
 	// Get the objects transform
 	ESTransform& GetTransform() { return m_transform; }
+	//
 
 	// Run a test to see if another object is overlapping
 	void TestCollision(const TShared<EWorldObject>& other);

@@ -321,7 +321,7 @@ void EWindow::MoveCamera()
 	if (const auto& camRef = GetGraphicsEngine()->GetCamera().lock()) {
 		if (!m_inputMode) {
 			// Translate the camera based on input direction
-			camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2 : 1));
+			camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2.0f : 1.0f));
 			// Rotate the camera based on input direction
 			camRef->Rotate(m_cameraRotation);
 			// Reset rotations

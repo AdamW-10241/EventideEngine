@@ -152,7 +152,7 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 		// ----------- DIRECTIONAL LIGHTS
 		if (const auto& lightRef = std::dynamic_pointer_cast<ESDirLight>(lights[i])) {
 			// Ignore dirLight if has reached max number
-			if (dirLights >= maxDirLights)
+			if (dirLights >= maxDirLights || !lightRef->isLightOn)
 				continue;
 			
 			// Add a dirLight and use as index
@@ -198,7 +198,7 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 		// ----------- POINT LIGHTS
 		if (const auto& lightRef = std::dynamic_pointer_cast<ESPointLight>(lights[i])) {
 			// Ensure only max lights
-			if (pointLights >= maxPointLights) {
+			if (pointLights >= maxPointLights || !lightRef->isLightOn) {
 				continue;
 			}
 			
@@ -253,7 +253,7 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 		// ----------- SPOT LIGHTS
 		if (const auto& lightRef = std::dynamic_pointer_cast<ESSpotLight>(lights[i])) {
 			// Ensure only max lights
-			if (spotLights >= maxSpotLights) {
+			if (spotLights >= maxSpotLights || !lightRef->isLightOn) {
 				continue;
 			}
 

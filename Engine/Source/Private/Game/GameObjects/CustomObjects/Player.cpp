@@ -49,7 +49,7 @@ void Player::OnStart()
 	// Add light
 	if (const auto& lightRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreateSpotLight().lock()) {
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
-		lightRef->intensity = 10.0f;
+		lightRef->intensity = 20.0f;
 		lightRef->outerCutOff = 45.0f;
 		lightRef->innerCutOff = 30.0f;
 		lightRef->linear *= 1.0f;
@@ -84,6 +84,14 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = false;
+		}
+	});
+
+	// Key pressed
+	m_input->OnKeyPressed->Bind([this](const SDL_Scancode& key) {
+		// Toggle light
+		if (key == SDL_SCANCODE_F) {
+			m_light->ToggleLight();
 		}
 	});
 }

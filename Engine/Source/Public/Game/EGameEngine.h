@@ -167,8 +167,8 @@ private:
 
 	// Store time taken to load so it can be subtracted
 	// Otherwise massive delta on first frame
-	float m_timeToLoad;
+	double m_timeToLoad;
 
 	// Store the games points
-	int m_points;
+	int m_points;//
 };

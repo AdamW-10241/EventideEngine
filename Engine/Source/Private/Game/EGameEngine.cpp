@@ -79,10 +79,10 @@ EGameEngine::EGameEngine()
 
 	m_timeToLoad = 0.0f;
 
-	m_points = 0.0f;
+	m_points = 0;
 
 	// Set random seed
-	RandGenerator.seed(time(0));
+	RandGenerator.seed((unsigned int)time(0));
 	
 	EDebug::Log("Game engine created");
 }
