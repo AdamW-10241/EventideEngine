@@ -100,22 +100,10 @@ void Player::OnTick(float deltaTime)
 		if (camRef) {
 			// If weapon exists
 			GetTransform().position = camRef->transform.position;
-			if (m_weapon) {
-				glm::vec3 forward = camRef->transform.Forward();
-				glm::vec3 right = camRef->transform.Right();
-				glm::vec3 up = camRef->transform.Up();
 
-				glm::vec3 rotatedWeaponOffset =
-					forward * m_weaponOffset.z +
-					right * m_weaponOffset.x +
-					up * m_weaponOffset.y;
-
-				m_weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
-				m_weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
-
-				// Fire weapon is holding left mouse
-				if (m_leftMouseHeld)
-					m_weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
+			// Fire weapon is holding left mouse
+			if (m_weapon && m_leftMouseHeld) {
+				m_weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
 			}
 		}
 	}
@@ -142,6 +130,21 @@ void Player::OnPostTick(float deltaTime)
 			camRef->transform.position = m_oldPosition;
 			// Reset player position to before collision
 			GetTransform().position = m_oldPosition;
+		}
+
+		// Update weapon position
+		if (m_weapon) {
+			glm::vec3 forward = camRef->transform.Forward();
+			glm::vec3 right = camRef->transform.Right();
+			glm::vec3 up = camRef->transform.Up();
+
+			glm::vec3 rotatedWeaponOffset =
+				forward * m_weaponOffset.z +
+				right * m_weaponOffset.x +
+				up * m_weaponOffset.y;
+
+			m_weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
+			m_weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
 		}
 
 		// Adjust light relative to player
