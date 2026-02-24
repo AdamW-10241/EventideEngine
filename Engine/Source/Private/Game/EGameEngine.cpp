@@ -167,9 +167,11 @@ void EGameEngine::Start()
 
 		// Add crosshair
 		if (const auto crosshair = CreateObject<EScreenObject>().lock()) {
+			crosshair->SetRenderOrder(0);
 			ESTransform2D transform;
 			transform.position = m_window->GetWindowCenter();
-			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform);
+			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform, 0, color);
 			sprite.lock()->GetTransform().scale *= 0.4f;
 			player->AddCrosshair(crosshair);
 		}
@@ -186,6 +188,17 @@ void EGameEngine::Start()
 		// Spawn grass
 		CreateObject<Grass>();
 	}
+
+	// Test
+	//if (const auto test = CreateObject<EScreenObject>().lock()) {
+	//	test->SetRenderOrder(1);
+	//	ESTransform2D transform;
+	//	transform.position = m_window->GetWindowCenter();
+	//	transform.scale = m_window->GetWindowSize();
+	//	glm::vec4 color = { 0.02f, 0.02f, 1.0f, 0.5f };
+	//	test->AddSprite(transform, 0, color);
+	//	test->SetDoRender(true);
+	//}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());

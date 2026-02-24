@@ -9,6 +9,20 @@
 
 bool ESprite::CreateSprite(const EString& texturePath)
 {
+    // Create sprite
+    if (!CreateSprite()) return false;
+
+    // Load texture
+    if (!LoadTexture(texturePath, texturePath)) {
+        EDebug::Log("ESprite failed to load texture.", LT_ERROR);
+        return false;
+    }
+
+    return true;
+}
+
+bool ESprite::CreateSprite()
+{
     // A simple quad, two triangles
     std::vector<ESVertexData> vertices = {
         // position              color    texcoords
@@ -23,13 +37,9 @@ bool ESprite::CreateSprite(const EString& texturePath)
         0, 2, 3
     };
 
+    // Create mesh
     if (!CreateMesh(vertices, indices)) {
         EDebug::Log("ESprite failed to create mesh.", LT_ERROR);
-        return false;
-    }
-
-    if (!LoadTexture(texturePath, texturePath)) {
-        EDebug::Log("ESprite failed to load texture.", LT_ERROR);
         return false;
     }
 
@@ -69,6 +79,11 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     varID = glGetUniformLocation(programID, "model");
     glUniformMatrix4fv(varID, 1, GL_FALSE, glm::value_ptr(model));
 
+    glUniform1i(glGetUniformLocation(programID, "useTexture"), !m_fileName.empty() ? 1 : 0);
+
+    glUniform4f(glGetUniformLocation(programID, "color"), 
+        m_renderColor.r, m_renderColor.g, m_renderColor.b, m_renderColor.a);
+    
     // Bind texture
     BindTexture(0);
     varID = glGetUniformLocation(programID, "sprite");

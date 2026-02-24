@@ -37,7 +37,7 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path)
         &m_channels,            // RGBA
         0   // Limit of required amount of channels (0 = no limit)
     );
-
+    
     // Test if the data imported correctly
     if (data == nullptr) {
         EString errorMsg = "Failed to load texture - " + m_fileName + ": " + stbi_failure_reason();

@@ -12,6 +12,7 @@
 #include "Math/ESCollision.h"
 
 // External Libs
+#include <algorithm>
 #include <GLEW/glew.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_opengl.h"
@@ -203,7 +204,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 			// Check models exist			
 			if (worldObjectRef->GetModelCount() <= 0) { continue; }
 			// Render all models
-			for (int model = 0; model < worldObjectRef->GetModelCount(); ++model) {
+			for (EUi32 model = 0; model < worldObjectRef->GetModelCount(); ++model) {
 				if (auto modelRef = worldObjectRef->GetModel(model).lock()) {
 					modelRef->Render(worldObjectRef->GetTransform(), m_shader, m_lights);
 				}
@@ -218,9 +219,19 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Enable blending for transparency
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST);
+
+	// Sort screen objects by render order
+	auto screenObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EScreenObject>();
+	std::sort(screenObjects.begin(), screenObjects.end(),
+		[](const TWeak<EScreenObject>& a, const TWeak<EScreenObject>& b) {
+			const auto& aRef = a.lock();
+			const auto& bRef = b.lock();
+			if (!aRef || !bRef) return false;
+			return aRef->GetRenderOrder() < bRef->GetRenderOrder();
+	});
 
 	// Render
-	const auto& screenObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EScreenObject>();
 	for (const auto& weakObject : screenObjects) {
 		if (auto screenObjectRef = weakObject.lock()) {
 			// Skip objects set to not render
@@ -232,6 +243,7 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 
 	// Disable transparency blending
 	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 
 	// ---------- WIRE SHADER
 	if (m_collisions.size() > 0) {

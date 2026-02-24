@@ -72,8 +72,11 @@ public:
 	// Get window params
 	ESWindowParams& GetWindowParams() { return m_params; }
 
+	// Get window size
+	glm::vec2 GetWindowSize() { return glm::vec2(m_params.w, m_params.h); }
+
 	// Get window center
-	glm::vec2 GetWindowCenter() { return glm::vec2(m_params.w / 2.0f, m_params.h / 2.0f); }
+	glm::vec2 GetWindowCenter() { return GetWindowSize() / 2.0f; }
 
 public:
 	// Flag to randomly change brightness
