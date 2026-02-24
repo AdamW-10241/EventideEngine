@@ -63,11 +63,17 @@ public:
 	// Render the graphics engine to the window
 	void Render();
 
+	// Get the input mode
+	bool GetInputMode() const { return m_inputMode; }
+
 	// Get a weak reference to the graphics engine
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_graphicsEngine; }
 
-	// Get the input mode
-	bool GetInputMode() const { return m_inputMode; }
+	// Get window params
+	ESWindowParams& GetWindowParams() { return m_params; }
+
+	// Get window center
+	glm::vec2 GetWindowCenter() { return glm::vec2(m_params.w / 2.0f, m_params.h / 2.0f); }
 
 public:
 	// Flag to randomly change brightness

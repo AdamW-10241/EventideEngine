@@ -33,6 +33,13 @@ public:
 		m_lifeTimeTimer = m_lifeTime;
 	}
 
+	// Render
+	const bool ToggleRender() { m_doRender = !m_doRender; return m_doRender; }
+
+	void SetDoRender(const bool newDoRender) { m_doRender = newDoRender; }
+
+	const bool GetDoRender() { return m_doRender; }
+
 protected:
 	// Run when the object spawns in
 	virtual void OnStart() {}
@@ -55,4 +62,8 @@ private:
 
 	// Time before destroy
 	float m_lifeTimeTimer;
+
+private:
+	// Whether object is rendered
+	bool m_doRender;
 };

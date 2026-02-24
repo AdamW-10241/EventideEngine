@@ -16,6 +16,7 @@ enum EEShaderType : EUi8 {
 };
 
 struct ESTransform;
+struct ESTransform2D;
 
 class EShaderProgram {
 public:
@@ -39,6 +40,9 @@ public:
 	// Set the 3D coordinates for the model
 	void SetWorldTransform(const TShared<ESCamera>& camera);
 
+	// Set the 2D coordinates for the sprite
+	void SetSpriteTransform(const ESTransform2D& transform);
+
 	// Set the lights in the shader
 	void SetLights(const TArray<TShared<ESLight>>& lights);
 
@@ -59,6 +63,9 @@ public:
 
 	// Reset the texture depth for textures in the vertex shader
 	void ResetTextureDepth();
+
+	// Get program ID
+	EUi32 GetProgramID() { return m_programID; }
 
 private:
 	// Import a shader based on the shader type

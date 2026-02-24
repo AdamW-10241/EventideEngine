@@ -8,7 +8,7 @@ public:
 	Character() {
 		m_health = 1.0f; 
 		m_isWeaponADS = false;
-		m_speedADS = 20.0f;
+		m_speedADS = 30.0f;
 		m_weaponOffset = glm::vec3(0.0f);
 		m_weaponBaseOffset = glm::vec3(0.0f);
 		m_weaponADSOffset = glm::vec3(0.0f);

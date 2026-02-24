@@ -132,6 +132,11 @@ void EShaderProgram::SetWorldTransform(const TShared<ESCamera>& camera)
 		varID, 1, GL_FALSE, glm::value_ptr(matrixT));
 }
 
+void EShaderProgram::SetSpriteTransform(const ESTransform2D& transform)
+{
+
+}
+
 void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 {	
 	// Set number of lights in the shader

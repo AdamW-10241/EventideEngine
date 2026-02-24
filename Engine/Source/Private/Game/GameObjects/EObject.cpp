@@ -5,6 +5,7 @@ EObject::EObject()
 	m_pendingDestroy = false;
 	m_lifeTime = 0.0f;
 	m_lifeTimeTimer = 0.0f;
+	m_doRender = true;
 	
 	// EDebug::Log("EObject created");
 }

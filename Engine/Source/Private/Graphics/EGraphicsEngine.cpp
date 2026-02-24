@@ -8,6 +8,7 @@
 #include "Graphics/ESLight.h"
 #include "Game/EGameEngine.h"
 #include "Game/GameObjects/EWorldObject.h"
+#include "Game/GameObjects/EScreenObject.h"
 #include "Math/ESCollision.h"
 
 // External Libs
@@ -101,11 +102,11 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		"Shaders/SimpleShader/SimpleShader.vertex",
 		"Shaders/SimpleShader/SimpleShader.frag"
 	)) {
-		EDebug::Log("Graphics engine failed to initialise due to shader failure.");
+		EDebug::Log("Graphics engine failed to initialise due to simple shader failure.");
 		return false;
 	}
 
-	// Creater the wire shader object
+	// Create the wire shader object
 	m_wireShader = TMakeShared<EShaderProgram>();
 
 	// Attempt to init shader and test if failed
@@ -113,7 +114,19 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		"Shaders/Wireframe/Wireframe.vertex",
 		"Shaders/Wireframe/Wireframe.frag"
 	)) {
-		EDebug::Log("Graphics engine failed to initialise due to shader failure.");
+		EDebug::Log("Graphics engine failed to initialise due to wire shader failure.");
+		return false;
+	}
+
+	// Creater the sprite shader object
+	m_spriteShader = TMakeShared<EShaderProgram>();
+
+	// Attempt to init shader and test if failed
+	if (!m_spriteShader->InitShader(
+		"Shaders/SpriteShader/SpriteShader.vertex",
+		"Shaders/SpriteShader/SpriteShader.frag"
+	)) {
+		EDebug::Log("Graphics engine failed to initialise due to sprite shader failure.");
 		return false;
 	}
 
@@ -181,17 +194,14 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	// Set the world transformations based on the camera
 	m_shader->SetWorldTransform(m_camera);
 
-	// Render custom graphics
-	// Models will update their own positions in the mesh based on the transform
+	// Render
 	const auto& worldObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EWorldObject>();
 	for (const auto& weakObject : worldObjects) {
 		if (auto worldObjectRef = weakObject.lock()) {
+			// Skip objects set to not render
+			if (!worldObjectRef->GetDoRender()) { continue; }
 			// Check models exist			
-			if (worldObjectRef->GetModelCount() <= 0) {
-				//EDebug::Log("Meshes in model: 0", LT_WARNING);
-				continue;
-			}
-			//EDebug::Log("Meshes in model: " + toEString(worldObjectRef->GetModelCount()), LT_LOG);
+			if (worldObjectRef->GetModelCount() <= 0) { continue; }
 			// Render all models
 			for (int model = 0; model < worldObjectRef->GetModelCount(); ++model) {
 				if (auto modelRef = worldObjectRef->GetModel(model).lock()) {
@@ -200,6 +210,28 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 			}
 		}
 	}
+
+	// ---------- SPRITE SHADER
+	// Activate shader
+	m_spriteShader->Activate();
+
+	// Enable blending for transparency
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Render
+	const auto& screenObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EScreenObject>();
+	for (const auto& weakObject : screenObjects) {
+		if (auto screenObjectRef = weakObject.lock()) {
+			// Skip objects set to not render
+			if (!screenObjectRef->GetDoRender()) { continue; }
+			// Render all sprites
+			screenObjectRef->Render(m_spriteShader);
+		}
+	}
+
+	// Disable transparency blending
+	glDisable(GL_BLEND);
 
 	// ---------- WIRE SHADER
 	if (m_collisions.size() > 0) {

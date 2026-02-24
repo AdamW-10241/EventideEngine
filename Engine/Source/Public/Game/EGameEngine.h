@@ -34,7 +34,7 @@ public:
 
 	// Create an EObject type
 	// Also pass args
-	template<typename T, std::enable_if_t<std::is_base_of_v<EObject, T>, T>* = nullptr, typename ... Args>
+	template<typename T, std::enable_if_t<std::is_base_of_v<EObject, T>, bool>* = nullptr, typename ... Args>
 	TWeak<T> CreateObject(Args&&... args) {
 		// Create an object within the template class
 		TShared<T> newObject = TMakeShared<T>(std::forward<Args>(args)...);

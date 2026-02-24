@@ -3,6 +3,7 @@
 #include "Graphics/ESCamera.h"
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Graphics/ESLight.h"
+#include "Game/GameObjects/EScreenObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <GLM/gtx/euler_angles.hpp>
@@ -16,7 +17,7 @@ Player::Player()
 	m_collided = false;
 	m_oldPosition = glm::vec3(0.0f);
 	m_weaponBaseOffset = glm::vec3(0.3f, -2.0f, 1.0f);
-	m_weaponADSOffset = glm::vec3(0.0f, -1.8f, -2.0f);
+	m_weaponADSOffset = glm::vec3(0.0f, -1.75f, -2.2f);
 
 	m_leftMouseHeld = false;
 	m_rightMouseHeld = false;
@@ -32,7 +33,7 @@ void Player::SetDefaultCamPosition(glm::vec3 position)
 void Player::OnStart()
 {
 	Super::OnStart();
-	
+
 	// If camera exists,
 	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		// Move to camera
@@ -66,11 +67,9 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		if (button == SDL_BUTTON_LEFT) {
 			m_leftMouseHeld = true;
 		}
-	});
-
-	m_input->OnMousePressed->Bind([this](const EUi8& button) {
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = true;
+			m_crosshair->SetDoRender(false);
 		}
 	});
 
@@ -79,11 +78,9 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		if (button == SDL_BUTTON_LEFT) {
 			m_leftMouseHeld = false;
 		}
-	});
-
-	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = false;
+			m_crosshair->SetDoRender(true);
 		}
 	});
 

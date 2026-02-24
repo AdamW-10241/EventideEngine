@@ -3,8 +3,9 @@
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/EShaderProgram.h"
 #include "Game/GameObjects/EWorldObject.h"
+#include "Game/GameObjects/EScreenObject.h"
 
-// External Livsd
+// External Libs
 #include <random>
 
 // Initialise a random generator
@@ -160,8 +161,17 @@ void EGameEngine::Start()
 		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
 
 		// Add weapon
-		if (TShared<Weapon> weapon = CreateObject<Weapon>(player, true, 1.0f, 500.0f, 0.2f, false).lock()) {
+		if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(player, true, 1.0f, 500.0f, 0.2f, false).lock()) {
 			player->AddWeapon(weapon);
+		}
+
+		// Add crosshair
+		if (const auto crosshair = CreateObject<EScreenObject>().lock()) {
+			ESTransform2D transform;
+			transform.position = m_window->GetWindowCenter();
+			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform);
+			sprite.lock()->GetTransform().scale *= 0.4f;
+			player->AddCrosshair(crosshair);
 		}
 
 		// Spawn Enemies

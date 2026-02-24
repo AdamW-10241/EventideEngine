@@ -15,7 +15,15 @@ EMesh::EMesh()
 	materialIndex = 0;
 }
 
-EMesh::~EMesh() {}
+EMesh::~EMesh()
+{
+	if (m_vao != 0)
+		glDeleteVertexArrays(1, &m_vao);
+	if (m_vbo != 0)
+		glDeleteBuffers(1, &m_vbo);
+	if (m_eao != 0)
+		glDeleteBuffers(1, &m_eao);
+}
 
 bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vector<uint32_t>& indices)
 {

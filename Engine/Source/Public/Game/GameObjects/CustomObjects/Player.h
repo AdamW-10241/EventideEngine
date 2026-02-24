@@ -3,6 +3,7 @@
 
 struct ESSpotLight;
 class Weapon;
+class EScreenObject;
 
 class Player : public Character {
 public:
@@ -10,6 +11,9 @@ public:
 
 	// Set the cameras default position
 	void SetDefaultCamPosition(glm::vec3 position);
+
+	// Add a crosshair to the character
+	void AddCrosshair(TShared<EScreenObject> crosshair) { m_crosshair = crosshair; }
 
 protected:
 	virtual void OnStart() override;
@@ -38,4 +42,7 @@ private:
 
 	// Store the spotlight attached to the player
 	TShared<ESSpotLight> m_light;
+
+	// Store the crosshair attached to the player
+	TShared<EScreenObject> m_crosshair;
 };

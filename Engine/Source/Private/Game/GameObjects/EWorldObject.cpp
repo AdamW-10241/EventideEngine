@@ -25,18 +25,18 @@ TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const TArray<E
             // Create texture if not in cache
             if (!textureCache.count(paths.base)) {
                 auto texBase = TMakeShared<ETexture>();
-                texBase->LoadTexture("Model: " + modelPath, paths.base);
+                texBase->LoadTexture(modelPath, paths.base);
                 textureCache[paths.base] = texBase;
 
                 if (!paths.normal.empty()) {
                     auto texNormal = TMakeShared<ETexture>();
-                    texNormal->LoadTexture("Model: " + modelPath, paths.normal);
+                    texNormal->LoadTexture(modelPath, paths.normal);
                     textureCache[paths.normal] = texNormal;
                 }
 
                 if (!paths.specular.empty()) {
                     auto texSpecular = TMakeShared<ETexture>();
-                    texSpecular->LoadTexture("Model: " + modelPath, paths.specular);
+                    texSpecular->LoadTexture(modelPath, paths.specular);
                     textureCache[paths.specular] = texSpecular;
                 }
             }

@@ -113,11 +113,13 @@
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Weapon.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\ELightObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EObject.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\EScreenObject.cpp" />
     <ClCompile Include="Source\Private\Graphics\EGraphicsEngine.cpp" />
     <ClCompile Include="Source\Private\EWindow.cpp" />
     <ClCompile Include="Source\Private\Graphics\EMesh.cpp" />
     <ClCompile Include="Source\Private\Graphics\EModel.cpp" />
     <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
+    <ClCompile Include="Source\Private\Graphics\ESprite.cpp" />
     <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Private\Listeners\EInput.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp" />
@@ -140,6 +142,7 @@
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Weapon.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\ELightObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EObject.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\EScreenObject.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\EWorldObject.h" />
     <ClInclude Include="Source\Public\Graphics\EGraphicsEngine.h" />
     <ClInclude Include="Source\Public\EWindow.h" />
@@ -149,6 +152,7 @@
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
     <ClInclude Include="Source\Public\Graphics\ESLight.h" />
     <ClInclude Include="Source\Public\Graphics\ESMaterial.h" />
+    <ClInclude Include="Source\Public\Graphics\ESprite.h" />
     <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\InvisibleWalls.h" />
     <ClInclude Include="Source\Public\Listeners\EInput.h" />

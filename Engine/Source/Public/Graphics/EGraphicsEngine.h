@@ -94,11 +94,10 @@ private:
 	// Storing memory location for OpenGL context
 	SDL_GLContext m_sdlGLContext;
 
-	// Store the shader for the engine
+	// Store the shaders for the engine
 	TShared<EShaderProgram> m_shader;
-
-	// Store the wireframe shader for the engine
 	TShared<EShaderProgram> m_wireShader;
+	TShared<EShaderProgram> m_spriteShader;
 
 	// Store the camera
 	TShared<ESCamera> m_camera;

@@ -34,7 +34,6 @@ public:
 
 	// Get the objects transform
 	ESTransform& GetTransform() { return m_transform; }
-	//
 
 	// Run a test to see if another object is overlapping
 	void TestCollision(const TShared<EWorldObject>& other);

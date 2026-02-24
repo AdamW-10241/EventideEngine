@@ -24,7 +24,7 @@ public:
 	// Gets the ID of the texture for OpenGL
 	EUi32 GetID() const { return m_ID; }
 	
-private:
+protected:
 	// Import path of the image
 	EString m_path;
 

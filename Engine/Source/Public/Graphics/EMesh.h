@@ -67,7 +67,7 @@ public:
 	// Index for the material relative to the model
 	unsigned int materialIndex;
 
-private:
+protected:
 	// Store the vertices
 	std::vector<ESVertexData> m_vertices;
 

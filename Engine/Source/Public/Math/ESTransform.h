@@ -73,3 +73,42 @@ struct ESTransform {
 	glm::vec3 rotation;
 	glm::vec3 scale;
 };
+
+struct ESTransform2D {
+	ESTransform2D() {
+		position = glm::vec2(0.0f);
+		rotation = 0.0f;
+		scale = glm::vec2(0.0f);
+	}
+
+	ESTransform2D(const glm::vec2& p, const float& r, const glm::vec2& s) {
+		position = p;
+		rotation = r;
+		scale = s;
+	}
+
+	ESTransform2D operator+(const ESTransform2D& other) const {
+		return {
+			position + other.position,
+			rotation + other.rotation,
+			scale + other.scale
+		};
+	}
+
+	ESTransform2D& operator+=(const ESTransform2D& other) {
+		return *this = *this + other;
+	}
+
+	ESTransform2D& operator=(const ESTransform2D& other) {
+		if (this != &other) {
+			position = other.position;
+			rotation = other.rotation;
+			scale = other.scale;
+		}
+		return *this;
+	}
+
+	glm::vec2 position;
+	float rotation;
+	glm::vec2 scale;
+};
