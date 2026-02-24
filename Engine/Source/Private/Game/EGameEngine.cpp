@@ -2,8 +2,6 @@
 #include "Game/GameObjects/EObject.h"
 #include "Graphics/EGraphicsEngine.h"
 #include "Graphics/EShaderProgram.h"
-#include "Game/GameObjects/EWorldObject.h"
-#include "Game/GameObjects/EScreenObject.h"
 
 // External Libs
 #include <random>
@@ -21,6 +19,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Skybox.h"
 #include "Game/GameObjects/CustomObjects/Wall.h"
 #include "Game/GameObjects/CustomObjects/InvisibleWalls.h"
+#include "Game/GameObjects/CustomObjects/GUIButton.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -166,13 +165,14 @@ void EGameEngine::Start()
 		}
 
 		// Add crosshair
-		if (const auto crosshair = CreateObject<EScreenObject>().lock()) {
-			crosshair->SetRenderOrder(0);
+		if (const auto crosshair = CreateObject<EScreenObject>(0).lock()) {
 			ESTransform2D transform;
 			transform.position = m_window->GetWindowCenter();
-			glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
-			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform, 0, color);
-			sprite.lock()->GetTransform().scale *= 0.4f;
+			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform, 0);
+			if (const auto& spriteRef = sprite.lock()) {
+				spriteRef->GetTransform().scale *= 0.4f;
+				spriteRef->GetTransform().CenterOnPosition();
+			}
 			player->AddCrosshair(crosshair);
 		}
 
@@ -189,16 +189,8 @@ void EGameEngine::Start()
 		CreateObject<Grass>();
 	}
 
-	// Test
-	//if (const auto test = CreateObject<EScreenObject>().lock()) {
-	//	test->SetRenderOrder(1);
-	//	ESTransform2D transform;
-	//	transform.position = m_window->GetWindowCenter();
-	//	transform.scale = m_window->GetWindowSize();
-	//	glm::vec4 color = { 0.02f, 0.02f, 1.0f, 0.5f };
-	//	test->AddSprite(transform, 0, color);
-	//	test->SetDoRender(true);
-	//}
+	// DEBUG GUI Button
+	// CreateObject<GUIButton>(1);
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());

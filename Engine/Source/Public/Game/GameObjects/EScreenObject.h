@@ -5,7 +5,7 @@
 class EScreenObject : public EObject {
 public:
     EScreenObject() { m_renderOrder = 0; }
-	virtual ~EScreenObject() = default;
+    EScreenObject(EUi32 renderOrder) { m_renderOrder = renderOrder; }
 	
     // Creates and stores a sprite, returns a weak ref if you need to modify it later
     TWeak<ESprite> AddSprite(const EString& texturePath, const ESTransform2D& transform, const EUi32 renderOrder, 

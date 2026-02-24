@@ -47,6 +47,9 @@ public:
 	// Get the state of the cursor
 	bool IsCursorHidden() const;
 
+	// Get mouse last motion
+	SDL_MouseMotionEvent& GetMouseLastMotion() { return m_lastMotion; }
+
 private:
 	// Weak pointer to the window to not count as a reference
 	// so that the inout does not control if the window gets destroyed

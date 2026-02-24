@@ -7,7 +7,7 @@ public:
 	~ETexture();
 
 	// Import a file and convert it to a texture
-	bool LoadTexture(const EString& fileName, const EString& path);
+	bool LoadTexture(const EString& fileName, const EString& path, bool repeat = true, bool linear = true);
 
 	// Activates the texture to use for OpenGL
 	void BindTexture(const EUi32& textureNumber);

@@ -73,6 +73,9 @@ public:
 	// Get a reference to the graphics engine
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_window->GetGraphicsEngine(); }
 
+	// Get window
+	TWeak<EWindow> GetWindow() { return m_window; }
+
 	// Find an object of type T from the object stack
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
 	TWeak<T> FindObjectOfType() {
@@ -170,5 +173,5 @@ private:
 	double m_timeToLoad;
 
 	// Store the games points
-	int m_points;//
+	int m_points;
 };

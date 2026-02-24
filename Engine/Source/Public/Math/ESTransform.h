@@ -81,11 +81,19 @@ struct ESTransform2D {
 		scale = glm::vec2(0.0f);
 	}
 
+	ESTransform2D(const glm::vec2& p) {
+		position = p;
+		rotation = 0.0f;
+		scale = glm::vec2(0.0f);
+	}
+
 	ESTransform2D(const glm::vec2& p, const float& r, const glm::vec2& s) {
 		position = p;
 		rotation = r;
 		scale = s;
 	}
+
+	void CenterOnPosition() { position -= scale * 0.5f; }
 
 	ESTransform2D operator+(const ESTransform2D& other) const {
 		return {

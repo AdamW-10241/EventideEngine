@@ -13,7 +13,7 @@ bool ESprite::CreateSprite(const EString& texturePath)
     if (!CreateSprite()) return false;
 
     // Load texture
-    if (!LoadTexture(texturePath, texturePath)) {
+    if (!LoadTexture(texturePath, texturePath, false, false)) {
         EDebug::Log("ESprite failed to load texture.", LT_ERROR);
         return false;
     }
@@ -26,10 +26,10 @@ bool ESprite::CreateSprite()
     // A simple quad, two triangles
     std::vector<ESVertexData> vertices = {
         // position              color    texcoords
-        { {-0.5f,  0.5f, 0.0f}, {1,1,1}, {0.0f, 0.0f} }, // top-left
-        { {-0.5f, -0.5f, 0.0f}, {1,1,1}, {0.0f, 1.0f} }, // bottom-left
-        { { 0.5f, -0.5f, 0.0f}, {1,1,1}, {1.0f, 1.0f} }, // bottom-right
-        { { 0.5f,  0.5f, 0.0f}, {1,1,1}, {1.0f, 0.0f} }  // top-right
+        { {0.0f, 1.0f, 0.0f}, {1,1,1}, {0.0f, 0.0f} }, // top-left
+        { {0.0f, 0.0f, 0.0f}, {1,1,1}, {0.0f, 1.0f} }, // bottom-left
+        { {1.0f, 0.0f, 0.0f}, {1,1,1}, {1.0f, 1.0f} }, // bottom-right
+        { {1.0f, 1.0f, 0.0f}, {1,1,1}, {1.0f, 0.0f} }  // top-right
     };
 
     std::vector<uint32_t> indices = {

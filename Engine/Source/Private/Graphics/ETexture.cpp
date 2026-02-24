@@ -20,7 +20,7 @@ ETexture::~ETexture()
     // EDebug::Log("Texture destroyed: " + m_fileName);
 }
 
-bool ETexture::LoadTexture(const EString& fileName, const EString& path)
+bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool repeat, bool linear)
 {
     // Assign the file name and path
     m_fileName = fileName;
@@ -70,14 +70,17 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path)
     // Set default parameters for the texture
     // Set the texture wrapping parameters
     // If the texture does not fit the model, repeat texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    GLint wrapMode = repeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
     // Set the filtering parameters
     // How much to blur pixels 
     // The resolution of the texture is lower than the size of the model
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    GLint filter = linear ? GL_LINEAR : GL_NEAREST;
+    GLint minFilter = linear ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
     // Set the default format at 3 channels
     GLint intFormat = GL_RGB;

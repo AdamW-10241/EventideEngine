@@ -123,6 +123,7 @@
     <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Private\Listeners\EInput.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\GUIButton.cpp" />
     <ClCompile Include="Source\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +137,7 @@
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Enemy.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Floor.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Grass.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\GUIButton.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Skybox.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Wall.h" />
