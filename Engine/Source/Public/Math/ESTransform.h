@@ -95,6 +95,8 @@ struct ESTransform2D {
 
 	void CenterOnPosition() { position -= scale * 0.5f; }
 
+	void UncenterPosition() { position += scale * 0.5f; }
+
 	ESTransform2D operator+(const ESTransform2D& other) const {
 		return {
 			position + other.position,

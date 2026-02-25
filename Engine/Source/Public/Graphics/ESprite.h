@@ -32,11 +32,20 @@ public:
 
 	bool CreateSprite();
 
+	// Render with set transform
+	void Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform);
+
+	// Render with base transform
+	void Render(const TShared<EShaderProgram>& shader) { Render(shader, m_transform); }
+
 	// Set transform
 	void SetTransform(const ESTransform2D transform) { m_transform = transform; }
 
 	// Get transform
 	ESTransform2D& GetTransform() { return m_transform; }
+
+	// Set scale to match texture
+	void SetScaleToTextureSize() { m_transform.scale = glm::vec2(static_cast<float>(m_width), static_cast<float>(m_height)); }
 
 	// Set render order
 	void SetRenderOrder(const EUi32 renderOrder) { m_renderOrder = renderOrder; }
@@ -44,14 +53,11 @@ public:
 	// Get render order
 	EUi32& GetRenderOrder() { return m_renderOrder; }
 
-	// Set scale to match texture
-	void SetScaleToTextureSize() { m_transform.scale = glm::vec2(static_cast<float>(m_width), static_cast<float>(m_height)); }
+	// Set render color
+	void SetRenderColor(const glm::vec4 renderColor) { m_renderColor = renderColor; }
 
-	// Render with set transform
-	void Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform);
-
-	// Render with base transform
-	void Render(const TShared<EShaderProgram>& shader) { Render(shader, m_transform); }
+	// Get render color
+	glm::vec4& GetRenderColor() { return m_renderColor; }
 
 protected:
 	// Store transform

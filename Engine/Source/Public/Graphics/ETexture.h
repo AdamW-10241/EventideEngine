@@ -23,6 +23,9 @@ public:
 
 	// Gets the ID of the texture for OpenGL
 	EUi32 GetID() const { return m_ID; }
+
+	// Get the number of channels
+	int GetChannels() const { return m_channels; }
 	
 protected:
 	// Import path of the image

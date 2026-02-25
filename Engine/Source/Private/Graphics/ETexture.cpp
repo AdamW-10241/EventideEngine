@@ -37,7 +37,10 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool re
         &m_channels,            // RGBA
         0   // Limit of required amount of channels (0 = no limit)
     );
-    
+
+    // Log channels
+    //EDebug::Log("Texture: " + fileName + " | Channels: " + std::to_string(m_channels));
+
     // Test if the data imported correctly
     if (data == nullptr) {
         EString errorMsg = "Failed to load texture - " + m_fileName + ": " + stbi_failure_reason();
@@ -90,6 +93,12 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool re
         intFormat = GL_RGBA;
     }
 
+    // RGB textures are 3 bytes per pixel which may not be 4-byte aligned
+    // OpenGL defaults to 4-byte alignment so we must set it to 1 for RGB
+    if (m_channels == 3) {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    }
+
     // Load the image data into the texture we just updated
     glTexImage2D(
         GL_TEXTURE_2D,      // Use a 2D Texture
@@ -101,6 +110,9 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool re
         GL_UNSIGNED_BYTE,   // Data type passed in
         data                // Image Data from STBI
     );
+
+    // Reset alignment to 4-byte default
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
     // Generate mip maps
     // Lower resolutions versions of texture

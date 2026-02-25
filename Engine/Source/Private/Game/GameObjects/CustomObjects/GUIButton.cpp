@@ -4,15 +4,36 @@
 
 void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 {
-	// Mouse motion
+	// Bind mouse events
 	m_input->OnMousePressed->Bind([this, m_input](const EUi8& button) {
-		if (button == SDL_BUTTON_LEFT) {
-			// Get button transform and compare if cursor on button
-			if (IsMouseOnButton(m_input)) {
-				OnButtonPressed();
-			}
+		if (button == SDL_BUTTON_LEFT && IsMouseOnButton(m_input)) {
+			// Button pressed
+			m_buttonHeld = true;
+			OnButtonPressed();
 		}
 	});
+
+	m_input->OnMouseReleased->Bind([this, m_input](const EUi8& button) {
+		if (button == SDL_BUTTON_LEFT && m_buttonHeld) {
+			// Button released
+			m_buttonHeld = false;
+			OnButtonReleased();
+		}
+	});
+}
+
+void GUIButton::OnTick(float deltaTime)
+{
+	// Run lambdas
+	if (OnTicked) OnTicked();
+
+	if (m_buttonHeld) OnHeld();
+}
+
+void GUIButton::OnPostTick(float deltaTime)
+{
+	// Run lambdas
+	if (OnPostTicked) OnPostTicked();
 }
 
 const bool GUIButton::IsMouseOnButton(const TShared<EInput>& m_input)
