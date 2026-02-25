@@ -14,9 +14,9 @@ public:
 	std::function<void()> OnReleased;
 
 	// Extend lambda bindings
-	void ExtendBinding(std::function<void()>& target, std::function<void()> func) {
-		auto existing = target;
-		target = [existing, func]() {
+	void ExtendBinding(std::function<void()> GUIButton::* target, std::function<void()> func) {
+		auto existing = this->*target;
+		this->*target = [existing, func]() {
 			if (existing) existing();
 			if (func) func();
 		};
@@ -27,11 +27,11 @@ public:
 		auto weak = GetWeakRef<GUIButton>();
 
 		// Set color on pressed
-		ExtendBinding(OnPressed, [weak, pressed]() {
+		ExtendBinding(&GUIButton::OnPressed, [weak, pressed]() {
 			if (const auto& btn = weak.lock()) btn->GetSprite(0).lock()->GetRenderColor() = pressed;
 		});
 		// Set color on released
-		ExtendBinding(OnReleased, [weak, released]() {
+		ExtendBinding(&GUIButton::OnReleased, [weak, released]() {
 			if (const auto& btn = weak.lock()) btn->GetSprite(0).lock()->GetRenderColor() = released;
 		});
 	}
