@@ -67,11 +67,11 @@ public:
 	// Unbind a function based on the index
 	// Get the index from the initial bind
 	void Unbind(const EUi8& index) {
-		std::erase_if(m_callbackNodes.begin(), m_callbackNodes.end(),
-			[index](const ECallbackNode& node) {
-				return node->id == index;
-			}
-		);
+		for (int i = m_callbackNodes.size() - 1; i >= 0; --i)
+		{
+			if (m_callbackNodes.at(i)->id == index)
+				m_callbackNodes.erase(m_callbackNodes.begin() + i);
+		}
 	}
 
 private:

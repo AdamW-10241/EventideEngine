@@ -28,7 +28,12 @@ public:
 
     TWeak<ESprite> GetSprite(const EString& texturePath);
 
-    TWeak<ESprite> GetSprite(const int index) { return m_sprites.at(index); }
+    TWeak<ESprite> GetSprite(const int index) {
+        if (m_sprites.size() > 0) {
+            return m_sprites.at(index);
+        }
+        return {};
+    }
 
 protected:
     TArray<TShared<ESprite>> m_sprites;

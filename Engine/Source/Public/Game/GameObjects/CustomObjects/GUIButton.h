@@ -14,7 +14,7 @@ public:
 	std::function<void()> OnReleased;
 
 	// Extend lambda bindings
-	// Adds new binding to existing lambda passing args
+	// Extends a binding
 	template<typename... Args, typename Func>
 	void ExtendBinding(std::function<void(Args...)> GUIButton::* target, Func func) {
 		auto existing = this->*target;
@@ -26,17 +26,26 @@ public:
 		};
 	}
 
+	// Extends a binding with automatic weak pointer safety for passed object
+	template<typename T, typename Func, typename... Args>
+	void BindObjectEvent(std::function<void(Args...)> GUIButton::* target, TWeak<T> weak, Func action) {
+		ExtendBinding(target, [weak, action](Args... args) {
+			if (const auto& obj = weak.lock()) action(obj, args...);
+		});
+	}
+
 	// Set pressed color
 	void SetPressedColor(const glm::vec4& pressed, const glm::vec4& released = glm::vec4(1.0f)) {
-		auto weak = GetWeakRef<GUIButton>();
-
+		SetPressedColor(0, pressed, released);
+	}
+	void SetPressedColor(const int index, const glm::vec4& pressed, const glm::vec4& released = glm::vec4(1.0f)) {
 		// Set color on pressed
-		ExtendBinding(&GUIButton::OnPressed, [weak, pressed]() {
-			if (const auto& btn = weak.lock()) btn->GetSprite(0).lock()->GetRenderColor() = pressed;
+		BindObjectEvent(&GUIButton::OnPressed, GetSprite(index), [pressed](const TShared<ESprite>& spr) {
+			spr->GetRenderColor() = pressed;
 		});
 		// Set color on released
-		ExtendBinding(&GUIButton::OnReleased, [weak, released]() {
-			if (const auto& btn = weak.lock()) btn->GetSprite(0).lock()->GetRenderColor() = released;
+		BindObjectEvent(&GUIButton::OnReleased, GetSprite(index), [released](const TShared<ESprite>& spr) {
+			spr->GetRenderColor() = released;
 		});
 	}
 
@@ -71,6 +80,8 @@ protected:
 	bool m_buttonHeld = false;
 
 	float m_timeHeld = 0.0f;
+
+	TArray<EUi8> m_inputBindings;
 
 private:
 	const bool IsMouseOnButton(const TShared<EInput>& input);

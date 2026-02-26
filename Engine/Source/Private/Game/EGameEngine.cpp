@@ -193,29 +193,31 @@ void EGameEngine::Start()
 	if (const auto& buttonRef = CreateObject<GUIButton>(1).lock()) {
 		const auto& sprite = buttonRef->AddSprite("Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0);
 		if (const auto& spriteRef = sprite.lock()) {
-			spriteRef->GetTransform().scale *= 6.0f;
-			spriteRef->GetTransform().CenterOnPosition();
+			spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
 		}
 
 		buttonRef->SetPressedColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-
-		auto weakButton = buttonRef->GetWeakRef<GUIButton>();
-		auto weakSprite = buttonRef->GetSprite(0);
-
-		buttonRef->ExtendBinding(&GUIButton::OnPressed, [weakSprite]() {
-			if (const auto& spr = weakSprite.lock()) {
-				spr->SetRenderScale(0.9f);
+		buttonRef->BindObjectEvent(&GUIButton::OnPressed, buttonRef->GetWeakRef<GUIButton>(), [](const TShared<GUIButton>& btn) {
+			btn->SetLifeTime(3.0f);
+			static bool wasAdded = false;
+			if (!wasAdded) {
+				btn->BindObjectEvent(&GUIButton::OnReleased, btn->GetWeakRef<GUIButton>(), [](const TShared<GUIButton>& btn) {
+					btn->GetSprite(0).lock()->SetRenderColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+					wasAdded = true;
+				});
+			}
+			else {
+				EDebug::Log("Already added!", LT_WARNING);
 			}
 		});
-		buttonRef->ExtendBinding(&GUIButton::OnReleased, [weakSprite]() {
-			if (const auto& spr = weakSprite.lock()) {
-				spr->SetRenderScale(1.0f);
-			}
+		buttonRef->BindObjectEvent(&GUIButton::OnPressed, sprite, [](const TShared<ESprite>& spr) {
+			spr->SetRenderScale(0.9f);
 		});
-		buttonRef->ExtendBinding(&GUIButton::OnHeld, [weakSprite](float deltaTime, float timeHeld) {
-			if (const auto& spr = weakSprite.lock()) {
-				//spr->GetTransform().rotation += deltaTime * 50.0f;
-			}
+		buttonRef->BindObjectEvent(&GUIButton::OnReleased, sprite, [](const TShared<ESprite>& spr) {
+			spr->SetRenderScale(1.0f);
+		});
+		buttonRef->BindObjectEvent(&GUIButton::OnHeld, sprite, [](const TShared<ESprite>& spr, float deltaTime, float timeHeld) {
+			//
 		});
 	}
 
@@ -270,7 +272,6 @@ void EGameEngine::Cleanup()
 {
 	m_input = nullptr;
 	m_window = nullptr;
-
 	SDL_Quit();
 }
 

@@ -15,6 +15,13 @@ public:
 	// Run after the start for adding inputs
 	void RegisterInputs(const TShared<EInput>& m_input);
 
+	template<typename... Args, typename Func>
+	void SetInputBinding(const TShared<EInput>& m_input, TShared<EEvents<Args...>> EInput::* event, Func func) {
+		const auto& eventRef = ((*m_input).*event);
+		EUi8 id = eventRef->Bind(func);
+		m_inputUnbinds.push_back([eventRef, id]() { eventRef->Unbind(id); });
+	}
+
 	// Run every frame, passes in deltaTime
 	void Tick(float deltaTime);
 
@@ -59,6 +66,9 @@ protected:
 	// Run after each tick every frame, passes in deltaTime
 	virtual void OnPostTick(float deltaTime) {}
 
+	// Run when object is marked for destroy
+	virtual void OnDestroy() {}
+
 private:
 	// If marked for destroy
 	bool m_pendingDestroy;
@@ -69,7 +79,9 @@ private:
 	// Time before destroy
 	float m_lifeTimeTimer;
 
-private:
 	// Whether object is rendered
 	bool m_doRender;
+
+	// Store unbinds for input bindings
+	TArray<std::function<void()>> m_inputUnbinds;
 };

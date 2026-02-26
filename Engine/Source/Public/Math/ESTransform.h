@@ -90,7 +90,20 @@ struct ESTransform2D {
 	ESTransform2D(const glm::vec2& p, const float& r, const glm::vec2& s) {
 		position = p;
 		rotation = r;
-		scale = s;
+		SetScaleCentered(s);
+	}
+
+	void SetScaleMultiCentered(float scaleMulti) {
+		scale *= scaleMulti;
+		CenterOnPosition();
+	}
+	void SetScaleCentered(float newScale) {
+		scale = glm::vec2(newScale);
+		CenterOnPosition();
+	}
+	void SetScaleCentered(glm::vec2 newScale) {
+		scale = newScale;
+		CenterOnPosition();
 	}
 
 	void CenterOnPosition() { position -= scale * 0.5f; }

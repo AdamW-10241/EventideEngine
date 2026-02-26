@@ -5,9 +5,9 @@
 void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 {
 	m_inputWeak = m_input;
-	
+
 	// Bind mouse events
-	m_input->OnMousePressed->Bind([this, m_input](const EUi8& button) {
+	SetInputBinding(m_input, &EInput::OnMousePressed, [this, m_input](const EUi8& button) {
 		if (button == SDL_BUTTON_LEFT && IsMouseOnButton(m_input)) {
 			// Button pressed
 			m_buttonHeld = true;
@@ -16,7 +16,7 @@ void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 	});
 
-	m_input->OnMouseReleased->Bind([this, m_input](const EUi8& button) {
+	SetInputBinding(m_input, &EInput::OnMouseReleased, [this, m_input](const EUi8& button) {
 		if (button == SDL_BUTTON_LEFT && m_buttonHeld) {
 			// Button released
 			m_buttonHeld = false;
@@ -61,10 +61,12 @@ void GUIButton::OnButtonHeld(float deltaTime)
 
 const bool GUIButton::IsMouseOnButton(const TShared<EInput>& m_input)
 {
-	
 	// Get positions
 	SDL_MouseMotionEvent& mouseLastMotion = m_input->GetMouseLastMotion();
-	ESTransform2D buttonTransform = GetSprite(0).lock()->GetTransform();
+	ESTransform2D buttonTransform;
+	if (const auto& spriteRef = GetSprite(0).lock()) {
+		buttonTransform = spriteRef->GetTransform();
+	}
 
 	// Get mouse position relative to button center
 	glm::vec2 center = buttonTransform.position + buttonTransform.scale * 0.5f;

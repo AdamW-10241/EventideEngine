@@ -49,5 +49,11 @@ void EObject::Destroy()
 {
 	m_pendingDestroy = true;
 
+	// Call all input unbinds
+	for (std::function<void()> unbind : m_inputUnbinds) {
+		unbind();
+	}
+
+	OnDestroy();
 	EGameEngine::GetGameEngine()->DestroyObject(shared_from_this());
 }
