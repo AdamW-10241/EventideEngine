@@ -59,13 +59,19 @@ public:
 	// Get render color
 	glm::vec4& GetRenderColor() { return m_renderColor; }
 
+	// Set render scale
+	void SetRenderScale(const glm::vec2 renderScale) { m_renderScale = renderScale; }
+	void SetRenderScale(const float renderScale) { m_renderScale = glm::vec2(renderScale); }
+
+	// Get render scale
+	glm::vec2& GetRenderScale() { return m_renderScale; }
+
 protected:
-	// Store transform
 	ESTransform2D m_transform;
 
-	// Store render order
 	EUi32 m_renderOrder;
 
-	// Store render color
 	glm::vec4 m_renderColor;
+
+	glm::vec2 m_renderScale = glm::vec2(1.0f);
 };

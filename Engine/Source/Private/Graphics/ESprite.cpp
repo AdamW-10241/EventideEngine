@@ -61,14 +61,13 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(transform.position, 0.0f));
+    glm::vec2 renderScale = transform.scale * m_renderScale;
+    glm::vec2 center = transform.position + transform.scale * 0.5f;
 
-    // Rotate around center
-    model = glm::translate(model, glm::vec3(0.5f * transform.scale, 0.0f));
+    model = glm::translate(model, glm::vec3(center, 0.0f));
     model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::translate(model, glm::vec3(-0.5f * transform.scale, 0.0f));
-
-    model = glm::scale(model, glm::vec3(transform.scale, 1.0f));
+    model = glm::translate(model, glm::vec3(-renderScale * 0.5f, 0.0f));
+    model = glm::scale(model, glm::vec3(renderScale, 1.0f));
 
     // Set uniforms
     GLuint programID = shader->GetProgramID();

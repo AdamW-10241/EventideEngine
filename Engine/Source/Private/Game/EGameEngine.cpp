@@ -191,13 +191,10 @@ void EGameEngine::Start()
 
 	// DEBUG GUI Button
 	if (const auto& buttonRef = CreateObject<GUIButton>(1).lock()) {
-		glm::vec2 originalScale;
-
 		const auto& sprite = buttonRef->AddSprite("Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0);
 		if (const auto& spriteRef = sprite.lock()) {
 			spriteRef->GetTransform().scale *= 6.0f;
 			spriteRef->GetTransform().CenterOnPosition();
-			originalScale = spriteRef->GetTransform().scale;
 		}
 
 		buttonRef->SetPressedColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
@@ -207,20 +204,18 @@ void EGameEngine::Start()
 
 		buttonRef->ExtendBinding(&GUIButton::OnPressed, [weakSprite]() {
 			if (const auto& spr = weakSprite.lock()) {
-				spr->GetTransform().UncenterPosition();
-				spr->GetTransform().scale *= 0.9f;
-				spr->GetTransform().CenterOnPosition();
+				spr->SetRenderScale(0.9f);
 			}
 		});
-		buttonRef->ExtendBinding(&GUIButton::OnReleased, [weakSprite, originalScale]() {
+		buttonRef->ExtendBinding(&GUIButton::OnReleased, [weakSprite]() {
 			if (const auto& spr = weakSprite.lock()) {
-				spr->GetTransform().UncenterPosition();
-				spr->GetTransform().scale = originalScale;
-				spr->GetTransform().CenterOnPosition();
+				spr->SetRenderScale(1.0f);
 			}
 		});
-		buttonRef->ExtendBinding(&GUIButton::OnHeld, []() {
-			EDebug::Log("Hello", LT_WARNING);
+		buttonRef->ExtendBinding(&GUIButton::OnHeld, [weakSprite](float deltaTime, float timeHeld) {
+			if (const auto& spr = weakSprite.lock()) {
+				//spr->GetTransform().rotation += deltaTime * 50.0f;
+			}
 		});
 	}
 

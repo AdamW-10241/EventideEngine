@@ -7,18 +7,22 @@ public:
 
 	// Lamba bindings
 	std::function<void()> OnStarted;
-	std::function<void()> OnTicked;
-	std::function<void()> OnPostTicked;
+	std::function<void(float)> OnTicked;
+	std::function<void(float)> OnPostTicked;
 	std::function<void()> OnPressed;
-	std::function<void()> OnHeld;
+	std::function<void(float, float)> OnHeld;
 	std::function<void()> OnReleased;
 
 	// Extend lambda bindings
-	void ExtendBinding(std::function<void()> GUIButton::* target, std::function<void()> func) {
+	// Adds new binding to existing lambda passing args
+	template<typename... Args, typename Func>
+	void ExtendBinding(std::function<void(Args...)> GUIButton::* target, Func func) {
 		auto existing = this->*target;
-		this->*target = [existing, func]() {
-			if (existing) existing();
-			if (func) func();
+		this->*target = [existing, func](Args... args) {
+			if (existing) existing(args...);
+			if constexpr (std::is_invocable_v<Func, Args...>) {
+				func(args...);
+			}
 		};
 	}
 
@@ -36,6 +40,8 @@ public:
 		});
 	}
 
+	float GetTimeHeld() const { return m_timeHeld; }
+
 protected:
 	virtual void OnStart() override {
 		EScreenObject::OnStart();
@@ -48,9 +54,11 @@ protected:
 
 	virtual void OnPostTick(float deltaTime) override;
 
-	virtual void OnButtonPressed() { 
-		if (OnPressed) OnPressed(); 
+	virtual void OnButtonPressed() {
+		if (OnPressed) OnPressed();
 	}
+
+	virtual void OnButtonHeld(float deltaTime);
 
 	virtual void OnButtonReleased() {
 		if (OnReleased) OnReleased();
@@ -58,8 +66,12 @@ protected:
 
 protected:
 	// Store state
+	TWeak<EInput> m_inputWeak;
+
 	bool m_buttonHeld = false;
 
+	float m_timeHeld = 0.0f;
+
 private:
-	const bool IsMouseOnButton(const TShared<EInput>& m_input);
+	const bool IsMouseOnButton(const TShared<EInput>& input);
 };
