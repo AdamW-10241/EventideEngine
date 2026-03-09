@@ -133,6 +133,8 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the camera
 	m_camera = TMakeShared<ESCamera>();
+	glm::vec2 windowSize = EGameEngine::GetGameEngine()->GetWindow().lock()->GetWindowSize();
+	m_camera->SetWindowAspectRatio(windowSize);
 
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();

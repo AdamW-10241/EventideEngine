@@ -12,6 +12,13 @@
 
 class EObject;
 
+enum EGameState {
+	NONE,
+	GAME,
+	MENU,
+	PAUSE
+};
+
 class EGameEngine {
 public:
 	// Get or create a game engine if one does not exist
@@ -171,6 +178,9 @@ private:
 	// Store time taken to load so it can be subtracted
 	// Otherwise massive delta on first frame
 	double m_timeToLoad;
+
+	// Store if game paused
+	EGameState m_gameState;
 
 	// Store the games points
 	int m_points;

@@ -74,10 +74,11 @@ EGameEngine::EGameEngine()
 	m_lastTickTime = 0.0f;
 	m_deltaTime = 0.0f;
 
-	m_defaultFrameRate = 120;
+	m_defaultFrameRate = 240;
 	m_frameRate = m_defaultFrameRate;
 
 	m_timeToLoad = 0.0f;
+	m_gameState = EGameState::NONE;
 
 	m_points = 0;
 
@@ -121,7 +122,7 @@ bool EGameEngine::Init()
 	// Creating an SDL window
 	if (!m_window->CreateWindow({ "Game Window",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		720, 720 })) {
+		3440, 1440 })) {
 		return false;
 	}
 
@@ -198,16 +199,12 @@ void EGameEngine::Start()
 
 		buttonRef->SetPressedColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
 		buttonRef->BindObjectEvent(&GUIButton::OnPressed, buttonRef->GetWeakRef<GUIButton>(), [](const TShared<GUIButton>& btn) {
-			btn->SetLifeTime(3.0f);
-			static bool wasAdded = false;
-			if (!wasAdded) {
-				btn->BindObjectEvent(&GUIButton::OnReleased, btn->GetWeakRef<GUIButton>(), [](const TShared<GUIButton>& btn) {
-					btn->GetSprite(0).lock()->SetRenderColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-					wasAdded = true;
-				});
-			}
-			else {
-				EDebug::Log("Already added!", LT_WARNING);
+			EGameState& gameState = EGameEngine::GetGameEngine()->m_gameState;
+			if (gameState == EGameState::PAUSE) {
+				gameState = EGameState::GAME;
+			}	
+			else if (gameState == EGameState::GAME) {
+				gameState = EGameState::PAUSE;
 			}
 		});
 		buttonRef->BindObjectEvent(&GUIButton::OnPressed, sprite, [](const TShared<ESprite>& spr) {
@@ -223,6 +220,9 @@ void EGameEngine::Start()
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
+
+	// Set game state
+	m_gameState = EGameState::GAME;
 }
 
 void EGameEngine::GameLoop()
@@ -259,7 +259,8 @@ void EGameEngine::GameLoop()
 		ProcessInput();
 
 		// Process all engine tick functions
-		Tick();
+		if (m_gameState == EGameState::GAME)
+			Tick();
 
 		// Process all engine render functions
 		Render();

@@ -72,6 +72,11 @@ struct ESCamera {
 		defaultFov = newFov;
 	}
 
+	// Set aspect ratio to match window size
+	void SetWindowAspectRatio(glm::vec2 windowSize) {
+		aspectRatio = windowSize.x / windowSize.y;
+	}
+
 	// Get the vertical movement status for the camera
 	bool& GetVerticalMovementStatus() { return canMoveVertical; }
 

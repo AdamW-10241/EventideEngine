@@ -337,3 +337,11 @@ void EWindow::Render()
 	if (m_graphicsEngine)
 		m_graphicsEngine->Render(m_sdlWindow);
 }
+
+SDL_Rect EWindow::GetDisplayBounds()
+{
+	int displayIndex = SDL_GetWindowDisplayIndex(m_sdlWindow);
+	SDL_Rect displayBounds;
+	SDL_GetDisplayBounds(displayIndex, &displayBounds);
+	return displayBounds;
+}

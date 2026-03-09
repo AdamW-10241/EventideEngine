@@ -1,6 +1,7 @@
 #pragma once
 #include "EngineTypes.h"
 #include "Math/ESTransform.h"
+#include "SDL/SDL_video.h"
 
 class EGraphicsEngine;
 class EInput;
@@ -77,6 +78,9 @@ public:
 
 	// Get window center
 	glm::vec2 GetWindowCenter() { return GetWindowSize() / 2.0f; }
+
+	// Get bounds of the display window is in
+	SDL_Rect GetDisplayBounds();
 
 public:
 	// Flag to randomly change brightness
