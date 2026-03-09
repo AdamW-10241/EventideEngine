@@ -20,6 +20,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/Wall.h"
 #include "Game/GameObjects/CustomObjects/InvisibleWalls.h"
 #include "Game/GameObjects/CustomObjects/GUIButton.h"
+#include "Game/GameObjects/CustomObjects/Coin.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -190,6 +191,10 @@ void EGameEngine::Start()
 		CreateObject<Grass>();
 	}
 
+	// Spawn Coin
+	auto coin = CreateObject<Coin>().lock();
+	coin->Destroy();
+
 	// DEBUG GUI Button
 	if (const auto& buttonRef = CreateObject<GUIButton>(1).lock()) {
 		const auto& sprite = buttonRef->AddSprite("Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0);
@@ -198,7 +203,7 @@ void EGameEngine::Start()
 		}
 
 		buttonRef->SetPressedColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-		buttonRef->BindObjectEvent(&GUIButton::OnPressed, buttonRef->GetWeakRef<GUIButton>(), [](const TShared<GUIButton>& btn) {
+		BTN_BIND_EVENT_RAW(buttonRef, OnPressed, []() {
 			EGameState& gameState = EGameEngine::GetGameEngine()->m_gameState;
 			if (gameState == EGameState::PAUSE) {
 				gameState = EGameState::GAME;
@@ -207,15 +212,18 @@ void EGameEngine::Start()
 				gameState = EGameState::PAUSE;
 			}
 		});
-		buttonRef->BindObjectEvent(&GUIButton::OnPressed, sprite, [](const TShared<ESprite>& spr) {
+		BTN_BIND_EVENT_SELF(buttonRef, OnPressed, [](const TShared<GUIButton>& btn) {
+			btn->GetSprite(0).lock()->GetTransform().rotation += 30.0f;
+		});
+		BTN_BIND_EVENT_EXT(buttonRef, OnPressed, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
 			spr->SetRenderScale(0.9f);
 		});
-		buttonRef->BindObjectEvent(&GUIButton::OnReleased, sprite, [](const TShared<ESprite>& spr) {
+		BTN_BIND_EVENT_EXT(buttonRef, OnReleased, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
 			spr->SetRenderScale(1.0f);
 		});
-		buttonRef->BindObjectEvent(&GUIButton::OnHeld, sprite, [](const TShared<ESprite>& spr, float deltaTime, float timeHeld) {
-			//
-		});
+		//BTN_BIND_EVENT(buttonRef, OnHeld, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr, float deltaTime, float timeHeld) {
+		//	//
+		//});
 	}
 
 	// Get the time to load

@@ -20,19 +20,39 @@ public:
 		auto existing = this->*target;
 		this->*target = [existing, func](Args... args) {
 			if (existing) existing(args...);
-			if constexpr (std::is_invocable_v<Func, Args...>) {
-				func(args...);
-			}
+			func(args...);
 		};
 	}
 
-	// Extends a binding with automatic weak pointer safety for passed object
+	// Extends a binding with weak safety on 'this' only (no external object)
+	template<typename Func, typename... Args>
+	void BindSelfEvent(std::function<void(Args...)> GUIButton::* target, Func action) {
+		auto self = GetWeakRef<GUIButton>();
+		ExtendBinding(target, [self, action](Args... args) {
+			if (const auto& s = self.lock())
+				if constexpr (std::is_invocable_v<Func, TShared<GUIButton>, Args...>)
+					action(s, args...);
+			});
+	}
+
+	// Extends a binding with weak safety on 'this' and external object
 	template<typename T, typename Func, typename... Args>
 	void BindObjectEvent(std::function<void(Args...)> GUIButton::* target, TWeak<T> weak, Func action) {
-		ExtendBinding(target, [weak, action](Args... args) {
-			if (const auto& obj = weak.lock()) action(obj, args...);
+		auto self = GetWeakRef<GUIButton>();
+		ExtendBinding(target, [self, weak, action](Args... args) {
+			if (const auto& s = self.lock())
+			if (const auto& obj = weak.lock()) 
+				if constexpr (std::is_invocable_v<Func, TShared<GUIButton>, TShared<T>, Args...>)
+					action(s, obj, args...);
 		});
 	}
+
+	#define BTN_BIND_EVENT_RAW(obj, event, action) \
+		obj->ExtendBinding(&std::remove_reference_t<decltype(*obj)>::event, action)
+	#define BTN_BIND_EVENT_SELF(obj, event, action) \
+		obj->BindSelfEvent(&std::remove_reference_t<decltype(*obj)>::event, action)
+	#define BTN_BIND_EVENT_EXT(obj, event, ...) \
+		obj->BindObjectEvent(&std::remove_reference_t<decltype(*obj)>::event, __VA_ARGS__)
 
 	// Set pressed color
 	void SetPressedColor(const glm::vec4& pressed, const glm::vec4& released = glm::vec4(1.0f)) {

@@ -159,25 +159,6 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		lightRef->intensity = 0.6f;
 	}
 
-	// Create the point light
-	//const auto& pointLight = CreatePointLight();
-	//if (const auto& lightRef = pointLight.lock()) {
-	//	lightRef->colour = glm::vec3(0.3f, 0.3f, 0.7f);
-	//	lightRef->intensity = 5.0f;
-	//	lightRef->position.y = 200.0f;
-	//}
-
-	// Create the spot light
-	//const auto& spotLight = CreateSpotLight();
-	//if (const auto& lightRef = spotLight.lock()) {
-	//	lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
-	//	lightRef->direction = glm::vec3(0.0f, -1.0f, -1.0f);
-	//	lightRef->position.y = 50.0f;
-	//	lightRef->intensity = 1.0f;
-	//	lightRef->outerCutOff = 180.0f;
-	//	lightRef->innerCutOff = 150.0f;
-	//}
-
 	return true;
 }
 
