@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <optional>
 
 // Redefine of standard string
 typedef std::string EString;
@@ -45,6 +46,12 @@ TShared<T> TMakeShared(Args&&... args) {
 template <typename T, typename ... Args>
 TUnique<T> TMakeUnique(Args&&... args) {
 	return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
+// Cast shared pointer 
+template <typename T, typename U>
+TShared<T> TCast(const TShared<U>& ptr) {
+	return std::dynamic_pointer_cast<T>(ptr);
 }
 
 // Template function to convert to EString

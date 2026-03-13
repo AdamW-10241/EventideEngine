@@ -33,10 +33,10 @@ public:
 	bool CreateSprite();
 
 	// Render with set transform
-	void Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform);
+	virtual void Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform, bool flipVertically = false);
 
 	// Render with base transform
-	void Render(const TShared<EShaderProgram>& shader) { Render(shader, m_transform); }
+	virtual void Render(const TShared<EShaderProgram>& shader, bool flipVertically = false) { Render(shader, m_transform, flipVertically); }
 
 	// Set transform
 	void SetTransform(const ESTransform2D transform) { m_transform = transform; }

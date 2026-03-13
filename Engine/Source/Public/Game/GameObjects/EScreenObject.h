@@ -2,17 +2,35 @@
 #include "Game/GameObjects/EObject.h"
 #include "Graphics/ESprite.h"
 
+struct ESAddSpriteConfig {
+    ESAddSpriteConfig(const ESTransform2D _transform, const EUi32 _renderOrder) {
+        transform = _transform;
+        renderOrder = _renderOrder;
+    }
+
+    ESAddSpriteConfig(const EString _texturePath, const ESTransform2D _transform, const EUi32 _renderOrder) {
+        texturePath = _texturePath;
+        transform = _transform;
+        renderOrder = _renderOrder;
+    }
+
+    ESAddSpriteConfig SetRenderColor(glm::vec4 _renderColor) { renderColor = _renderColor; return *this; }
+    ESAddSpriteConfig SetIsText(bool _isText) { isText = _isText; return *this; }
+
+    ESTransform2D transform;
+    EUi32 renderOrder;
+    EString texturePath = "";
+    bool isText = false;
+    glm::vec4 renderColor = glm::vec4(1.0f);
+};
+
 class EScreenObject : public EObject {
 public:
     EScreenObject() { m_renderOrder = 0; }
     EScreenObject(EUi32 renderOrder) { m_renderOrder = renderOrder; }
 	
     // Creates and stores a sprite, returns a weak ref if you need to modify it later
-    TWeak<ESprite> AddSprite(const EString& texturePath, const ESTransform2D& transform, const EUi32 renderOrder, 
-        const glm::vec4 renderColor = glm::vec4(1.0f));
-
-    TWeak<ESprite> AddSprite(const ESTransform2D& transform, const EUi32 renderOrder,
-        const glm::vec4 renderColor = glm::vec4(1.0f));
+    TWeak<ESprite> AddSprite(ESAddSpriteConfig config);
 
     // Render sprites
     void Render(const TShared<EShaderProgram>& shader);
@@ -24,15 +42,40 @@ public:
     EUi32& GetRenderOrder() { return m_renderOrder; }
 
     // Get sprites
-    TArray<TShared<ESprite>>& GetSprites() { return m_sprites; }
+    TArray<TWeak<ESprite>> GetSprites() { 
+        TArray<TWeak<ESprite>> weakSprites;
+        for (auto sprite : m_sprites) {
+            weakSprites.push_back(sprite);
+        }
+        return weakSprites;
+    }
 
     TWeak<ESprite> GetSprite(const EString& texturePath);
 
     TWeak<ESprite> GetSprite(const int index) {
-        if (m_sprites.size() > 0) {
+        if (m_sprites.size() > index) {
             return m_sprites.at(index);
         }
         return {};
+    }
+
+    // Manip all sprites in array
+    void SetSpritesTransforms(const ESTransform2D transform) {
+        for (auto sprite : m_sprites)
+            sprite->GetTransform() = transform;
+    }
+
+    void SetSpritesRenderColors(const glm::vec4 renderColor) { 
+        for (auto sprite : m_sprites)
+            sprite->SetRenderColor(renderColor);
+    }
+
+    void SetSpritesRenderScales(const glm::vec2 renderScale) {
+        for (auto sprite : m_sprites)
+            sprite->SetRenderScale(renderScale);
+    }
+    void SetSpritesRenderScales(const float renderScale) { 
+        SetSpritesRenderScales(glm::vec2(renderScale));
     }
 
 protected:

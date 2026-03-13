@@ -2,6 +2,7 @@
 
 // External Libs
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
 
 // Engine Libs
 #include "EngineTypes.h"

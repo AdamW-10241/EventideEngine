@@ -13,6 +13,8 @@ public:
 	std::function<void(float, float)> OnHeld;
 	std::function<void()> OnReleased;
 
+	float GetTimeHeld() const { return m_timeHeld; }
+
 	// Extend lambda bindings
 	// Extends a binding
 	template<typename... Args, typename Func>
@@ -27,6 +29,10 @@ public:
 	// Extends a binding with weak safety on 'this' only (no external object)
 	template<typename Func, typename... Args>
 	void BindSelfEvent(std::function<void(Args...)> GUIButton::* target, Func action) {
+		static_assert(
+			std::is_invocable_v<Func, TShared<GUIButton>, Args...>,
+			"GUIButton - BindSelfEvent: action must take (TShared<GUIButton>, ...Args)"
+			);
 		auto self = GetWeakRef<GUIButton>();
 		ExtendBinding(target, [self, action](Args... args) {
 			if (const auto& s = self.lock())
@@ -38,12 +44,17 @@ public:
 	// Extends a binding with weak safety on 'this' and external object
 	template<typename T, typename Func, typename... Args>
 	void BindObjectEvent(std::function<void(Args...)> GUIButton::* target, TWeak<T> weak, Func action) {
+		static_assert(
+			std::is_invocable_v<Func, TShared<GUIButton>, TShared<T>, Args...>,
+			"GUIButton - BindObjectEvent: action must take (TShared<GUIButton>, TShared<T>, ...Args)"
+			);
 		auto self = GetWeakRef<GUIButton>();
 		ExtendBinding(target, [self, weak, action](Args... args) {
-			if (const auto& s = self.lock())
-			if (const auto& obj = weak.lock()) 
-				if constexpr (std::is_invocable_v<Func, TShared<GUIButton>, TShared<T>, Args...>)
-					action(s, obj, args...);
+			if (const auto& s = self.lock()) {
+				if (const auto& obj = weak.lock())
+					if constexpr (std::is_invocable_v<Func, TShared<GUIButton>, TShared<T>, Args...>)
+						action(s, obj, args...);
+			}
 		});
 	}
 
@@ -54,22 +65,42 @@ public:
 	#define BTN_BIND_EVENT_EXT(obj, event, ...) \
 		obj->BindObjectEvent(&std::remove_reference_t<decltype(*obj)>::event, __VA_ARGS__)
 
-	// Set pressed color
-	void SetPressedColor(const glm::vec4& pressed, const glm::vec4& released = glm::vec4(1.0f)) {
-		SetPressedColor(0, pressed, released);
+	// Set pressed colors
+	void SetSpritePressedColor(const glm::vec4 pressed, std::optional<glm::vec4> released = std::nullopt) {
+		SetSpritePressedColor(0, pressed, released);
 	}
-	void SetPressedColor(const int index, const glm::vec4& pressed, const glm::vec4& released = glm::vec4(1.0f)) {
+	void SetSpritePressedColor(const int index, const glm::vec4 pressed, std::optional<glm::vec4> released = std::nullopt) {
+		// Validate sprite
+		const auto& sprite = GetSprite(index);
+		if (!sprite.lock()) {
+			EDebug::Log("GUIButton - Sprite at index " + toEString(index) + " does not exist.", LT_ERROR);
+			return;
+		}
+
 		// Set color on pressed
-		BindObjectEvent(&GUIButton::OnPressed, GetSprite(index), [pressed](const TShared<ESprite>& spr) {
+		BindObjectEvent(&GUIButton::OnPressed, GetSprite(index), [pressed](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
 			spr->GetRenderColor() = pressed;
 		});
 		// Set color on released
-		BindObjectEvent(&GUIButton::OnReleased, GetSprite(index), [released](const TShared<ESprite>& spr) {
-			spr->GetRenderColor() = released;
+		glm::vec4 releasedColor = released.has_value() ? released.value() : GetSprite(index).lock()->GetRenderColor();
+		BindObjectEvent(&GUIButton::OnReleased, GetSprite(index), [releasedColor](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
+			spr->GetRenderColor() = releasedColor;
 		});
 	}
 
-	float GetTimeHeld() const { return m_timeHeld; }
+	//void SetSpritesPressedColors(const glm::vec4 pressed, const glm::vec4 released = glm::vec4(1.0f)) {
+	//	// Set color on pressed
+	//	BindSelfEvent(&GUIButton::OnPressed, [pressed](const TShared<GUIButton>& btn) {
+	//		for (auto spr : btn->GetSprites()) {
+	//			spr.lock()->SetRenderColor(pressed);
+	//		}
+	//	});
+	//	// Set color on released
+	//	BindSelfEvent(&GUIButton::OnReleased, [released](const TShared<GUIButton>& btn) {
+	//		for (auto spr : btn->GetSprites())
+	//			spr.lock()->SetRenderColor(released);
+	//	});
+	//}
 
 protected:
 	virtual void OnStart() override {

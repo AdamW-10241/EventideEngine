@@ -1,27 +1,18 @@
 #include "Game/GameObjects/EScreenObject.h"
+#include "Graphics/EText.h"
 
 // External Libs
 #include <algorithm>
 
-TWeak<ESprite> EScreenObject::AddSprite(const EString& texturePath, const ESTransform2D& transform, const EUi32 renderOrder, const glm::vec4 renderColor)
+TWeak<ESprite> EScreenObject::AddSprite(ESAddSpriteConfig config)
 {
-    TShared<ESprite> sprite = TMakeShared<ESprite>(texturePath, transform, renderOrder, renderColor);
+    // Create sprite
+    auto sprite = config.isText ?
+        TMakeShared<EText>(config.texturePath, config.transform, config.renderOrder, config.renderColor) :
+        TMakeShared<ESprite>(config.texturePath, config.transform, config.renderOrder, config.renderColor);
 
     // Set sprite scale to texture size if not set
-    if (transform.scale == glm::vec2(0.0f)) {
-        sprite->SetScaleToTextureSize();
-    }
-
-    m_sprites.push_back(sprite);
-    return sprite;
-}
-
-TWeak<ESprite> EScreenObject::AddSprite(const ESTransform2D& transform, const EUi32 renderOrder, const glm::vec4 renderColor)
-{
-    TShared<ESprite> sprite = TMakeShared<ESprite>(transform, renderOrder, renderColor);
-
-    // Set sprite scale to texture size if not set
-    if (transform.scale == glm::vec2(0.0f)) {
+    if (config.transform.scale == glm::vec2(0.0f)) {
         sprite->SetScaleToTextureSize();
     }
 
@@ -37,6 +28,10 @@ void EScreenObject::Render(const TShared<EShaderProgram>& shader)
     });
 
     for (const auto& sprite : m_sprites) {
+        if (const auto& text = TCast<EText>(sprite)) {
+            text->Render(shader, true);
+            continue;
+        }
         sprite->Render(shader);
     }
 }

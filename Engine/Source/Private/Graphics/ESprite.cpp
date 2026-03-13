@@ -46,7 +46,7 @@ bool ESprite::CreateSprite()
     return true;
 }
 
-void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform)
+void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& transform, bool flipVertically)
 {
     shader->Activate();
     
@@ -57,7 +57,14 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     float screenHeight = static_cast<float>(viewport[3]);
 
     // Screen-space orthographic projection
-    glm::mat4 projection = glm::ortho(0.0f, screenWidth, screenHeight, 0.0f, -1.0f, 1.0f);
+    glm::mat4 projection;
+    if (flipVertically) {
+        projection = glm::ortho(0.0f, screenWidth, 0.0f, screenHeight, -1.0f, 1.0f);
+    }else {
+        // Flip sprite vertically
+        projection = glm::ortho(0.0f, screenWidth, screenHeight, 0.0f, -1.0f, 1.0f);
+    }
+    
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);

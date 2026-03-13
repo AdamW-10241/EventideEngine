@@ -21,6 +21,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/InvisibleWalls.h"
 #include "Game/GameObjects/CustomObjects/GUIButton.h"
 #include "Game/GameObjects/CustomObjects/Coin.h"
+#include "Graphics/EText.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -104,6 +105,11 @@ bool EGameEngine::Init()
 		return false;
 	}
 
+	if (TTF_Init() != 0) {
+		EDebug::Log("Failed to init SDL TTF: " + EString(TTF_GetError()), LT_ERROR);
+		return false;
+	}
+
 	// Tell SDL that we will be rendering in OpenGL version 460 or 4.60
 	// 4 is the major version
 	// .60 is the minor version
@@ -123,7 +129,8 @@ bool EGameEngine::Init()
 	// Creating an SDL window
 	if (!m_window->CreateWindow({ "Game Window",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		3440, 1440 })) {
+		//3440, 1440 })) {
+		720, 720 })) {
 		return false;
 	}
 
@@ -170,7 +177,7 @@ void EGameEngine::Start()
 		if (const auto crosshair = CreateObject<EScreenObject>(0).lock()) {
 			ESTransform2D transform;
 			transform.position = m_window->GetWindowCenter();
-			const auto& sprite = crosshair->AddSprite("Sprites/Crosshairs/crosshair009.png", transform, 0);
+			const auto& sprite = crosshair->AddSprite(ESAddSpriteConfig{ "Sprites/Crosshairs/crosshair009.png", transform, 0 });
 			if (const auto& spriteRef = sprite.lock()) {
 				spriteRef->GetTransform().scale *= 0.4f;
 				spriteRef->GetTransform().CenterOnPosition();
@@ -196,33 +203,35 @@ void EGameEngine::Start()
 	coin->Destroy();
 
 	// DEBUG GUI Button
-	if (const auto& buttonRef = CreateObject<GUIButton>(1).lock()) {
-		const auto& sprite = buttonRef->AddSprite("Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0);
-		if (const auto& spriteRef = sprite.lock()) {
+	if (auto buttonRef = CreateObject<GUIButton>(1).lock()) {
+		auto spriteBase = buttonRef->AddSprite(ESAddSpriteConfig{ "Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0 });
+		if (auto spriteRef = spriteBase.lock()) {
 			spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
 		}
 
-		buttonRef->SetPressedColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-		BTN_BIND_EVENT_RAW(buttonRef, OnPressed, []() {
-			EGameState& gameState = EGameEngine::GetGameEngine()->m_gameState;
-			if (gameState == EGameState::PAUSE) {
-				gameState = EGameState::GAME;
-			}	
-			else if (gameState == EGameState::GAME) {
-				gameState = EGameState::PAUSE;
+		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", m_window->GetWindowCenter(), 0);
+		config.SetIsText(true);
+		config.SetRenderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+
+		auto spriteText = buttonRef->AddSprite(config);
+		if (auto spriteRef = spriteText.lock()) {
+			if (auto textRef = TCast<EText>(spriteRef)) {
+				textRef->SetFontSize(20);
+				textRef->SetText("Test!");
 			}
-		});
+			spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
+		}
+
+		buttonRef->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+		buttonRef->SetSpritePressedColor(1, glm::vec4(0.4f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f ));
 		BTN_BIND_EVENT_SELF(buttonRef, OnPressed, [](const TShared<GUIButton>& btn) {
-			btn->GetSprite(0).lock()->GetTransform().rotation += 30.0f;
+			btn->SetSpritesRenderScales(0.9f);
 		});
-		BTN_BIND_EVENT_EXT(buttonRef, OnPressed, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
-			spr->SetRenderScale(0.9f);
+		BTN_BIND_EVENT_SELF(buttonRef, OnReleased, [](const TShared<GUIButton>& btn) {
+			btn->SetSpritesRenderScales(1.0f);
 		});
-		BTN_BIND_EVENT_EXT(buttonRef, OnReleased, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
-			spr->SetRenderScale(1.0f);
-		});
-		//BTN_BIND_EVENT(buttonRef, OnHeld, sprite, [](const TShared<GUIButton>& btn, const TShared<ESprite>& spr, float deltaTime, float timeHeld) {
-		//	//
+		//BTN_BIND_EVENT_SELF(buttonRef, OnHeld, [](const TShared<GUIButton>& btn, float deltaTime, float timeHeld) {
+		//
 		//});
 	}
 
@@ -279,8 +288,17 @@ void EGameEngine::GameLoop()
 
 void EGameEngine::Cleanup()
 {
+	// Destroy all objects first
+	m_objectStack.clear();
+	m_objectsToBeSpawned.clear();
+	m_objectsPendingDestroy.clear();
+
+	// Then destroy window (which holds graphics/sprites)
 	m_input = nullptr;
 	m_window = nullptr;
+
+	// Now safe to quit SDL subsystems
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -301,13 +319,13 @@ void EGameEngine::Tick()
 		eObjectRef->Tick(DeltaTimeF());
 
 		// Check if object is a world object, otherwise skip logic 
-		if (const auto& woRef = std::dynamic_pointer_cast<EWorldObject>(eObjectRef)) {
+		if (const auto& woRef = TCast<EWorldObject>(eObjectRef)) {
 			// Check if world object has collisions
 			if (woRef->HasCollisions()) {
 				// Loop through all objects to test against
 				for (const auto& otherObj : m_objectStack) {
 					// Test if the other object is also a world object
-					if (const auto& otherWoRef = std::dynamic_pointer_cast<EWorldObject>(otherObj)) {
+					if (const auto& otherWoRef = TCast<EWorldObject>(otherObj)) {
 						// Skip colliding with self
 						if (woRef == otherWoRef)
 							continue;
@@ -372,7 +390,7 @@ void EGameEngine::PostLoop()
 			continue;
 
 		// Cleanup lights from the lights stack (otherwise they stay forever)
-		if (const auto& eLightObjectRef = std::dynamic_pointer_cast<ELightObject>(eObjectRef)) {
+		if (const auto& eLightObjectRef = TCast<ELightObject>(eObjectRef)) {
 			// Get the model
 			const auto& eLight = eLightObjectRef->GetPointLight();
 

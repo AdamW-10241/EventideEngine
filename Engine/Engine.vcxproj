@@ -67,7 +67,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\ExternalLibs\LIBS;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)ExternalLibs\LIBS\*.dll" "$(SolutionDir)Build\$(Configuration)\"</Command>
@@ -91,7 +91,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\ExternalLibs\LIBS;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)ExternalLibs\LIBS\*.dll" "$(SolutionDir)Build\$(Configuration)\"</Command>
@@ -120,6 +120,7 @@
     <ClCompile Include="Source\Private\Graphics\EModel.cpp" />
     <ClCompile Include="Source\Private\Graphics\EShaderProgram.cpp" />
     <ClCompile Include="Source\Private\Graphics\ESprite.cpp" />
+    <ClCompile Include="Source\Private\Graphics\EText.cpp" />
     <ClCompile Include="Source\Private\Graphics\ETexture.cpp" />
     <ClCompile Include="Source\Private\Listeners\EInput.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Source\Public\Graphics\ESLight.h" />
     <ClInclude Include="Source\Public\Graphics\ESMaterial.h" />
     <ClInclude Include="Source\Public\Graphics\ESprite.h" />
+    <ClInclude Include="Source\Public\Graphics\EText.h" />
     <ClInclude Include="Source\Public\Graphics\ETexture.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\InvisibleWalls.h" />
     <ClInclude Include="Source\Public\Listeners\EInput.h" />
