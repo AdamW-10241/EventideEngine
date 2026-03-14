@@ -1,4 +1,6 @@
 #include "Game/GameObjects/CustomObjects/Coin.h"
+#include "Graphics/EText.h"
+#include "Game/GameObjects/EScreenObject.h"
 
 #define Super EWorldObject
 
@@ -40,11 +42,7 @@ void Coin::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollisi
 	
 	if (otherCol->type == EECollisionType::PLAYER) {
 		// Increment points
-		EGameEngine::GetGameEngine()->GetPoints() += m_points;
-
-		// Display points
-		EString pointAmountText = toEString(EGameEngine::GetGameEngine()->GetPoints() * 1000);
-		EDebug::Log("Points: " + pointAmountText);
+		EGameEngine::GetGameEngine()->AddPoints(1000, true);
 
 		// Destroy coin
 		Destroy();

@@ -2,8 +2,12 @@
 #include "GameInput.h"
 #include "Graphics/EGraphicsEngine.h"
 
+#define Super EScreenObject
+
 void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 {
+	Super::OnRegisterInputs(m_input);
+	
 	m_inputWeak = m_input;
 
 	// Bind mouse events
@@ -28,16 +32,10 @@ void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 
 void GUIButton::OnTick(float deltaTime)
 {
+	Super::OnTick(deltaTime);
+	
 	// Run lambdas
-	if (OnTicked) OnTicked(deltaTime);
-
 	if (m_buttonHeld) OnButtonHeld(deltaTime);
-}
-
-void GUIButton::OnPostTick(float deltaTime)
-{
-	// Run lambdas
-	if (OnPostTicked) OnPostTicked(deltaTime);
 }
 
 void GUIButton::OnButtonHeld(float deltaTime)

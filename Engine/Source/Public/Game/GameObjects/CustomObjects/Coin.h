@@ -12,8 +12,4 @@ protected:
 
 	virtual void OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col,
 		const TShared<ESCollision>& otherCol) override;
-
-private:
-	// Store the coins point value
-	int m_points = 1;
 };

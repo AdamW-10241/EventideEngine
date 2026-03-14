@@ -151,6 +151,7 @@
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
     <ClInclude Include="Source\Public\Graphics\EModel.h" />
+    <ClInclude Include="Source\Public\Graphics\ESAddSpriteConfig.h" />
     <ClInclude Include="Source\Public\Graphics\ESCamera.h" />
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
     <ClInclude Include="Source\Public\Graphics\ESLight.h" />

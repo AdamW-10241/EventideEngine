@@ -209,5 +209,8 @@
     <ClInclude Include="Source\Public\Graphics\EText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Public\Graphics\ESAddSpriteConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

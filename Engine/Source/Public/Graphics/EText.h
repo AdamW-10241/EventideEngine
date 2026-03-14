@@ -27,11 +27,18 @@ public:
 	// Change the text of the text
 	void SetText(EString NewText);
 
+	EString GetText() const { return m_text; }
+
 	// Change the size of the text
 	void SetFontSize(int NewSize);
 
+	int GetFontSize() const { return m_fontSize; }
+
 	// Chang ethe color of the font
 	void SetFontColor(SDL_Color Color);
+
+	SDL_Color* GetFontColor() const { return m_textColor; }
+	
 
 protected:
 	void UpdateFont();

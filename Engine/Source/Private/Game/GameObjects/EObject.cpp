@@ -29,6 +29,9 @@ void EObject::Tick(float deltaTime)
 {
 	OnTick(deltaTime);
 
+	// Run lambdas
+	if (OnTicked) OnTicked(deltaTime);
+
 	if (m_lifeTime > 0.0f) {
 		// Count down the lifetime timer
 		m_lifeTimeTimer -= deltaTime;
@@ -43,6 +46,9 @@ void EObject::Tick(float deltaTime)
 void EObject::PostTick(float deltaTime)
 {
 	OnPostTick(deltaTime);
+
+	// Run lambdas
+	if (OnPostTicked) OnPostTicked(deltaTime);
 }
 
 void EObject::Destroy()

@@ -22,6 +22,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/GUIButton.h"
 #include "Game/GameObjects/CustomObjects/Coin.h"
 #include "Graphics/EText.h"
+#include "Graphics/ESprite.h"
 
 #include "Game/GameObjects/ELightObject.h"
 
@@ -40,7 +41,7 @@ void EGameEngine::DestroyEngine()
 bool EGameEngine::Run()
 {
 	if (!Init()) {
-		EDebug::Log(("Game engine failed to initialise"), LT_ERROR);
+		EDebug::Log(("Game Engine failed to initialise."), LT_ERROR);
 		return false;
 	}
 
@@ -49,6 +50,44 @@ bool EGameEngine::Run()
 	GameLoop();
 
 	return true;
+}
+
+void EGameEngine::AddPoints(int points, bool createText)
+{
+	// Add points
+	m_points += points;
+
+	if (!createText) return;
+	
+	// Create HUD text
+	glm::vec2 spawnPos;
+	if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
+		spawnPos = { 100.0f, window->GetWindowSize().y - (window->GetWindowSize().y / 3.0f) }; // WindowSize y = height
+	}
+
+	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+	config.SetIsText(true);
+	config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
+	if (const auto& screenObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+		screenObj->SetLifeTime(1.5f);
+		auto spriteText = screenObj->AddSprite(config);
+		if (auto spriteRef = spriteText.lock()) {
+			if (auto textRef = TCast<EText>(spriteRef)) {
+				textRef->SetFontSize(14);
+				textRef->SetText("+" + toEString(points) + " Points!");
+			}
+		}
+
+		BIND_EVENT_SELF(screenObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
+			if (const auto& screen = TCast<EScreenObject>(obj)) {
+				if (const auto& sprite = screen->GetSprite(0).lock()) {
+					sprite->GetTransform().position.y += 60.0f * deltaTime;
+					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
+				}
+			}
+			});
+	}
 }
 
 void EGameEngine::DestroyObject(const TShared<EObject>& object)
@@ -87,14 +126,14 @@ EGameEngine::EGameEngine()
 	// Set random seed
 	RandGenerator.seed((unsigned int)time(0));
 	
-	EDebug::Log("Game engine created");
+	EDebug::Log("Game Engine created.");
 }
 
 EGameEngine::~EGameEngine()
 {
 	Cleanup();
 	
-	EDebug::Log("Game engine destroyed");
+	EDebug::Log("Game Engine destroyed.");
 }
 
 bool EGameEngine::Init()
@@ -202,38 +241,57 @@ void EGameEngine::Start()
 	auto coin = CreateObject<Coin>().lock();
 	coin->Destroy();
 
-	// DEBUG GUI Button
-	if (auto buttonRef = CreateObject<GUIButton>(1).lock()) {
-		auto spriteBase = buttonRef->AddSprite(ESAddSpriteConfig{ "Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0 });
-		if (auto spriteRef = spriteBase.lock()) {
-			spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
+	// Create Points HUD text
+	glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
+	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+	config.SetIsText(true);
+	config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+
+	if (const auto& pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+		auto spriteText = pointsObj->AddSprite(config);
+		if (auto textRef = TCast<EText>(spriteText.lock())) {
+			textRef->SetFontSize(16);
 		}
 
-		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", m_window->GetWindowCenter(), 0);
-		config.SetIsText(true);
-		config.SetRenderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-
-		auto spriteText = buttonRef->AddSprite(config);
-		if (auto spriteRef = spriteText.lock()) {
-			if (auto textRef = TCast<EText>(spriteRef)) {
-				textRef->SetFontSize(20);
-				textRef->SetText("Test!");
+		BIND_EVENT_SELF(pointsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
+			if (const auto& points = TCast<EScreenObject>(obj)) {
+				if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
+					EString newText = "Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints());
+					text->SetText(newText);
+				}
 			}
-			spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
-		}
-
-		buttonRef->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-		buttonRef->SetSpritePressedColor(1, glm::vec4(0.4f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f ));
-		BTN_BIND_EVENT_SELF(buttonRef, OnPressed, [](const TShared<GUIButton>& btn) {
-			btn->SetSpritesRenderScales(0.9f);
 		});
-		BTN_BIND_EVENT_SELF(buttonRef, OnReleased, [](const TShared<GUIButton>& btn) {
-			btn->SetSpritesRenderScales(1.0f);
-		});
-		//BTN_BIND_EVENT_SELF(buttonRef, OnHeld, [](const TShared<GUIButton>& btn, float deltaTime, float timeHeld) {
-		//
-		//});
 	}
+
+	// DEBUG GUI Button
+	//if (auto buttonRef = CreateObject<GUIButton>(1).lock()) {
+	//	auto spriteBase = buttonRef->AddSprite(ESAddSpriteConfig{ "Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0 });
+	//	if (auto spriteRef = spriteBase.lock()) {
+	//		spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
+	//	}
+
+	//	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", m_window->GetWindowCenter(), 0);
+	//	config.SetIsText(true);
+	//	config.SetRenderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+
+	//	auto spriteText = buttonRef->AddSprite(config);
+	//	if (auto spriteRef = spriteText.lock()) {
+	//		if (auto textRef = TCast<EText>(spriteRef)) {
+	//			textRef->SetFontSize(20);
+	//			textRef->SetText("Test!");
+	//		}
+	//		spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
+	//	}
+
+	//	buttonRef->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+	//	buttonRef->SetSpritePressedColor(1, glm::vec4(0.4f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f ));
+	//	BIND_EVENT_SELF(buttonRef, OnPressed, [](const TShared<GUIButton>& btn) {
+	//		btn->SetSpritesRenderScales(0.9f);
+	//	});
+	//	BIND_EVENT_SELF(buttonRef, OnReleased, [](const TShared<GUIButton>& btn) {
+	//		btn->SetSpritesRenderScales(1.0f);
+	//	});
+	//}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
@@ -258,30 +316,21 @@ void EGameEngine::GameLoop()
 		// Update the last tick time to the current tick time for the loop
 		m_lastTickTime = curTickTime;
 
-		// Caps the frame rate
-		int frameDuration = 1000 / m_frameRate;
-
-		if ((double)frameDuration > deltaMilli) {
-			frameDuration = int(deltaMilli);
+		// Only delay if we're running faster than target frame rate
+		double targetDeltaMilli = 1000.0 / m_frameRate;
+		if (deltaMilli < targetDeltaMilli) {
+			SDL_Delay((EUi32)(targetDeltaMilli - deltaMilli));
 		}
 
-		// If the frame rate is greater than m_frameRate, delay the frame
-		SDL_Delay((EUi32)frameDuration);
-
-		// The order of these functions is important
 		// We must detect input, react with logic and then render based on logic
 		PreLoop();
-
-		// Process all engine input functions
 		ProcessInput();
 
 		// Process all engine tick functions
 		if (m_gameState == EGameState::GAME)
 			Tick();
 
-		// Process all engine render functions
 		Render();
-		
 		PostLoop();
 	}
 }

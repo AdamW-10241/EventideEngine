@@ -96,6 +96,9 @@ void Enemy::OnPostTick(float deltaTime)
 void Enemy::OnTakeDamage(float damage)
 {
 	Super::OnTakeDamage(damage);
+
+	// Increment points
+	EGameEngine::GetGameEngine()->AddPoints(50, false);
 	
 	// Check if dead
 	if (m_health <= 0.0) {

@@ -31,8 +31,11 @@ public:
 	// Run the game
 	bool Run();
 
-	// Get the games points
+	// Get the game's points
 	int& GetPoints() { return m_points; }
+
+	// Add points to the game
+	void AddPoints(int points, bool createText = true);
 
 	// Return the delta time between frames
 	double DeltaTime() const { return m_deltaTime; }

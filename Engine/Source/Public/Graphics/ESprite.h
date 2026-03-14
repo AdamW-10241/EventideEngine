@@ -3,6 +3,7 @@
 #include "Graphics/EMesh.h"
 #include "Graphics/EShaderProgram.h"
 #include "Math/ESTransform.h"
+#include "ESAddSpriteConfig.h"
 
 class ESprite : public EMesh, public ETexture {
 public:
@@ -55,9 +56,11 @@ public:
 
 	// Set render color
 	void SetRenderColor(const glm::vec4 renderColor) { m_renderColor = renderColor; }
+	void SetRenderColorAlpha(const float renderAlpha) { m_renderColor.a = renderAlpha; }
 
 	// Get render color
 	glm::vec4& GetRenderColor() { return m_renderColor; }
+	float& GetRenderAlpha() { return m_renderColor.a; }
 
 	// Set render scale
 	void SetRenderScale(const glm::vec2 renderScale) { m_renderScale = renderScale; }
