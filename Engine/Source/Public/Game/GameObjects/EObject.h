@@ -77,6 +77,9 @@ public:
 		m_inputUnbinds.push_back([eventRef, id]() { eventRef->Unbind(id); });
 	}
 
+	#define BIND_INPUT(input, event, action) \
+			this->SetInputBinding(input, &EInput::event, action)
+
 	// Run every frame, passes in deltaTime
 	void Tick(float deltaTime);
 

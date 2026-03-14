@@ -67,7 +67,7 @@ public:
 	// Unbind a function based on the index
 	// Get the index from the initial bind
 	void Unbind(const EUi8& index) {
-		for (int i = m_callbackNodes.size() - 1; i >= 0; --i)
+		for (int i = (int)m_callbackNodes.size() - 1; i >= 0; --i)
 		{
 			if (m_callbackNodes.at(i)->id == index)
 				m_callbackNodes.erase(m_callbackNodes.begin() + i);

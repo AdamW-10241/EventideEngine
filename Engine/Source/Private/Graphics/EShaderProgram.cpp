@@ -153,7 +153,7 @@ void EShaderProgram::SetLights(const TArray<TShared<ESLight>>& lights)
 	int varID = 0;
 
 	// Loop through all of the lights and add them to the shader
-	for (EUi32 i = 0; i < lights.size(); ++i) {
+	for (EUi32 i = 0; i < (EUi32)lights.size(); ++i) {
 		// ----------- DIRECTIONAL LIGHTS
 		if (const auto& lightRef = std::dynamic_pointer_cast<ESDirLight>(lights[i])) {
 			// Ignore dirLight if has reached max number

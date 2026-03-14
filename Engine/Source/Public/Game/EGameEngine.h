@@ -3,6 +3,7 @@
 // External Libs
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
+#include <set>
 
 // Engine Libs
 #include "EngineTypes.h"
@@ -12,12 +13,26 @@
 #include "Graphics/ESMaterial.h"
 
 class EObject;
+class EWorldObject;
 
 enum EGameState {
 	NONE,
 	GAME,
 	MENU,
 	PAUSE
+};
+
+struct EGridCell {
+	int x, y;
+	bool operator==(const EGridCell& other) const {
+		return x == other.x && y == other.y;
+	}
+};
+
+struct EGridCellHash {
+	size_t operator()(const EGridCell& cell) const {
+		return std::hash<int>()(cell.x) ^ (std::hash<int>()(cell.y) << 16);
+	}
 };
 
 class EGameEngine {
@@ -128,7 +143,7 @@ private:
 	// Initialise all required libraries for the game
 	bool Init();
 
-	// Runs after initialise of the engine
+	// Runs after initialising the engine
 	void Start();
 
 	// Runs the loop of the game
@@ -152,6 +167,17 @@ private:
 
 	// Runs at the end of each loop
 	void PostLoop();
+
+	// Collision processing
+	EGridCell GetCell(const glm::vec3& position) const { 
+		return { (int)floor(position.x / m_cellSize), (int)floor(position.z / m_cellSize) };
+	}
+
+	TArray<EGridCell> GetOccupiedCells(const TShared<EWorldObject>& wo) const;
+
+	void RebuildSpatialGrid();
+
+	void TestCollisions();
 
 private:
 	// Store the window for the game engine
@@ -188,4 +214,8 @@ private:
 
 	// Store the games points
 	int m_points;
+
+	// Collision grid cell values
+	float m_cellSize = 40.0f;
+	std::unordered_map<EGridCell, TArray<TShared<EWorldObject>>, EGridCellHash> m_spatialGrid;
 };

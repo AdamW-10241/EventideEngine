@@ -63,7 +63,7 @@ void Player::OnStart()
 void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 {
 	// Mouse pressed
-	SetInputBinding(m_input, &EInput::OnMousePressed, [this](const EUi8& button) {
+	BIND_INPUT(m_input, OnMousePressed, [this](const EUi8& button) {
 		if (button == SDL_BUTTON_LEFT) {
 			m_leftMouseHeld = true;
 		}
@@ -74,7 +74,7 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 	});
 
 	// Mouse released
-	SetInputBinding(m_input, &EInput::OnMouseReleased, [this](const EUi8& button) {
+	BIND_INPUT(m_input, OnMouseReleased, [this](const EUi8& button) {
 		if (button == SDL_BUTTON_LEFT) {
 			m_leftMouseHeld = false;
 		}
@@ -85,7 +85,7 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 	});
 
 	// Key pressed
-	SetInputBinding(m_input, &EInput::OnKeyPressed, [this](const SDL_Scancode& key) {
+	BIND_INPUT(m_input, OnKeyPressed, [this](const SDL_Scancode& key) {
 		// Toggle light
 		if (key == SDL_SCANCODE_F) {
 			m_light->ToggleLight();

@@ -208,7 +208,7 @@ void EGameEngine::Start()
 		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
 
 		// Add weapon
-		if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(player, true, 1.0f, 500.0f, 0.2f, false).lock()) {
+		if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(player, true, 1.0f, 2000.0f, 0.1f, false).lock()) {
 			player->AddWeapon(weapon);
 		}
 
@@ -242,25 +242,51 @@ void EGameEngine::Start()
 	coin->Destroy();
 
 	// Create Points HUD text
-	glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
-	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
-	config.SetIsText(true);
-	config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+	{
+		glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
+		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+		config.SetIsText(true);
+		config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 
-	if (const auto& pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
-		auto spriteText = pointsObj->AddSprite(config);
-		if (auto textRef = TCast<EText>(spriteText.lock())) {
-			textRef->SetFontSize(16);
-		}
-
-		BIND_EVENT_SELF(pointsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-			if (const auto& points = TCast<EScreenObject>(obj)) {
-				if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
-					EString newText = "Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints());
-					text->SetText(newText);
-				}
+		if (const auto& pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+			auto spriteText = pointsObj->AddSprite(config);
+			if (auto textRef = TCast<EText>(spriteText.lock())) {
+				textRef->SetFontSize(16);
 			}
-		});
+
+			BIND_EVENT_SELF(pointsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
+				if (const auto& points = TCast<EScreenObject>(obj)) {
+					if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
+						EString newText = "Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints());
+						text->SetText(newText);
+					}
+				}
+				});
+		}
+	}
+
+	// Create Points HUD text
+	{
+		glm::vec2 spawnPos{ 100.0f, 100.0f };
+		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+		config.SetIsText(true);
+		config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+		if (const auto& fpsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+			auto spriteText = fpsObj->AddSprite(config);
+			if (auto textRef = TCast<EText>(spriteText.lock())) {
+				textRef->SetFontSize(16);
+			}
+
+			BIND_EVENT_SELF(fpsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
+				if (const auto& points = TCast<EScreenObject>(obj)) {
+					if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
+						EString newText = "FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime()));
+						text->SetText(newText);
+					}
+				}
+				});
+		}
 	}
 
 	// DEBUG GUI Button
@@ -360,37 +386,24 @@ void EGameEngine::Tick()
 	}
 	
 	// Move Camera
+	// Player is an addon to camera currently - this movement should be made part of player?
 	if (m_window)
 		m_window->MoveCamera();
 
-	// Run through all EObjects in the game and run their ticks
-	for (const auto& eObjectRef : m_objectStack) {
-		eObjectRef->Tick(DeltaTimeF());
+	// Tick all objects first
+	for (const auto& obj : m_objectStack) {
+		obj->Tick(DeltaTimeF());
+	}
 
-		// Check if object is a world object, otherwise skip logic 
-		if (const auto& woRef = TCast<EWorldObject>(eObjectRef)) {
-			// Check if world object has collisions
-			if (woRef->HasCollisions()) {
-				// Loop through all objects to test against
-				for (const auto& otherObj : m_objectStack) {
-					// Test if the other object is also a world object
-					if (const auto& otherWoRef = TCast<EWorldObject>(otherObj)) {
-						// Skip colliding with self
-						if (woRef == otherWoRef)
-							continue;
+	// Build grid for testing collisions after ticking for updated positions
+	RebuildSpatialGrid();
 
-						// Check if other ref has collisions
-						if (!otherWoRef->HasCollisions())
-							continue;
+	// Test collisions
+	TestCollisions();
 
-						// If all is good then test if their collisions are overlapping
-						woRef->TestCollision(otherWoRef);
-					}
-				}
-			}
-		}
-
-		eObjectRef->PostTick(DeltaTimeF());
+	// PostTick all objects after collision check
+	for (const auto& obj : m_objectStack) {
+		obj->PostTick(DeltaTimeF());
 	}
 }
 
@@ -456,6 +469,84 @@ void EGameEngine::PostLoop()
 
 	// Make sure the clear the pending destroy array so no references remain
 	m_objectsPendingDestroy.clear();
+}
+
+void EGameEngine::RebuildSpatialGrid()
+{
+	m_spatialGrid.clear();
+
+	for (const auto& obj : m_objectStack) {
+		if (const auto& wo = TCast<EWorldObject>(obj)) {
+			if (wo->HasCollisions()) {
+				// Register in every cell the object overlaps
+				for (const auto& cell : GetOccupiedCells(wo)) {
+					m_spatialGrid[cell].push_back(wo);
+				}
+			}
+		}
+	}
+}
+
+void EGameEngine::TestCollisions()
+{
+	// Store tested pairs
+	std::set<std::pair<void*, void*>> testedPairs;
+
+	// Collision detection using spatial grid
+	for (const auto& obj : m_objectStack) {
+		const auto& wo = TCast<EWorldObject>(obj);
+		if (!wo || !wo->HasCollisions()) continue;
+
+		EGridCell center = GetCell(wo->GetTransform().position);
+
+		// Iterate cell and neighbours
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				auto it = m_spatialGrid.find({ center.x + dx, center.y + dz });
+				if (it == m_spatialGrid.end()) continue;
+
+				for (const auto& other : it->second) {
+					if (wo == other) continue;
+
+					// Check if already tested pair
+					void* pA = wo.get();
+					void* pB = other.get();
+					if (pA > pB) std::swap(pA, pB);
+
+					if (testedPairs.count({ pA, pB })) continue;
+					testedPairs.insert({ pA, pB });
+
+					// Test collisions
+					wo->TestCollision(other);
+					other->TestCollision(wo);
+				}
+			}
+		}
+	}
+}
+
+TArray<EGridCell> EGameEngine::GetOccupiedCells(const TShared<EWorldObject>& wo) const
+{
+	TArray<EGridCell> cells;
+	
+	// Iterate collisions
+	auto collisions = wo->GetCollisions();
+	for (auto col : collisions) {
+		if (const auto& colRef = col.lock()) {
+			// Compute min/max cell extents
+			EGridCell minCell = GetCell(col.lock()->box.GetMin());
+			EGridCell maxCell = GetCell(col.lock()->box.GetMax());
+
+			// Add overlapping cells
+			for (int x = minCell.x; x <= maxCell.x; x++) {
+				for (int z = minCell.y; z <= maxCell.y; z++) {
+					cells.push_back({ x, z });
+				}
+			}
+		}
+	}
+
+	return cells;
 }
 
 float EGameEngine::GetRandomFloatRange(float min, float max) const

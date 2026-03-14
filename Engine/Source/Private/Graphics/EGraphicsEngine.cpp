@@ -236,30 +236,24 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 		// Set the world transformations based on the camera
 		m_wireShader->SetWorldTransform(m_camera);
 
+		// Cleanup expired collisions
+		for (int i = (int)m_collisions.size() - 1; i >= 0; --i) {
+			if (m_collisions[i].expired()) {
+				std::swap(m_collisions[i], m_collisions.back());
+				m_collisions.pop_back();
+			}
+		}
+
 		// Render custom graphics
-		for (int i = m_collisions.size() - 1; i >= 0; --i) {
-			// Detecting if the reference still exists
+		for (int i = 0; i < (int)m_collisions.size() - 1; ++i) {
 			if (const auto& colRef = m_collisions[i].lock()) {
-				// Convert position of collision into transform'
+				// Get transform
 				ESTransform transform;
 				transform.position = colRef->box.position;
 				transform.scale = colRef->box.halfSize;
 
-				// Set the colour of the collision
 				m_wireShader->SetWireColour(colRef->debugColour);
-
-				// Render if there is a reference
 				colRef->debugMesh->WireRender(m_wireShader, transform);
-			}
-			else {
-				// Erase from the array if there is no reference
-				auto& collisions = m_collisions;
-				for (int i = collisions.size() - 1; i >= 0; --i) {
-					if (collisions[i].expired()) {
-						std::swap(collisions[i], collisions.back());
-						collisions.pop_back();
-					}
-				}
 			}
 		}
 	}

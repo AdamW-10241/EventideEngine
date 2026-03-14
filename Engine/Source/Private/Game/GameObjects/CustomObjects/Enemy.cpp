@@ -12,7 +12,7 @@ Enemy::Enemy(TWeak<Player> playerRef)
 {
 	m_playerRef = playerRef;
 	
-	m_health = 3.0f;
+	m_health = 8.0f;
 
 	m_weaponOffset = { 0.0f, 10.0f, 0.0f };
 	m_coinSpawnOffset = { 0.0f, 5.0f, 0.0f };

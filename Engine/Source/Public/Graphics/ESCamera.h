@@ -29,31 +29,23 @@ struct ESCamera {
 
 	// Translate the camera based on the passed translation
 	void Translate(glm::vec3 translation, glm::vec3 scale = glm::vec3(1.0f)) {
-		// Move the input direction forward if required
-		glm::vec3 moveDir = transform.Forward() * translation.z;
-		moveDir += transform.Right() * translation.x;
+		// Use yaw-only forward/right so pitch doesn't affect movement
+		glm::vec3 flatForward = glm::normalize(glm::vec3(transform.Forward().x, 0.0f, transform.Forward().z));
+		glm::vec3 flatRight = glm::normalize(glm::vec3(transform.Right().x, 0.0f, transform.Right().z));
+
+		glm::vec3 moveDir = flatForward * translation.z;
+		moveDir += flatRight * translation.x;
 		moveDir.y += translation.y;
 
 		if (glm::length(moveDir) != 0.0f)
 			moveDir = glm::normalize(moveDir);
 
 		glm::vec3 direction = moveDir * scale;
-
-		// Cancel out vertical movements if flag set
 		if (!canMoveVertical)
 			direction.y = 0.0f;
 
-		// Get delta time
-		float deltaTime = 1.0f;
-		if (const auto& ge = EGameEngine::GetGameEngine()) {
-			deltaTime = ge->DeltaTimeF();
-		}
-
-		// Get movement
-		glm::vec3 movement = direction * moveSpeed * deltaTime;
-
-		// Adjust position
-		transform.position += movement;
+		float deltaTime = EGameEngine::GetGameEngine()->DeltaTimeF();
+		transform.position += direction * moveSpeed * deltaTime;
 	};
 
 	// Zoom in the fov based on the amount added

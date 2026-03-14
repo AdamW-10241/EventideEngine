@@ -71,8 +71,8 @@ bool EText::LoadTexture(const EString& fileName, const EString& path, bool repea
 		CleanupSurface(surf);
 		return false;
 	}
+	//SDL_SaveBMP(surf, "debug_text.bmp");
 
-	SDL_SaveBMP(surf, "debug_text.bmp");
 	// Generate the texture ID in OpenGL
 	glGenTextures(1, &m_ID);
 

@@ -21,7 +21,12 @@ public:
 	TWeak<EModel> LoadModel(const EString& modelPath, const TArray<ESMaterialSlot>& materials);
 
 	// Get the world objects model at an index
-	TWeak<EModel> GetModel(const int& index) const { return m_objectModels.at(index); }
+	TWeak<EModel> GetModel(const int& index) const {
+		if ((int)m_objectModels.size() > index) {
+			return m_objectModels.at(index);
+		}
+		return {};
+	}
 
 	// Get the world objects models
 	TArray<TWeak<EModel>> GetModels() const { return m_objectModels; }
@@ -31,6 +36,22 @@ public:
 
 	// Add a collision to the object
 	TWeak<ESCollision> AddCollision(const ESBox& box, const bool& debug = false);
+
+	// Get weak collisions
+	TWeak<ESCollision> GetCollision(const int index) {
+		if ((int)m_objectCollisions.size() > index) {
+			return m_objectCollisions.at(index);
+		}
+		return {};
+	}
+
+	TArray<TWeak<ESCollision>> GetCollisions() {
+		TArray<TWeak<ESCollision>> weakCollisions;
+		for (auto collision : m_objectCollisions) {
+			weakCollisions.push_back(collision);
+		}
+		return weakCollisions;
+	}
 
 	// Get the objects transform
 	ESTransform& GetTransform() { return m_transform; }

@@ -31,7 +31,7 @@ public:
     TWeak<ESprite> GetSprite(const EString& texturePath);
 
     TWeak<ESprite> GetSprite(const int index) {
-        if (m_sprites.size() > index) {
+        if ((int)m_sprites.size() > index) {
             return m_sprites.at(index);
         }
         return {};
