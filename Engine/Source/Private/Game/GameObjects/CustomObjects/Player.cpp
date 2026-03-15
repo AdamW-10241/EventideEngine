@@ -10,7 +10,7 @@
 
 #define Super Character
 
-Player::Player()
+Player::Player(glm::vec3 spawnLocation)
 {
 	m_health = 10.0f;
 	
@@ -21,11 +21,13 @@ Player::Player()
 
 	m_leftMouseHeld = false;
 	m_rightMouseHeld = false;
+
+	SetSpawnLocation(spawnLocation);
 }
 
-void Player::SetDefaultCamPosition(glm::vec3 position)
+void Player::SetSpawnLocation(glm::vec3 position)
 {
-	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
+	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		camRef->transform.position = position;
 	}
 }
@@ -35,7 +37,7 @@ void Player::OnStart()
 	Super::OnStart();
 
 	// If camera exists,
-	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
+	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		// Move to camera
 		GetTransform().position = camRef->transform.position;
 		// Set old position (for next loop)
@@ -43,12 +45,12 @@ void Player::OnStart()
 	}
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 10.0f, 5.0f) }, false).lock()) {
+	if (auto colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 10.0f, 5.0f) }, false).lock()) {
 		colRef->type = EECollisionType::PLAYER;
 	}
 
 	// Add light
-	if (const auto& lightRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreateSpotLight().lock()) {
+	if (auto lightRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->CreateSpotLight().lock()) {
 		lightRef->colour = glm::vec3(1.0f, 1.0f, 0.7f);
 		lightRef->intensity = 20.0f;
 		lightRef->outerCutOff = 45.0f;
@@ -57,6 +59,24 @@ void Player::OnStart()
 		lightRef->quadratic *= 1.0f;
 
 		m_light = lightRef;
+	}
+
+	// Add weapon
+	if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(GetSharedRef<Player>(), true, 1.0f, 2000.0f, 0.1f, false).lock()) {
+		AddWeapon(weapon);
+	}
+	
+	// Add crosshair
+	if (auto crosshair = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>(0).lock()) {
+		if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
+			ESTransform2D transform;
+			transform.position = window->GetWindowCenter();
+			if (auto spriteRef = crosshair->AddSprite(ESAddSpriteConfig{ "Sprites/Crosshairs/crosshair009.png", transform, 0 }).lock()) {
+				spriteRef->GetTransform().scale *= 0.4f;
+				spriteRef->GetTransform().CenterOnPosition();
+			}
+			AddCrosshair(crosshair);
+		}
 	}
 }
 
@@ -69,7 +89,7 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = true;
-			m_crosshair->SetDoRender(false);
+			if (auto crosshair = m_crosshair.lock()) crosshair->SetDoRender(false);
 		}
 	});
 
@@ -80,7 +100,7 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = false;
-			m_crosshair->SetDoRender(true);
+			if (auto crosshair = m_crosshair.lock()) crosshair->SetDoRender(true);
 		}
 	});
 
@@ -101,14 +121,13 @@ void Player::OnTick(float deltaTime)
 	m_collided = false;
 
 	// Move to camera
-	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
-		if (camRef) {
-			// If weapon exists
-			GetTransform().position = camRef->transform.position;
+	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
+		GetTransform().position = camRef->transform.position;
 
-			// Fire weapon is holding left mouse
-			if (m_weapon && m_leftMouseHeld) {
-				m_weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
+		// Fire weapon if holding left mouse
+		if (auto weapon = m_weapon.lock()) {
+			if (m_leftMouseHeld) {
+				weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
 			}
 		}
 	}
@@ -129,7 +148,7 @@ void Player::OnPostTick(float deltaTime)
 	Super::OnPostTick(deltaTime);
 
 	// Move to camera, or reverse frame camera movement, based on collisions
-	if (const auto& camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
+	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		if (m_collided) {
 			// Reset camera position to before collision
 			camRef->transform.position = m_oldPosition;
@@ -138,7 +157,7 @@ void Player::OnPostTick(float deltaTime)
 		}
 
 		// Update weapon position
-		if (m_weapon) {
+		if (auto weapon = m_weapon.lock()) {
 			glm::vec3 forward = camRef->transform.Forward();
 			glm::vec3 right = camRef->transform.Right();
 			glm::vec3 up = camRef->transform.Up();
@@ -148,8 +167,8 @@ void Player::OnPostTick(float deltaTime)
 				right * m_weaponOffset.x +
 				up * m_weaponOffset.y;
 
-			m_weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
-			m_weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
+			weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
+			weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
 		}
 
 		// Adjust light relative to player

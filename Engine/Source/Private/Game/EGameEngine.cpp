@@ -198,48 +198,20 @@ void EGameEngine::Start()
 	CreateObject<InvisibleWalls>();
 
 	// Spawn Walls
-	for (EUi32 i = 0; i < 15; i++) {
-		CreateObject<Wall>();
-	}
+	for (EUi32 i = 0; i < 15; i++) CreateObject<Wall>();
 
 	// Spawn Player
-	if (const auto& player = CreateObject<Player>().lock()) {
-		// Set default camera position
-		player->SetDefaultCamPosition({ 0.0f, 20.0f, 0.0f });
-
-		// Add weapon
-		if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(player, true, 1.0f, 2000.0f, 0.1f, false).lock()) {
-			player->AddWeapon(weapon);
-		}
-
-		// Add crosshair
-		if (const auto crosshair = CreateObject<EScreenObject>(0).lock()) {
-			ESTransform2D transform;
-			transform.position = m_window->GetWindowCenter();
-			const auto& sprite = crosshair->AddSprite(ESAddSpriteConfig{ "Sprites/Crosshairs/crosshair009.png", transform, 0 });
-			if (const auto& spriteRef = sprite.lock()) {
-				spriteRef->GetTransform().scale *= 0.4f;
-				spriteRef->GetTransform().CenterOnPosition();
-			}
-			player->AddCrosshair(crosshair);
-		}
-
+	glm::vec3 spawnLocation = { 0.0f, 20.0f, 0.0f };
+	if (auto player = CreateObject<Player>(spawnLocation).lock()) {
 		// Spawn Enemies
-		for (EUi32 i = 0; i < 8; i++) {
-			// Spawn enemy
-			Enemy::SpawnEnemy(player);
-		}
+		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
 	}
 
 	// Spawn Grass
-	for (EUi32 i = 0; i < 30; i++) {
-		// Spawn grass
-		CreateObject<Grass>();
-	}
+	for (EUi32 i = 0; i < 30; i++) CreateObject<Grass>();
 
-	// Spawn Coin
-	auto coin = CreateObject<Coin>().lock();
-	coin->Destroy();
+	// Load Coin Model
+	CreateObject<Coin>().lock()->Destroy();
 
 	// Create Points HUD text
 	{
@@ -427,12 +399,15 @@ void EGameEngine::Render()
 
 void EGameEngine::PreLoop()
 {
-	// Running through all objects to be spawned
-	// Run their start logic and add to game object stack
-	for (auto& eObjectRef : m_objectsToBeSpawned) {
-		eObjectRef->Start();
-		eObjectRef->RegisterInputs(m_input);
-		m_objectStack.push_back(std::move(eObjectRef));
+	// Run through all objects to be spawned
+	while (!m_objectsToBeSpawned.empty()) {
+		auto batch = std::move(m_objectsToBeSpawned);
+		m_objectsToBeSpawned.clear();
+		for (auto& obj : batch) {
+			obj->Start();
+			obj->RegisterInputs(m_input);
+			m_objectStack.push_back(std::move(obj));
+		}
 	}
 
 	m_objectsToBeSpawned.clear();

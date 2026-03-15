@@ -92,9 +92,14 @@ public:
 	// Test if the object is marked for destroy
 	bool IsPendingDestroy() const { return m_pendingDestroy; }
 
-	// Get weak reference
+	// Get reference
 	template<typename T>
 	TWeak<T> GetWeakRef() {
+		return std::static_pointer_cast<T>(shared_from_this());
+	}
+
+	template<typename T>
+	TShared<T> GetSharedRef() {
 		return std::static_pointer_cast<T>(shared_from_this());
 	}
 

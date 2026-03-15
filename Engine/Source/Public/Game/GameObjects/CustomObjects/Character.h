@@ -41,7 +41,7 @@ protected:
 	float m_health;
 
 	// Store the characters weapon
-	TShared<Weapon> m_weapon;
+	TWeak<Weapon> m_weapon;
 
 	// Store if weapon is ADS
 	bool m_isWeaponADS;

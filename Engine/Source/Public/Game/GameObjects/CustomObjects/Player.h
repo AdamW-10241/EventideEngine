@@ -7,10 +7,7 @@ class EScreenObject;
 
 class Player : public Character {
 public:
-	Player();
-
-	// Set the cameras default position
-	void SetDefaultCamPosition(glm::vec3 position);
+	Player(glm::vec3 spawnLocation);
 
 	// Add a crosshair to the character
 	void AddCrosshair(TShared<EScreenObject> crosshair) { m_crosshair = crosshair; }
@@ -26,6 +23,9 @@ protected:
 		const TShared<ESCollision>& otherCol) override;
 
 	virtual void OnPostTick(float deltaTime) override;
+
+private:
+	void SetSpawnLocation(glm::vec3 position);
 
 private:
 	// Bool for if collided this frame
@@ -44,5 +44,5 @@ private:
 	TShared<ESSpotLight> m_light;
 
 	// Store the crosshair attached to the player
-	TShared<EScreenObject> m_crosshair;
+	TWeak<EScreenObject> m_crosshair;
 };

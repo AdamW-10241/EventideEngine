@@ -12,7 +12,7 @@ Enemy::Enemy(TWeak<Player> playerRef)
 {
 	m_playerRef = playerRef;
 	
-	m_health = 8.0f;
+	m_health = 6.0f;
 
 	m_weaponOffset = { 0.0f, 10.0f, 0.0f };
 	m_coinSpawnOffset = { 0.0f, 5.0f, 0.0f };
@@ -23,7 +23,7 @@ void Enemy::OnStart()
 	Super::OnStart();
 
 	// Place randomly on floor mesh
-	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
+	if (auto floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
 		PlaceOnFloorRandomly(floor, 25.0f);
 	}
 
@@ -43,7 +43,7 @@ void Enemy::OnStart()
 	auto model = LoadModel(modelPath, materials);
 
 	// Add a collision
-	if (const auto& colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, false).lock()) {
+	if (auto colRef = AddCollision({ GetTransform().position, glm::vec3(5.0f, 20.0f, 5.0f)}, false).lock()) {
 		colRef->type = EECollisionType::ENEMY;
 	}
 }
@@ -53,7 +53,9 @@ void Enemy::OnTick(float deltaTime)
 	Super::OnTick(deltaTime);
 	
 	// Move weapon to enemy
-	m_weapon->GetTransform().position = GetTransform().position + m_weaponOffset;
+	if (auto weapon = m_weapon.lock()) {
+		weapon->GetTransform().position = GetTransform().position + m_weaponOffset;
+	}
 }
 
 void Enemy::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, const TShared<ESCollision>& otherCol)
@@ -72,8 +74,8 @@ void Enemy::OnPostTick(float deltaTime)
 	Super::OnPostTick(deltaTime);
 	
 	// Look at player
-	if (const auto& player = m_playerRef.lock()) {
-		if (player) {
+	if (auto player = m_playerRef.lock()) {
+		if (auto weapon = m_weapon.lock()) {
 			// Calculate target angle with atan2 from enemy and player positions
 			float targetAngle = glm::degrees(atan2(player->GetTransform().position.x - GetTransform().position.x,
 				player->GetTransform().position.z - GetTransform().position.z));
@@ -88,7 +90,7 @@ void Enemy::OnPostTick(float deltaTime)
 			glm::vec3 shootDirection = player->GetTransform().position - GetTransform().position;
 			shootDirection.y = 0.0f;
 			shootDirection = glm::normalize(shootDirection);
-			m_weapon->TryFire(EECollisionType::BULLET_ENEMY, shootDirection);
+			weapon->TryFire(EECollisionType::BULLET_ENEMY, shootDirection);
 		}
 	}
 }
@@ -103,7 +105,7 @@ void Enemy::OnTakeDamage(float damage)
 	// Check if dead
 	if (m_health <= 0.0) {
 		// Spawn coin
-		if (const auto& coinRef = EGameEngine::GetGameEngine()->CreateObject<Coin>().lock()) {
+		if (auto coinRef = EGameEngine::GetGameEngine()->CreateObject<Coin>().lock()) {
 			coinRef->GetTransform().position = GetTransform().position + m_coinSpawnOffset;
 		}
 
@@ -118,11 +120,10 @@ void Enemy::OnTakeDamage(float damage)
 void Enemy::SpawnEnemy(TWeak<Player> playerRef)
 {
 	// Spawn a new enemy
-	if (const auto& newEnemy = EGameEngine::GetGameEngine()->CreateObject<Enemy>(playerRef).lock()) {
-		// Random fire rate
-		float fireRate = EGameEngine::GetGameEngine()->GetRandomFloatRange(0.8f, 1.2f);
+	if (auto newEnemy = EGameEngine::GetGameEngine()->CreateObject<Enemy>(playerRef).lock()) {
 		// Add weapon
-		if (TShared<Weapon> weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(newEnemy, false, 1.0f, 100.0f, fireRate, true).lock()) {
+		float fireRate = EGameEngine::GetGameEngine()->GetRandomFloatRange(0.8f, 1.2f);
+		if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(newEnemy, false, 1.0f, 100.0f, fireRate, true).lock()) {
 			newEnemy->AddWeapon(weapon);
 		}
 	}
