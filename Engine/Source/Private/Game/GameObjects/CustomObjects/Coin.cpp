@@ -41,10 +41,10 @@ void Coin::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollisi
 	Super::OnOverlap(other, col, otherCol);
 	
 	if (otherCol->type == EECollisionType::PLAYER) {
-		// Increment points
 		EGameEngine::GetGameEngine()->AddPoints(1000, true);
-
-		// Destroy coin
+		if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
+			soundManager->PlaySound(EE_SOUND_COIN, 100);
+		}
 		Destroy();
 	}
 }

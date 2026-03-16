@@ -8,6 +8,7 @@
 // Engine Libs
 #include "EngineTypes.h"
 #include "EWindow.h"
+#include "ESoundManager.h"
 #include "Listeners/EInput.h"
 #include "Graphics/EModel.h"
 #include "Graphics/ESMaterial.h"
@@ -51,6 +52,9 @@ public:
 
 	// Add points to the game
 	void AddPoints(int points, bool createText = true);
+
+	// Add text temporary notification to the game
+	void AddTextNotif(EString text, glm::vec4 color = glm::vec4{1.0f});
 
 	// Return the delta time between frames
 	double DeltaTime() const { return m_deltaTime; }
@@ -101,6 +105,9 @@ public:
 
 	// Get window
 	TWeak<EWindow> GetWindow() { return m_window; }
+
+	// Get sound manager
+	TWeak<ESoundManager> GetSoundManager() { return m_soundManager; }
 
 	// Find an object of type T from the object stack
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
@@ -185,6 +192,9 @@ private:
 
 	// Store the input for the game engine
 	TShared<EInput> m_input;
+
+	// Store the sound manager for the game engine
+	TShared<ESoundManager> m_soundManager;
 
 	// Last time ticked
 	double m_lastTickTime;

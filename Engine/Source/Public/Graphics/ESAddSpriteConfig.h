@@ -2,6 +2,8 @@
 #include "EngineTypes.h"
 #include "Math/ESTransform.h"
 
+#define FONT_PRESS_START "Fonts/Press_Start_2P/PressStart2P-Regular.ttf"
+
 struct ESAddSpriteConfig {
     ESAddSpriteConfig(const ESTransform2D _transform, const EUi32 _renderOrder) {
         transform = _transform;

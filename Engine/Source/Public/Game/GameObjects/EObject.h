@@ -43,10 +43,6 @@ public:
 	// Extends a binding with weak safety on 'this' and external object
 	template<typename TClass, typename TPassed, typename Func, typename... Args>
 	void BindObjectEvent(std::function<void(Args...)> TClass::* target, TWeak<TPassed> weak, Func action) {
-		static_assert(
-			std::is_invocable_v<Func, TShared<TClass>, TShared<TPassed>, Args...>,
-			"BindObjectEvent: action must take (TShared<TClass>, TShared<TPassed>, ...Args)"
-			);
 		auto self = GetWeakRef<TClass>();
 		ExtendBinding(target, [self, weak, action](Args... args) {
 			if (const auto& s = self.lock()) {
@@ -55,6 +51,11 @@ public:
 						action(s, obj, args...);
 			}
 			});
+	}
+	template<typename TClass, typename TPassed, typename Func, typename... Args>
+	void BindObjectEvent(std::function<void(Args...)> TClass::* target, TShared<TPassed> shared, Func action) {
+		auto weak = shared->GetWeakRef<TPassed>();
+		BindObjectEvent(target, weak, action);
 	}
 
 	#define BIND_EVENT_RAW(obj, event, action) \

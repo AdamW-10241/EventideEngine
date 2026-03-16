@@ -67,7 +67,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\ExternalLibs\LIBS;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)ExternalLibs\LIBS\*.dll" "$(SolutionDir)Build\$(Configuration)\"</Command>
@@ -91,7 +91,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\ExternalLibs\LIBS;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mtd.lib;Shell32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)ExternalLibs\LIBS\*.dll" "$(SolutionDir)Build\$(Configuration)\"</Command>
@@ -125,6 +125,7 @@
     <ClCompile Include="Source\Private\Listeners\EInput.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\EWorldObject.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\GUIButton.cpp" />
+    <ClCompile Include="Source\Private\ESoundManager.cpp" />
     <ClCompile Include="Source\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,13 @@
     <ClInclude Include="Source\Public\Math\ESBox.h" />
     <ClInclude Include="Source\Public\Math\ESCollision.h" />
     <ClInclude Include="Source\Public\Math\ESTransform.h" />
+    <ClInclude Include="Source\Public\ESoundManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\SimpleShader\SimpleShader.frag" />
+    <None Include="Shaders\SimpleShader\SimpleShader.vertex" />
+    <None Include="Shaders\SpriteShader\SpriteShader.frag" />
+    <None Include="Shaders\SpriteShader\SpriteShader.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

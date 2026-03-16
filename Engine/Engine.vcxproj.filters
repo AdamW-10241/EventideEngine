@@ -99,6 +99,9 @@
     <ClCompile Include="Source\Private\Graphics\EText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\ESoundManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Public\EWindow.h">
@@ -212,5 +215,14 @@
     <ClInclude Include="Source\Public\Graphics\ESAddSpriteConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Public\ESoundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\SimpleShader\SimpleShader.frag" />
+    <None Include="Shaders\SimpleShader\SimpleShader.vertex" />
+    <None Include="Shaders\SpriteShader\SpriteShader.frag" />
+    <None Include="Shaders\SpriteShader\SpriteShader.vertex" />
   </ItemGroup>
 </Project>

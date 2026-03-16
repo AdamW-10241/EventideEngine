@@ -12,7 +12,8 @@ Enemy::Enemy(TWeak<Player> playerRef)
 {
 	m_playerRef = playerRef;
 	
-	m_health = 6.0f;
+	m_maxHealth = 6.0f;
+	ResetHealth();
 
 	m_weaponOffset = { 0.0f, 10.0f, 0.0f };
 	m_coinSpawnOffset = { 0.0f, 5.0f, 0.0f };
@@ -67,6 +68,13 @@ void Enemy::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollis
 		// Destroy self
 		Destroy();
 	}
+
+	// Debug HIT notif
+	//if (otherCol->type == EECollisionType::BULLET_PLAYER) {
+	//	EString text = "Enemy Hit!";
+	//	glm::vec4 color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	//	EGameEngine::GetGameEngine()->AddTextNotif(text, color);
+	//}
 }
 
 void Enemy::OnPostTick(float deltaTime)

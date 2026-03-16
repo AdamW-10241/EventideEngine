@@ -12,7 +12,8 @@
 
 Player::Player(glm::vec3 spawnLocation)
 {
-	m_health = 10.0f;
+	m_maxHealth = 10.0f;
+	ResetHealth();
 	
 	m_collided = false;
 	m_oldPosition = glm::vec3(0.0f);
@@ -62,7 +63,7 @@ void Player::OnStart()
 	}
 
 	// Add weapon
-	if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(GetSharedRef<Player>(), true, 1.0f, 2000.0f, 0.1f, false).lock()) {
+	if (auto weapon = EGameEngine::GetGameEngine()->CreateObject<Weapon>(GetSharedRef<Player>(), true, 1.0f, 1000.0f, 0.1f, false).lock()) {
 		AddWeapon(weapon);
 	}
 	
@@ -123,14 +124,10 @@ void Player::OnTick(float deltaTime)
 	// Move to camera
 	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		GetTransform().position = camRef->transform.position;
-
-		// Fire weapon if holding left mouse
-		if (auto weapon = m_weapon.lock()) {
-			if (m_leftMouseHeld) {
-				weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
-			}
-		}
 	}
+
+	// Heal if not hit
+	if (!m_hasBeenHit) HealHealth(1.0f * deltaTime);
 }
 
 void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, const TShared<ESCollision>& otherCol)
@@ -140,12 +137,26 @@ void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 	if (otherCol->type != EECollisionType::BULLET_PLAYER) {
 		// Set collide flag
 		m_collided = true;
+
+		if (otherCol->type == EECollisionType::BULLET_ENEMY) {
+			if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
+				soundManager->PlaySound(EE_SOUND_HIT_PLAYER);
+			}
+
+			// Debug HIT notif
+			//EString text = "Player Hit!";
+			//glm::vec4 color = { 1.0f, 0.0f, 0.0f, 1.0f };
+			//EGameEngine::GetGameEngine()->AddTextNotif(text, color);
+		}
 	}
 }
 
 void Player::OnPostTick(float deltaTime)
 {
 	Super::OnPostTick(deltaTime);
+
+	// Toggle ADS
+	m_toBeWeaponOffset = m_rightMouseHeld ? m_weaponADSOffset : m_weaponBaseOffset;
 
 	// Move to camera, or reverse frame camera movement, based on collisions
 	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
@@ -156,8 +167,9 @@ void Player::OnPostTick(float deltaTime)
 			GetTransform().position = m_oldPosition;
 		}
 
-		// Update weapon position
+		// Update weapon
 		if (auto weapon = m_weapon.lock()) {
+			// Move with player
 			glm::vec3 forward = camRef->transform.Forward();
 			glm::vec3 right = camRef->transform.Right();
 			glm::vec3 up = camRef->transform.Up();
@@ -169,6 +181,13 @@ void Player::OnPostTick(float deltaTime)
 
 			weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
 			weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
+
+			// Fire weapon if holding left mouse
+			if (auto weapon = m_weapon.lock()) {
+				if (m_leftMouseHeld) {
+					weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
+				}
+			}
 		}
 
 		// Adjust light relative to player
@@ -178,7 +197,4 @@ void Player::OnPostTick(float deltaTime)
 
 	// Store old position (old for next loop)
 	m_oldPosition = GetTransform().position;
-
-	// Toggle ADS
-	m_toBeWeaponOffset = m_rightMouseHeld ? m_weaponADSOffset : m_weaponBaseOffset;
 }

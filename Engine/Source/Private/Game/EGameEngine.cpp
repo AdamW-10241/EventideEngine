@@ -59,15 +59,23 @@ void EGameEngine::AddPoints(int points, bool createText)
 
 	if (!createText) return;
 	
+	// Create text
+	EString text = "+" + toEString(points) + " Points!";
+	glm::vec4 color = { 1.0f, 1.0f, 0.0f, 1.0f };
+	AddTextNotif(text, color);
+}
+
+void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
+{
 	// Create HUD text
 	glm::vec2 spawnPos;
 	if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
 		spawnPos = { 100.0f, window->GetWindowSize().y - (window->GetWindowSize().y / 3.0f) }; // WindowSize y = height
 	}
 
-	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+	ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
 	config.SetIsText(true);
-	config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+	config.SetRenderColor(color);
 
 	if (const auto& screenObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
 		screenObj->SetLifeTime(1.5f);
@@ -75,7 +83,7 @@ void EGameEngine::AddPoints(int points, bool createText)
 		if (auto spriteRef = spriteText.lock()) {
 			if (auto textRef = TCast<EText>(spriteRef)) {
 				textRef->SetFontSize(14);
-				textRef->SetText("+" + toEString(points) + " Points!");
+				textRef->SetText(text);
 			}
 		}
 
@@ -149,6 +157,11 @@ bool EGameEngine::Init()
 		return false;
 	}
 
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, NULL) != 0) {
+		EDebug::Log("Failed to init SDL Mixer: "+ EString(Mix_GetError()), LT_ERROR);
+		return false;
+	}
+
 	// Tell SDL that we will be rendering in OpenGL version 460 or 4.60
 	// 4 is the major version
 	// .60 is the minor version
@@ -176,14 +189,17 @@ bool EGameEngine::Init()
 	// Create the input class and assign the window
 	m_input = TMakeShared<EInput>();
 	m_input->InitInput(m_window);
-	
+
+	// Create sound engine
+	m_soundManager = TMakeShared<ESoundManager>();
+
 	return true;
 }
 
 void EGameEngine::Start()
 {
 	// Loading log
-	EDebug::Log("\nLoading...\n");
+	EDebug::Log("Loading...\n");
 	
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
@@ -205,6 +221,31 @@ void EGameEngine::Start()
 	if (auto player = CreateObject<Player>(spawnLocation).lock()) {
 		// Spawn Enemies
 		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
+
+		// Create Health HUD text
+		{
+			glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
+			ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
+			config.SetIsText(true);
+			config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+
+			if (auto healthObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+				auto spriteText = healthObj->AddSprite(config);
+				if (auto textRef = TCast<EText>(spriteText.lock())) {
+					textRef->SetFontSize(16);
+				}
+
+				BIND_EVENT_EXT(healthObj, OnTicked, player, [](TShared<EObject> obj, TShared<Player> player, float deltaTime) {
+					if (auto health = TCast<EScreenObject>(obj)) {
+						if (auto text = TCast<EText>(health->GetSprite(0).lock())) {
+							int healthPercent = (int)ceil(player->GetHealthRatio() * 100.0f);
+							EString newText = "HP - " + toEString(healthPercent) + "%";
+							text->SetText(newText);
+						}
+					}
+				});
+			}
+		}
 	}
 
 	// Spawn Grass
@@ -215,49 +256,49 @@ void EGameEngine::Start()
 
 	// Create Points HUD text
 	{
-		glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
-		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+		glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 130.0f };
+		ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
 		config.SetIsText(true);
 		config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
 
-		if (const auto& pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+		if (auto pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
 			auto spriteText = pointsObj->AddSprite(config);
 			if (auto textRef = TCast<EText>(spriteText.lock())) {
 				textRef->SetFontSize(16);
 			}
 
-			BIND_EVENT_SELF(pointsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-				if (const auto& points = TCast<EScreenObject>(obj)) {
-					if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
+			BIND_EVENT_SELF(pointsObj, OnTicked, [](TShared<EObject> obj, float deltaTime) {
+				if (auto points = TCast<EScreenObject>(obj)) {
+					if (auto text = TCast<EText>(points->GetSprite(0).lock())) {
 						EString newText = "Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints());
 						text->SetText(newText);
 					}
 				}
-				});
+			});
 		}
 	}
 
-	// Create Points HUD text
+	// Create FPS HUD text
 	{
 		glm::vec2 spawnPos{ 100.0f, 100.0f };
-		ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", spawnPos, 0);
+		ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
 		config.SetIsText(true);
 		config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 
-		if (const auto& fpsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+		if (auto fpsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
 			auto spriteText = fpsObj->AddSprite(config);
 			if (auto textRef = TCast<EText>(spriteText.lock())) {
 				textRef->SetFontSize(16);
 			}
 
 			BIND_EVENT_SELF(fpsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-				if (const auto& points = TCast<EScreenObject>(obj)) {
-					if (const auto& text = TCast<EText>(points->GetSprite(0).lock())) {
+				if (auto points = TCast<EScreenObject>(obj)) {
+					if (auto text = TCast<EText>(points->GetSprite(0).lock())) {
 						EString newText = "FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime()));
 						text->SetText(newText);
 					}
 				}
-				});
+			});
 		}
 	}
 
@@ -268,7 +309,7 @@ void EGameEngine::Start()
 	//		spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
 	//	}
 
-	//	ESAddSpriteConfig config("Fonts/Press_Start_2P/PressStart2P-Regular.ttf", m_window->GetWindowCenter(), 0);
+	//	ESAddSpriteConfig config(FONT_PRESS_START, m_window->GetWindowCenter(), 0);
 	//	config.SetIsText(true);
 	//	config.SetRenderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
 

@@ -147,7 +147,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	m_defaultMaterial->m_baseColourMap = defaultTexture;
 
 	// Log the success of the graphics engine initialisation
-	EDebug::Log("Successfully initialised Graphics Engine.", LT_SUCCESS);
+	EDebug::Log("Successfully initialised Graphics Engine.\n", LT_SUCCESS);
 
 	// ----------- LIGHTS
 	// Create the dir light

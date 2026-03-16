@@ -53,10 +53,11 @@ void Bullet::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 	if (m_collisionType == EECollisionType::BULLET_PLAYER && otherCol->type == EECollisionType::ENEMY ||
 		m_collisionType == EECollisionType::BULLET_ENEMY && otherCol->type == EECollisionType::PLAYER) {
 		// Hit player or enemy with counterpart bullet
-		if (const auto& character = std::dynamic_pointer_cast<Character>(other)) {
-			// Deal damage
+		if (auto character = TCast<Character>(other)) {
 			character->TakeDamage(m_damage);
-			// Destroy after overlap
+			if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
+				soundManager->PlaySound(EE_SOUND_HIT, 100);
+			}
 			Destroy();
 		}
 	}
