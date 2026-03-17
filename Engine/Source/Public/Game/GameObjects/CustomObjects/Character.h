@@ -10,6 +10,7 @@ public:
 		ResetHealth();
 		m_isDead = false;
 		m_hasBeenHit = false;
+		m_healRate = -1.0f;
 		m_timeSinceLastHit = 0.0f;
 		m_hitAwarenessTime = 3.0f;
 		m_isWeaponADS = false;
@@ -59,6 +60,9 @@ protected:
 	float m_health;
 	float m_maxHealth;
 	float m_isDead;
+
+	// Store heal rate
+	float m_healRate;
 
 	// Store time since last hit
 	bool m_hasBeenHit;

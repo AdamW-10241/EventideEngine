@@ -14,6 +14,7 @@ Player::Player(glm::vec3 spawnLocation)
 {
 	m_maxHealth = 10.0f;
 	ResetHealth();
+	m_healRate = 1.0f;
 	
 	m_collided = false;
 	m_oldPosition = glm::vec3(0.0f);
@@ -125,9 +126,6 @@ void Player::OnTick(float deltaTime)
 	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		GetTransform().position = camRef->transform.position;
 	}
-
-	// Heal if not hit
-	if (!m_hasBeenHit) HealHealth(1.0f * deltaTime);
 }
 
 void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESCollision>& col, const TShared<ESCollision>& otherCol)

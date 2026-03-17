@@ -3,6 +3,7 @@
 void Character::TakeDamage(float damage)
 {
 	if (m_isDead) return;
+	if (damage <= 0.0f) return;
 	
 	// Take damage and cap min health to 0.0f
 	m_health = std::fmax(0.0f, m_health - damage);
@@ -11,15 +12,15 @@ void Character::TakeDamage(float damage)
 	if (!m_hasBeenHit) m_hasBeenHit = true;
 	m_timeSinceLastHit = 0.0f;
 
-	// Call virtual
 	OnTakeDamage(damage);
 }
 
 void Character::HealHealth(float health)
 {
 	if (m_isDead) return;
+	if (health <= 0.0f) return;
 	
-	// Take damage and cap min health to 0.0f
+	// Take damage and cap max health
 	m_health = std::fmin(m_health + health, m_maxHealth);
 }
 
@@ -41,4 +42,7 @@ void Character::OnTick(float deltaTime)
 		m_hasBeenHit = false;
 		m_timeSinceLastHit = 0.0f;
 	}
+
+	// Heal if not hit
+	if (!m_hasBeenHit) HealHealth(m_healRate * deltaTime);
 }
