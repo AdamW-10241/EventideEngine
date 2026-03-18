@@ -50,10 +50,11 @@ public:
 	void LerpWeaponOffset(float deltaTime);
 
 protected:
-	// Virtual take damage function
+	virtual void OnTick(float deltaTime) override;
+
 	virtual void OnTakeDamage(float damage) {}
 
-	virtual void OnTick(float deltaTime) override;
+	virtual void OnDeath() {};
 
 protected:
 	// Store the characters health

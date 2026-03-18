@@ -205,3 +205,11 @@ void Player::OnPostTick(float deltaTime)
 	// Store old position (old for next loop)
 	m_oldPosition = GetTransform().position;
 }
+
+void Player::OnDeath()
+{
+	// Death notif
+	EString text = "You are DEAD!";
+	glm::vec4 color = { 1.0f, 0.0f, 0.0f, 1.0f };
+	EGameEngine::GetGameEngine()->AddTextNotif(text, color);
+}

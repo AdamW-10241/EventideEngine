@@ -8,6 +8,12 @@ void Character::TakeDamage(float damage)
 	// Take damage and cap min health to 0.0f
 	m_health = std::fmax(0.0f, m_health - damage);
 
+	// Check if dead
+	if (m_health <= 0.0f) {
+		m_isDead = true;
+		OnDeath();
+	}
+
 	// Reset time since last hit
 	if (!m_hasBeenHit) m_hasBeenHit = true;
 	m_timeSinceLastHit = 0.0f;

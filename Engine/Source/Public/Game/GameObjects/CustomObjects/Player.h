@@ -24,6 +24,8 @@ protected:
 
 	virtual void OnPostTick(float deltaTime) override;
 
+	virtual void OnDeath() override;
+
 private:
 	void SetSpawnLocation(glm::vec3 position);
 
