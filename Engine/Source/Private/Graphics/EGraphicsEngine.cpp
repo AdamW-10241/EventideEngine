@@ -133,7 +133,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the camera
 	m_camera = TMakeShared<ESCamera>();
-	glm::vec2 windowSize = EGameEngine::GetGameEngine()->GetWindow().lock()->GetWindowSize();
+	glm::vec2 windowSize = EGameEngine::GetGameEngine()->GetWindow().lock()->GetCurrentSize();
 	m_camera->SetWindowAspectRatio(windowSize);
 
 	// Create the default texture object
@@ -208,10 +208,10 @@ void EGraphicsEngine::Render(SDL_Window* sdlWindow)
 	auto screenObjects = EGameEngine::GetGameEngine()->FindAllObjectsOfType<EScreenObject>();
 	std::sort(screenObjects.begin(), screenObjects.end(),
 		[](const TWeak<EScreenObject>& a, const TWeak<EScreenObject>& b) {
-			const auto& aRef = a.lock();
-			const auto& bRef = b.lock();
-			if (!aRef || !bRef) return false;
-			return aRef->GetRenderOrder() < bRef->GetRenderOrder();
+			if (auto aRef = a.lock(), bRef = b.lock(); aRef && bRef) {
+				return aRef->GetRenderOrder() < bRef->GetRenderOrder();
+			}
+			return false;
 	});
 
 	// Render

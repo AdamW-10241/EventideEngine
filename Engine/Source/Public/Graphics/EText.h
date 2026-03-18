@@ -7,17 +7,14 @@ struct SDL_Surface;
 
 class EText : public ESprite {
 public:
-	EText() : EText(ESTransform2D(), 0, glm::vec4(1.0f)) {}
+	EText(const ESAddSpriteConfig config);
 	~EText();
-
-	EText(const ESTransform2D transform, const EUi32 renderOrder, const glm::vec4 renderColor = glm::vec4(1.0f))
-		: EText("", transform, renderOrder, renderColor) {
-	}
-
-	EText(const EString& texturePath, const ESTransform2D transform, const EUi32 renderOrder, const glm::vec4 renderColor = glm::vec4(1.0f));
 
 	// Import a file and convert it to a texture
 	virtual bool LoadTexture(const EString& fileName, const EString& path, bool repeat = true, bool linear = true) override;
+
+	// Undefine function
+	virtual void OnUpdateTransformScreenPosition() override {}
 
 	// Cleanup surface
 	void CleanupSurface(SDL_Surface* surface);
@@ -25,17 +22,21 @@ public:
 	void CleanupFont();
 
 	// Change the text of the text
-	void SetText(EString NewText);
+	void SetText(EString newText);
 
 	EString GetText() const { return m_text; }
 
 	// Change the size of the text
-	void SetFontSize(int NewSize);
+	void SetFontSize(int newSize);
+
+	void SetFontSizeMulti(float multi);
+
+	void SetDefaultFontSize(int newSize, bool setFontSize = true);
 
 	int GetFontSize() const { return m_fontSize; }
 
 	// Chang ethe color of the font
-	void SetFontColor(SDL_Color Color);
+	void SetFontColor(SDL_Color color);
 
 	SDL_Color* GetFontColor() const { return m_textColor; }
 	
@@ -57,6 +58,7 @@ private:
 	EString m_text;
 
 	// Size of the font
+	int m_defaultFontSize;
 	int m_fontSize;
 
 	// Load texture flags stored for easy rerender

@@ -106,6 +106,7 @@
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Enemy.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Floor.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Grass.cpp" />
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\GUIHUD.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\InvisibleWalls.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Player.cpp" />
     <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\Skybox.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Floor.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Grass.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\GUIButton.h" />
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\GUIHUD.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Player.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Skybox.h" />
     <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\Wall.h" />
@@ -152,7 +154,6 @@
     <ClInclude Include="Source\Public\EWindow.h" />
     <ClInclude Include="Source\Public\Graphics\EMesh.h" />
     <ClInclude Include="Source\Public\Graphics\EModel.h" />
-    <ClInclude Include="Source\Public\Graphics\ESAddSpriteConfig.h" />
     <ClInclude Include="Source\Public\Graphics\ESCamera.h" />
     <ClInclude Include="Source\Public\Graphics\EShaderProgram.h" />
     <ClInclude Include="Source\Public\Graphics\ESLight.h" />

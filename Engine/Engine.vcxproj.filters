@@ -102,6 +102,9 @@
     <ClCompile Include="Source\Private\ESoundManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Game\GameObjects\CustomObjects\GUIHUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Public\EWindow.h">
@@ -212,10 +215,10 @@
     <ClInclude Include="Source\Public\Graphics\EText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\Graphics\ESAddSpriteConfig.h">
+    <ClInclude Include="Source\Public\ESoundManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\ESoundManager.h">
+    <ClInclude Include="Source\Public\Game\GameObjects\CustomObjects\GUIHUD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

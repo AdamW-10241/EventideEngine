@@ -15,6 +15,7 @@
 
 class EObject;
 class EWorldObject;
+class GUIHUD;
 
 enum EGameState {
 	NONE,
@@ -109,6 +110,9 @@ public:
 	// Get sound manager
 	TWeak<ESoundManager> GetSoundManager() { return m_soundManager; }
 
+	// Get game HUD
+	TWeak<GUIHUD> GetGameHUD() { return m_gameHUD; }
+
 	// Find an object of type T from the object stack
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
 	TWeak<T> FindObjectOfType() {
@@ -195,6 +199,9 @@ private:
 
 	// Store the sound manager for the game engine
 	TShared<ESoundManager> m_soundManager;
+	
+	// Store reference to HUD object
+	TWeak<GUIHUD> m_gameHUD;
 
 	// Last time ticked
 	double m_lastTickTime;

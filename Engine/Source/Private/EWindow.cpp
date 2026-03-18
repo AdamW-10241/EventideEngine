@@ -8,6 +8,7 @@
 
 // External Libs
 #include <SDL/SDL.h>
+#include <GLEW/glew.h>
 
 EWindow::EWindow()
 {
@@ -67,9 +68,7 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 
 	// Check if SDL window was created
 	if (!m_sdlWindow) {
-		EDebug::Log(
-			"SDL failed to create window: " + EString(SDL_GetError()),
-			LT_ERROR);
+		EDebug::Log("SDL failed to create window: " + EString(SDL_GetError()), LT_ERROR);
 		CloseWindow();
 		return false;
 	}
@@ -123,7 +122,7 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 			if (m_graphicsEngine)
 				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
 		}
-		
+
 		// Quick exit button for debug
 		if (key == SDL_SCANCODE_ESCAPE) {
 			CloseWindow();
@@ -152,9 +151,25 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = true;
 		}
-		// Set frame rate to 10
+		// Toggle fullscreen
 		if (key == SDL_SCANCODE_TAB) {
-			EGameEngine::GetGameEngine()->SetFrameRate(10);
+			// Get window sizes
+			auto bounds = GetDisplayBounds(); // Display Size
+			glm::vec2 defaultSize = GetDefaultSize(); // Default Size
+			glm::vec2 currentSize = GetCurrentSize(); // Current Size
+
+			if (defaultSize.x != currentSize.x || defaultSize.y != currentSize.y) {
+				SDL_SetWindowSize(m_sdlWindow, defaultSize.x, defaultSize.y);
+				glm::vec2 position{ ((float)bounds.w) / 2.0f, ((float)bounds.h) / 2.0f };
+				position -= (defaultSize / 2.0f);
+				SDL_SetWindowPosition(m_sdlWindow, position.x, position.y);
+				m_params.fullscreen = false;
+			}	
+			else {
+				SDL_SetWindowSize(m_sdlWindow, bounds.w, bounds.h);
+				SDL_SetWindowPosition(m_sdlWindow, 0, 0);
+				m_params.fullscreen = true;
+			}
 		}
 		// Set flag to randomly change brightness
 		if (key == SDL_SCANCODE_LCTRL) {
@@ -334,8 +349,20 @@ void EWindow::MoveCamera()
 void EWindow::Render()
 {
 	// Render the graphics engine if exists
-	if (m_graphicsEngine)
+	if (m_graphicsEngine) {
+		// Update viewport to match current window size
+		int w, h;
+		SDL_GetWindowSize(m_sdlWindow, &w, &h);
+		glViewport(0, 0, w, h);
+
+		// Update camera aspect ratio to match new size
+		if (auto camera = m_graphicsEngine->GetCamera().lock()) {
+			camera->SetWindowAspectRatio({ w, h });
+		}
+
 		m_graphicsEngine->Render(m_sdlWindow);
+	}
+		
 }
 
 SDL_Rect EWindow::GetDisplayBounds()

@@ -1,6 +1,7 @@
 #include "Graphics/ESprite.h"
 #include "Graphics/EShaderProgram.h"
 #include "Math/ESTransform.h"
+#include "Game/EGameEngine.h"
 
 // External Libs
 #include <GLEW/glew.h>
@@ -99,4 +100,33 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+}
+
+void ESprite::UpdateTransformScreenPosition(glm::vec2 windowSize)
+{
+    // Calculate offset from center (0.5) and scale that by aspect ratio
+    float aspectRatio = windowSize.x / windowSize.y;
+    glm::vec2 screenPositionRatio = GetScreenPositionRatio();
+
+    float centerOffsetX = (screenPositionRatio.x - 0.5f);
+    glm::vec2 newPosition{
+        (0.5f + centerOffsetX) * windowSize.x + m_positionOffset.x,
+        screenPositionRatio.y * windowSize.y + m_positionOffset.y
+    };
+
+    // Set new position
+    GetTransform().position = newPosition;
+    OnUpdateTransformScreenPosition();
+}
+
+void ESprite::UpdateTransformScreenPosition()
+{
+    auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+    if (!window) {
+        EDebug::Log("Window could not be locked.\n");
+        return;
+    }
+
+    glm::vec2 windowSize = window->GetCurrentSize();
+    UpdateTransformScreenPosition(windowSize);
 }

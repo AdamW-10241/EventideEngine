@@ -21,6 +21,7 @@ std::default_random_engine RandGenerator;
 #include "Game/GameObjects/CustomObjects/InvisibleWalls.h"
 #include "Game/GameObjects/CustomObjects/GUIButton.h"
 #include "Game/GameObjects/CustomObjects/Coin.h"
+#include "Game/GameObjects/CustomObjects/GUIHUD.h"
 #include "Graphics/EText.h"
 #include "Graphics/ESprite.h"
 
@@ -67,34 +68,36 @@ void EGameEngine::AddPoints(int points, bool createText)
 
 void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
 {
-	// Create HUD text
-	glm::vec2 spawnPos;
-	if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
-		spawnPos = { 100.0f, window->GetWindowSize().y - (window->GetWindowSize().y / 3.0f) }; // WindowSize y = height
+	// Get HUD
+	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
+	if (!hud) {
+		EDebug::Log("Game HUD could not be locked.\n");
+		return;
 	}
-
-	ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
-	config.SetIsText(true);
-	config.SetRenderColor(color);
-
-	if (const auto& screenObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
+	
+	// Create HUD text
+	if (auto screenObj = hud->AddScreenObject().lock()) {
+		// Set lifetime
 		screenObj->SetLifeTime(1.5f);
-		auto spriteText = screenObj->AddSprite(config);
-		if (auto spriteRef = spriteText.lock()) {
-			if (auto textRef = TCast<EText>(spriteRef)) {
-				textRef->SetFontSize(14);
-				textRef->SetText(text);
-			}
-		}
 
+		// Add text
+		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.6} };
+		config.SetIsText(true);
+		config.SetRenderColor(color);
+		screenObj->AddSprite(config);
+
+		// Add text tick binding (for scaling)
+		screenObj->AddTextBindingTick([text]{ return text; }, 0.8f);
+
+		// Add movement binding
 		BIND_EVENT_SELF(screenObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-			if (const auto& screen = TCast<EScreenObject>(obj)) {
-				if (const auto& sprite = screen->GetSprite(0).lock()) {
-					sprite->GetTransform().position.y += 60.0f * deltaTime;
+			if (auto screenObj = TCast<EScreenObject>(obj)) {
+				if (auto sprite = screenObj->GetSprite(0).lock()) {
+					sprite->GetPositionOffset().y += 60.0f * screenObj->GetAspectRatioMulti() * deltaTime;
 					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
 				}
 			}
-			});
+		});
 	}
 }
 
@@ -193,6 +196,9 @@ bool EGameEngine::Init()
 	// Create sound engine
 	m_soundManager = TMakeShared<ESoundManager>();
 
+	// Create game HUD
+	m_gameHUD = CreateObject<GUIHUD>();
+
 	return true;
 }
 
@@ -203,6 +209,10 @@ void EGameEngine::Start()
 	
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
+
+	// Get HUD
+	auto hud = m_gameHUD.lock();
+	if (!hud) { EDebug::Log("Game HUD could not be locked.\n"); }
 
 	// Spawn Skybox
 	CreateObject<Skybox>();
@@ -219,32 +229,28 @@ void EGameEngine::Start()
 	// Spawn Player
 	glm::vec3 spawnLocation = { 0.0f, 20.0f, 0.0f };
 	if (auto player = CreateObject<Player>(spawnLocation).lock()) {
+		auto playerWeak = player->GetWeakRef<Player>();
+
 		// Spawn Enemies
 		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
 
 		// Create Health HUD text
-		{
-			glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 100.0f };
-			ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
+		if (auto healthObj = hud->AddScreenObject().lock()) {
+			// Add text
+			ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.9} };
 			config.SetIsText(true);
 			config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			healthObj->AddSprite(config);
 
-			if (auto healthObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
-				auto spriteText = healthObj->AddSprite(config);
-				if (auto textRef = TCast<EText>(spriteText.lock())) {
-					textRef->SetFontSize(16);
+			// Add text binding for tick
+			healthObj->AddTextBindingTick([playerWeak] {
+				// Set text
+				if (auto player = playerWeak.lock()) {
+					int healthPercent = (int)ceil(player->GetHealthRatio() * 100.0f);
+					return EString("HP - " + toEString(healthPercent) + "%");
 				}
-
-				BIND_EVENT_EXT(healthObj, OnTicked, player, [](TShared<EObject> obj, TShared<Player> player, float deltaTime) {
-					if (auto health = TCast<EScreenObject>(obj)) {
-						if (auto text = TCast<EText>(health->GetSprite(0).lock())) {
-							int healthPercent = (int)ceil(player->GetHealthRatio() * 100.0f);
-							EString newText = "HP - " + toEString(healthPercent) + "%";
-							text->SetText(newText);
-						}
-					}
-				});
-			}
+				return EString("");
+			});
 		}
 	}
 
@@ -255,54 +261,36 @@ void EGameEngine::Start()
 	CreateObject<Coin>().lock()->Destroy();
 
 	// Create Points HUD text
-	{
-		glm::vec2 spawnPos{ 100.0f, GetWindow().lock()->GetWindowSize().y - 130.0f };
-		ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
+	if (auto pointsObj = hud->AddScreenObject().lock()) {
+		// Add text
+		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.85} };
 		config.SetIsText(true);
 		config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+		pointsObj->AddSprite(config);
 
-		if (auto pointsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
-			auto spriteText = pointsObj->AddSprite(config);
-			if (auto textRef = TCast<EText>(spriteText.lock())) {
-				textRef->SetFontSize(16);
-			}
-
-			BIND_EVENT_SELF(pointsObj, OnTicked, [](TShared<EObject> obj, float deltaTime) {
-				if (auto points = TCast<EScreenObject>(obj)) {
-					if (auto text = TCast<EText>(points->GetSprite(0).lock())) {
-						EString newText = "Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints());
-						text->SetText(newText);
-					}
-				}
-			});
-		}
+		// Add text binding for tick
+		pointsObj->AddTextBindingTick([] {
+			// Set text
+			return EString("Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints()));
+		});
 	}
 
 	// Create FPS HUD text
-	{
-		glm::vec2 spawnPos{ 100.0f, 100.0f };
-		ESAddSpriteConfig config(FONT_PRESS_START, spawnPos, 0);
+	if (auto fpsObj = hud->AddScreenObject().lock()) {
+		// Add text
+		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.1} };
 		config.SetIsText(true);
 		config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		fpsObj->AddSprite(config);
 
-		if (auto fpsObj = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>().lock()) {
-			auto spriteText = fpsObj->AddSprite(config);
-			if (auto textRef = TCast<EText>(spriteText.lock())) {
-				textRef->SetFontSize(16);
-			}
-
-			BIND_EVENT_SELF(fpsObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-				if (auto points = TCast<EScreenObject>(obj)) {
-					if (auto text = TCast<EText>(points->GetSprite(0).lock())) {
-						EString newText = "FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime()));
-						text->SetText(newText);
-					}
-				}
-			});
-		}
+		// Add text binding for tick
+		fpsObj->AddTextBindingTick([] {
+			// Set text
+			return EString("FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime())));
+		});
 	}
 
-	// DEBUG GUI Button
+	// DEBUG GUI Buttons
 	//if (auto buttonRef = CreateObject<GUIButton>(1).lock()) {
 	//	auto spriteBase = buttonRef->AddSprite(ESAddSpriteConfig{ "Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0 });
 	//	if (auto spriteRef = spriteBase.lock()) {

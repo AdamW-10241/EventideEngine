@@ -5,6 +5,20 @@
 
 #define Super ESprite
 
+EText::EText(const ESAddSpriteConfig config) : ESprite(config)
+{
+	m_font = nullptr;
+	m_surfaceData = nullptr;
+	m_textColor = new SDL_Color({ 255, 255, 255, 255 });
+	m_text = "Text";
+	SetDefaultFontSize(16);
+	m_repeat = false;
+	m_linear = false;
+
+	// Load texture
+	LoadTexture(config.texturePath, config.texturePath, m_repeat, m_linear);
+}
+
 EText::~EText()
 {
 	CleanupFont();
@@ -13,23 +27,6 @@ EText::~EText()
 		delete m_textColor;
 		m_textColor = nullptr;
 	}
-}
-
-EText::EText(const EString& texturePath, const ESTransform2D transform, const EUi32 renderOrder, const glm::vec4 renderColor)
-{
-	m_renderOrder = renderOrder;
-	m_renderColor = renderColor;
-	m_font = nullptr;
-	m_surfaceData = nullptr;
-	m_textColor = new SDL_Color({ 255, 255, 255, 255 });
-	m_text = "Text";
-	m_fontSize = 204;
-	m_repeat = false;
-	m_linear = false;
-
-	if (!texturePath.empty()) CreateSprite(texturePath);
-	else CreateSprite();
-	SetTransform(transform);
 }
 
 bool EText::LoadTexture(const EString& fileName, const EString& path, bool repeat, bool linear)
@@ -148,35 +145,47 @@ void EText::CleanupFont()
 	}
 }
 
-void EText::SetText(EString NewText)
+void EText::SetText(EString newText)
 {
 	// Compare value and return if same
-	if (NewText == m_text) return;
+	if (newText == m_text) return;
 
 	// Copy value
-	m_text = NewText;
+	m_text = newText;
 
 	UpdateFont();
 }
 
-void EText::SetFontSize(int NewSize)
+void EText::SetFontSize(int newSize)
 {
-	if (m_fontSize == NewSize) return;
-	m_fontSize = NewSize;
+	if (m_fontSize == newSize) return;
+	m_fontSize = newSize;
 	CleanupFont(); // force reload on next LoadTexture
 	UpdateFont();
 }
 
-void EText::SetFontColor(SDL_Color Color)
+void EText::SetFontSizeMulti(float multi)
 {
-	if (m_textColor == &Color) {
+	int newSize = (int)((float)m_defaultFontSize * multi);
+	SetFontSize(newSize);
+}
+
+void EText::SetDefaultFontSize(int newSize, bool setFontSize)
+{
+	m_defaultFontSize = newSize;
+	if (setFontSize) m_fontSize = m_defaultFontSize;
+}
+
+void EText::SetFontColor(SDL_Color color)
+{
+	if (m_textColor == &color) {
 		return;
 	}
 
-	m_textColor->r = Color.r;
-	m_textColor->g = Color.g;
-	m_textColor->b = Color.b;
-	m_textColor->a = Color.a;
+	m_textColor->r = color.r;
+	m_textColor->g = color.g;
+	m_textColor->b = color.b;
+	m_textColor->a = color.a;
 
 	UpdateFont();
 }

@@ -71,13 +71,29 @@ public:
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_graphicsEngine; }
 
 	// Get window params
-	ESWindowParams& GetWindowParams() { return m_params; }
+	ESWindowParams& GetParams() { return m_params; }
 
-	// Get window size
-	glm::vec2 GetWindowSize() { return glm::vec2(m_params.w, m_params.h); }
+	// Get default size
+	glm::vec2 GetDefaultSize() { return glm::vec2(m_params.w, m_params.h); }
 
-	// Get window center
-	glm::vec2 GetWindowCenter() { return GetWindowSize() / 2.0f; }
+	// Get default center
+	glm::vec2 GetDefaultCenter() { return GetDefaultSize() / 2.0f; }
+
+	// Get current size
+	glm::vec2 GetCurrentSize() {
+		int windowWidth; int windowHeight;
+		SDL_GetWindowSize(m_sdlWindow, &windowWidth, &windowHeight); // Current Size
+		return glm::vec2(windowWidth, windowHeight);
+	}
+
+	// Get current center
+	glm::vec2 GetCurrentCenter() { return GetCurrentSize() / 2.0f; }
+	
+	// Get aspect ratio
+	float GetAspectRatio() {
+		glm::vec2 currentSize = GetCurrentSize();
+		return currentSize.x / currentSize.y;
+	}
 
 	// Get bounds of the display window is in
 	SDL_Rect GetDisplayBounds();

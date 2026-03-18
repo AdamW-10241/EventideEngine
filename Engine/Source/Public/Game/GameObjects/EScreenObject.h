@@ -13,6 +13,14 @@ public:
     // Render sprites
     void Render(const TShared<EShaderProgram>& shader);
 
+    // Adds text OnTicked binding to set text and size using passed functions
+    void AddTextBindingTick(std::function<EString()> text, std::function<float()> fontSizeMulti, const int spriteIndex = 0);
+
+    void AddTextBindingTick(std::function<EString()> text, const float fontSizeMulti = 1.2f, const int spriteIndex = 0);
+
+    // Apply multi to aspect ratio if non-square for use with text binding tick
+    float GetAspectRatioMulti(const float multi = 1.0f);
+
     // Set render order
     void SetRenderOrder(const EUi32 renderOrder) { m_renderOrder = renderOrder; }
 

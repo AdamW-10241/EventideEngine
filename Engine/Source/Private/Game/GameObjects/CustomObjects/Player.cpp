@@ -4,6 +4,7 @@
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Graphics/ESLight.h"
 #include "Game/GameObjects/EScreenObject.h"
+#include "Game/GameObjects/CustomObjects/GUIHUD.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <GLM/gtx/euler_angles.hpp>
@@ -68,15 +69,23 @@ void Player::OnStart()
 		AddWeapon(weapon);
 	}
 	
+	// Get HUD
+	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
+	if (!hud) { 
+		EDebug::Log("Game HUD could not be locked.\n");
+		return;
+	}
+
 	// Add crosshair
-	if (auto crosshair = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>(0).lock()) {
+	if (auto crosshair = hud->AddScreenObject().lock()) {
 		if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
-			ESTransform2D transform;
-			transform.position = window->GetWindowCenter();
-			if (auto spriteRef = crosshair->AddSprite(ESAddSpriteConfig{ "Sprites/Crosshairs/crosshair009.png", transform, 0 }).lock()) {
+			// Add sprite
+			ESAddSpriteConfig config{ .texturePath = "Sprites/Crosshairs/crosshair009.png", .screenPositionRatio = {0.5, 0.5} };
+			if (auto spriteRef = crosshair->AddSprite(config).lock()) {
 				spriteRef->GetTransform().scale *= 0.4f;
 				spriteRef->GetTransform().CenterOnPosition();
 			}
+			// Add to player
 			AddCrosshair(crosshair);
 		}
 	}
