@@ -6,11 +6,14 @@ public:
 	GUIHUD() {}
 
 	// Stores a screen object
-	TWeak<EScreenObject> AddScreenObject(TWeak<EScreenObject> screenObject);
+	template<typename T>
+		requires std::derived_from<T, EScreenObject>
+	TWeak<T> AddScreenObject(TWeak<T> screenObject);
 
 	// Pass in arguments to create screen object and add to array
-	template<typename... Args>
-	TWeak<EScreenObject> AddScreenObject(Args&&... args);
+	template<typename T, typename ...Args>
+		requires std::derived_from<T, EScreenObject>
+	TWeak<T> AddScreenObject(Args&&... args);
 
     // Get screen objects
     TArray<TWeak<EScreenObject>> GetScreenObjects() { return m_screenObjects; }
@@ -30,10 +33,23 @@ protected:
 
 };
 
-template<typename ...Args>
-inline TWeak<EScreenObject> GUIHUD::AddScreenObject(Args&&... args)
+template<typename T>
+	requires std::derived_from<T, EScreenObject>
+inline TWeak<T> GUIHUD::AddScreenObject(TWeak<T> screenObject)
+{
+	// Add to array and return it
+	if (auto ref = screenObject.lock()) {
+		m_screenObjects.push_back(ref);
+		return ref;
+	}
+	return {};
+}
+
+template<typename T, typename ...Args>
+	requires std::derived_from<T, EScreenObject>
+inline TWeak<T> GUIHUD::AddScreenObject(Args&&... args)
 {
 	// Create and add screen object
-	auto screenObject = EGameEngine::GetGameEngine()->CreateObject<EScreenObject>(std::forward<Args>(args)...);
+	auto screenObject = EGameEngine::GetGameEngine()->CreateObject<T>(std::forward<Args>(args)...);
 	return AddScreenObject(screenObject);
 }

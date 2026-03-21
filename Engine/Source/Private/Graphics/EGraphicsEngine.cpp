@@ -138,7 +138,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
-	if (!defaultTexture->LoadTexture("Default Texure", "Textures/T_DefaultGrid.png")) {
+	if (!defaultTexture->LoadTexture("Textures/T_DefaultGrid.png")) {
 		EDebug::Log("Graphics engine default texture did not load.", LT_ERROR);
 	}
 

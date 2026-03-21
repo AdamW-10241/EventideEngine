@@ -6,7 +6,7 @@
 
 ETexture::ETexture()
 {
-    m_path = m_fileName = "";
+    m_path = "";
     m_ID = 0U;
     m_width = m_height = m_channels = 0;
 }
@@ -20,10 +20,9 @@ ETexture::~ETexture()
     // EDebug::Log("Texture destroyed: " + m_fileName);
 }
 
-bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool repeat, bool linear)
+bool ETexture::LoadTexture(const EString& path, bool repeat, bool linear)
 {
     // Assign the file name and path
-    m_fileName = fileName;
     m_path = path;
 
     // STB Image imports images upside down
@@ -43,14 +42,14 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool re
 
     // Test if the data imported correctly
     if (data == nullptr) {
-        EString errorMsg = "Failed to load texture - " + m_fileName + ": " + stbi_failure_reason();
+        EString errorMsg = "Failed to load texture - " + m_path + ": " + stbi_failure_reason();
         EDebug::Log(errorMsg, LT_ERROR);
         return false;
     }
 
     // Test the amount of channels
     if (m_channels > 4 || m_channels < 3) {
-        EDebug::Log("Failed to import texture - " + m_fileName 
+        EDebug::Log("Failed to import texture - " + m_path
             + ": Incorrect number of channels, must have 3 or 4 channels");
         return false;
     }
@@ -61,7 +60,7 @@ bool ETexture::LoadTexture(const EString& fileName, const EString& path, bool re
     // Test if the generate failed
     if (m_ID == 0) {
         EString error = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
-        EString errorMsg = "Failed to generate texture ID - " + m_fileName + ": " + error;
+        EString errorMsg = "Failed to generate texture ID - " + m_path + ": " + error;
         EDebug::Log(errorMsg, LT_ERROR);
         return false;
     }

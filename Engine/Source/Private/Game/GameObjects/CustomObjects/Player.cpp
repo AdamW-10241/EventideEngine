@@ -77,14 +77,15 @@ void Player::OnStart()
 	}
 
 	// Add crosshair
-	if (auto crosshair = hud->AddScreenObject().lock()) {
+	if (auto crosshair = hud->AddScreenObject<EScreenObject>().lock()) {
 		if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
 			// Add sprite
-			ESAddSpriteConfig config{ .texturePath = "Sprites/Crosshairs/crosshair009.png", .screenPositionRatio = {0.5, 0.5} };
-			if (auto spriteRef = crosshair->AddSprite(config).lock()) {
-				spriteRef->GetTransform().scale *= 0.4f;
-				spriteRef->GetTransform().CenterOnPosition();
-			}
+			ESAddSpriteConfig config;
+			config.path = "Sprites/Crosshairs/crosshair009.png";
+			config.doScale = false;
+			config.sizeInUnits = { 40.0f, 40.0f };
+			crosshair->AddSprite(config);
+
 			// Add to player
 			AddCrosshair(crosshair);
 		}

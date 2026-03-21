@@ -1,15 +1,5 @@
 #include "Game/GameObjects/CustomObjects/GUIHUD.h"
 
-TWeak<EScreenObject> GUIHUD::AddScreenObject(TWeak<EScreenObject> screenObject)
-{
-    // Add to array and return it
-    if (auto ref = screenObject.lock()) {
-        m_screenObjects.push_back(ref);
-        return ref;
-    }
-    return {};
-}
-
 void GUIHUD::OnTick(float deltaTime)
 {
     // Get window
@@ -26,7 +16,7 @@ void GUIHUD::OnTick(float deltaTime)
             // Reposition sprites
             for (auto sprite : objRef->GetSprites()) {
                 if (auto spriteRef = sprite.lock()) {
-                    spriteRef->UpdateTransformScreenPosition(windowSize);
+                    spriteRef->UpdateTransform(windowSize);
                 }
             }
         }

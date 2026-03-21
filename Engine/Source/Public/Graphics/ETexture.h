@@ -7,7 +7,7 @@ public:
 	~ETexture();
 
 	// Import a file and convert it to a texture
-	virtual bool LoadTexture(const EString& fileName, const EString& path, bool repeat = true, bool linear = true);
+	virtual bool LoadTexture(const EString& path, bool repeat = true, bool linear = true);
 
 	// Activates the texture to use for OpenGL
 	void BindTexture(const EUi32& textureNumber);
@@ -15,11 +15,8 @@ public:
 	// Deactivates the texture for OpenGL
 	void Unbind();
 
-	// Gets the import path of the texture
-	EString GetImportPath() const { return m_path; }
-
-	// Gets the custom file name of the texture
-	EString GetName() const { return m_fileName; }
+	// Gets the path of the file used by texture
+	EString GetPath() const { return m_path; }
 
 	// Gets the ID of the texture for OpenGL
 	EUi32 GetID() const { return m_ID; }
@@ -30,9 +27,6 @@ public:
 protected:
 	// Import path of the image
 	EString m_path;
-
-	// Custome name of the texture
-	EString m_fileName;
 
 	// ID for the texture in OpenGL
 	EUi32 m_ID;

@@ -18,20 +18,29 @@ public:
 	}
 	void SetSpritePressedColor(const int index, const glm::vec4 pressed, std::optional<glm::vec4> released = std::nullopt) {
 		// Validate sprite
-		const auto& sprite = GetSprite(index);
-		if (!sprite.lock()) {
+		auto spriteRef = GetSprite(index);
+		if (!spriteRef.lock()) {
 			EDebug::Log("GUIButton - Sprite at index " + toEString(index) + " does not exist.", LT_ERROR);
 			return;
 		}
 
-		// Set color on pressed
-		BindObjectEvent(&GUIButton::OnPressed, GetSprite(index), [pressed](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
+		// Set colors
+		BIND_EVENT_EXT(GetSharedRef<GUIButton>(), OnPressed, GetSprite(index), [pressed](const TShared<GUIButton>& obj, const TShared<ESprite>& spr) {
 			spr->GetRenderColor() = pressed;
 		});
-		// Set color on released
 		glm::vec4 releasedColor = released.has_value() ? released.value() : GetSprite(index).lock()->GetRenderColor();
-		BindObjectEvent(&GUIButton::OnReleased, GetSprite(index), [releasedColor](const TShared<GUIButton>& btn, const TShared<ESprite>& spr) {
+		BIND_EVENT_EXT(GetSharedRef<GUIButton>(), OnReleased, GetSprite(index), [releasedColor](const TShared<GUIButton>& obj, const TShared<ESprite>& spr) {
 			spr->GetRenderColor() = releasedColor;
+		});
+	}
+
+	// Add scaling for pressing button
+	void AddPressAndReleaseScaling(float pressScale = 0.9f, float releaseScale = 1.0f) {
+		BIND_EVENT_SELF(GetSharedRef<GUIButton>(), OnPressed, [pressScale](const TShared<GUIButton>& btn) {
+			btn->SetSpritesRenderScales(pressScale);
+		});
+		BIND_EVENT_SELF(GetSharedRef<GUIButton>(), OnReleased, [releaseScale](const TShared<GUIButton>& btn) {
+			btn->SetSpritesRenderScales(releaseScale);
 		});
 	}
 

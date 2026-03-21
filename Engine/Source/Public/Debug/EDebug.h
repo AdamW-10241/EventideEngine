@@ -1,6 +1,7 @@
 #pragma once
 
 // External Libs
+#include <GLM/vec2.hpp>
 #include <GLM/vec3.hpp>
 #include <iostream>
 #include <string>
@@ -35,6 +36,12 @@ public:
 	// Log a message to the console based on log type as a float
 	static void Log(const float& floatMsg, const EELogType& logType = LT_LOG) {
 		std::cout << std::to_string(floatMsg) << std::endl;
+	}
+
+	// Log a message to the console based on log type as a vec2
+	static void Log(const glm::vec2& vec2Msg, const EELogType& logType = LT_LOG) {
+		std::cout << std::to_string(vec2Msg.x) << ", "
+				  << std::to_string(vec2Msg.y) << std::endl;
 	}
 
 	// Log a message to the console based on log type as a vec3

@@ -1,25 +1,33 @@
 #pragma once
 #include "Game/GameObjects/EObject.h"
 #include "Graphics/ESprite.h"
+#include "Graphics/EText.h"
+
+#define DEFAULT_FONT_SIZE_MULTI 1.2f
+
+template<typename T>
+concept IsSpriteConfig = requires(T t) {
+    static_cast<ESAddSpriteConfigBase<T>&>(t);
+};
 
 class EScreenObject : public EObject {
 public:
     EScreenObject() { m_renderOrder = 0; }
     EScreenObject(EUi32 renderOrder) { m_renderOrder = renderOrder; }
-	
-    // Creates and stores a sprite, returns a weak ref if you need to modify it later
-    TWeak<ESprite> AddSprite(ESAddSpriteConfig config);
+
+    template<typename T>
+        requires IsSpriteConfig<T>
+    TWeak<ESprite> AddSprite(const T& config);
 
     // Render sprites
     void Render(const TShared<EShaderProgram>& shader);
 
     // Adds text OnTicked binding to set text and size using passed functions
-    void AddTextBindingTick(std::function<EString()> text, std::function<float()> fontSizeMulti, const int spriteIndex = 0);
+    void AddTextBindingTick(std::function<EString()> text, const int spriteIndex = 0);
 
-    void AddTextBindingTick(std::function<EString()> text, const float fontSizeMulti = 1.2f, const int spriteIndex = 0);
-
-    // Apply multi to aspect ratio if non-square for use with text binding tick
-    float GetAspectRatioMulti(const float multi = 1.0f);
+    void AddTextBindingTick(const int spriteIndex) {
+        AddTextBindingTick([] { return EString(""); }, spriteIndex);
+    }
 
     // Set render order
     void SetRenderOrder(const EUi32 renderOrder) { m_renderOrder = renderOrder; }
@@ -70,3 +78,20 @@ protected:
     // Store render order
     EUi32 m_renderOrder;
 };
+
+template<typename T>
+    requires IsSpriteConfig<T>
+inline TWeak<ESprite> EScreenObject::AddSprite(const T& config)
+{
+    // Create sprite
+    TShared<ESprite> sprite;
+    if constexpr (std::is_base_of_v<ESAddTextConfig, T>) {
+        sprite = TMakeShared<EText>(static_cast<const ESAddTextConfig&>(config));
+    }
+    else {
+        sprite = TMakeShared<ESprite>(config);
+    }
+
+    m_sprites.push_back(sprite);
+    return sprite;
+}

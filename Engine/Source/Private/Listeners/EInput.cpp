@@ -1,4 +1,5 @@
 #include "Listeners/EInput.h"
+#include "Game/EGameEngine.h"
 #include "EWindow.h"
 
 EInput::EInput()
@@ -28,9 +29,7 @@ void EInput::UpdateInputs()
 	while (SDL_PollEvent(&e)) {
 		// Quit program
 		if (e.type == SDL_QUIT) {
-			if (const auto& windowRef = m_window.lock()) {
-				windowRef->CloseWindow();
-			}
+			EGameEngine::QuitGame();
 		}
 
 		// Run different events based on type of input

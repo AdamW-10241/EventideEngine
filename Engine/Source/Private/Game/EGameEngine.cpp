@@ -34,6 +34,13 @@ EGameEngine* EGameEngine::GetGameEngine()
 	return instance;
 }
 
+void EGameEngine::QuitGame()
+{
+	if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
+		window->CloseWindow();
+	}
+}
+
 void EGameEngine::DestroyEngine()
 {
 	delete GetGameEngine();
@@ -76,24 +83,26 @@ void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
 	}
 	
 	// Create HUD text
-	if (auto screenObj = hud->AddScreenObject().lock()) {
+	if (auto screenObj = hud->AddScreenObject<EScreenObject>().lock()) {
 		// Set lifetime
 		screenObj->SetLifeTime(1.5f);
 
 		// Add text
-		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.6} };
-		config.SetIsText(true);
+		ESAddTextConfig config;
+		config.path = FONT_PRESS_START;
+		config.anchor = { 0.08f, 0.35f };
+		config.alignment = { 0.0f, 0.0f };
 		config.SetRenderColor(color);
+		config.SetText(text);
 		screenObj->AddSprite(config);
-
-		// Add text tick binding (for scaling)
-		screenObj->AddTextBindingTick([text]{ return text; }, 0.8f);
 
 		// Add movement binding
 		BIND_EVENT_SELF(screenObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
 			if (auto screenObj = TCast<EScreenObject>(obj)) {
 				if (auto sprite = screenObj->GetSprite(0).lock()) {
-					sprite->GetPositionOffset().y += 60.0f * screenObj->GetAspectRatioMulti() * deltaTime;
+					if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
+						sprite->GetPositionOffset().y += (SLATE_UNIT_SCALAR / 15.0f) * window->GetSlateUnit() * deltaTime;
+					}
 					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
 				}
 			}
@@ -235,11 +244,13 @@ void EGameEngine::Start()
 		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
 
 		// Create Health HUD text
-		if (auto healthObj = hud->AddScreenObject().lock()) {
+		if (auto healthObj = hud->AddScreenObject<EScreenObject>().lock()) {
 			// Add text
-			ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.9} };
-			config.SetIsText(true);
-			config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			ESAddTextConfig config;
+			config.path = FONT_PRESS_START;
+			config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			config.anchor = { 0.08f, 0.1f };
+			config.alignment = { 0.0f, 0.0f };
 			healthObj->AddSprite(config);
 
 			// Add text binding for tick
@@ -261,11 +272,13 @@ void EGameEngine::Start()
 	CreateObject<Coin>().lock()->Destroy();
 
 	// Create Points HUD text
-	if (auto pointsObj = hud->AddScreenObject().lock()) {
+	if (auto pointsObj = hud->AddScreenObject<EScreenObject>().lock()) {
 		// Add text
-		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.85} };
-		config.SetIsText(true);
-		config.SetRenderColor({ 1.0f, 1.0f, 0.0f, 1.0f });
+		ESAddTextConfig config;
+		config.path = FONT_PRESS_START;
+		config.renderColor = { 1.0f, 1.0f, 0.0f, 1.0f };
+		config.anchor = { 0.08f, 0.15f };
+		config.alignment = { 0.0f, 0.0f };
 		pointsObj->AddSprite(config);
 
 		// Add text binding for tick
@@ -276,11 +289,14 @@ void EGameEngine::Start()
 	}
 
 	// Create FPS HUD text
-	if (auto fpsObj = hud->AddScreenObject().lock()) {
+	if (auto fpsObj = hud->AddScreenObject<EScreenObject>().lock()) {
 		// Add text
-		ESAddSpriteConfig config{ .texturePath = FONT_PRESS_START, .screenPositionRatio = {0.05, 0.1} };
-		config.SetIsText(true);
-		config.SetRenderColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+		ESAddTextConfig config;
+		config.path = FONT_PRESS_START;
+		config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		config.anchor = { 0.08f, 0.9f };
+		config.alignment = { 0.0f, 0.0f };
+
 		fpsObj->AddSprite(config);
 
 		// Add text binding for tick
@@ -291,34 +307,30 @@ void EGameEngine::Start()
 	}
 
 	// DEBUG GUI Buttons
-	//if (auto buttonRef = CreateObject<GUIButton>(1).lock()) {
-	//	auto spriteBase = buttonRef->AddSprite(ESAddSpriteConfig{ "Sprites/Button/QuitButton.png", m_window->GetWindowCenter(), 0 });
-	//	if (auto spriteRef = spriteBase.lock()) {
-	//		spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
-	//	}
+	if (auto buttonObj = hud->AddScreenObject<GUIButton>(1).lock()) {
+		glm::vec2 anchor{ 0.8f, 0.1f };
+		// Add base sprite
+		ESAddSpriteConfig spriteConfig;
+		spriteConfig.path = "Sprites/Button/QuitButton.png";
+		spriteConfig.anchor = anchor;
+		spriteConfig.sizeInUnits = glm::vec2(230.0f, 0.0f);
+		buttonObj->AddSprite(spriteConfig);
 
-	//	ESAddSpriteConfig config(FONT_PRESS_START, m_window->GetWindowCenter(), 0);
-	//	config.SetIsText(true);
-	//	config.SetRenderColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+		// Add text
+		//ESAddTextConfig textConfig;
+		//textConfig.path = FONT_PRESS_START;
+		//textConfig.anchor = anchor;
+		//textConfig.text = "QUIT";
+		//textConfig.fontSize = 40;
+		//buttonObj->AddSprite(textConfig);
 
-	//	auto spriteText = buttonRef->AddSprite(config);
-	//	if (auto spriteRef = spriteText.lock()) {
-	//		if (auto textRef = TCast<EText>(spriteRef)) {
-	//			textRef->SetFontSize(20);
-	//			textRef->SetText("Test!");
-	//		}
-	//		spriteRef->GetTransform().SetScaleMultiCentered(1.0f);
-	//	}
-
-	//	buttonRef->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-	//	buttonRef->SetSpritePressedColor(1, glm::vec4(0.4f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f ));
-	//	BIND_EVENT_SELF(buttonRef, OnPressed, [](const TShared<GUIButton>& btn) {
-	//		btn->SetSpritesRenderScales(0.9f);
-	//	});
-	//	BIND_EVENT_SELF(buttonRef, OnReleased, [](const TShared<GUIButton>& btn) {
-	//		btn->SetSpritesRenderScales(1.0f);
-	//	});
-	//}
+		// Add bindings
+		buttonObj->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+		buttonObj->AddPressAndReleaseScaling();
+		BIND_EVENT_RAW(buttonObj, OnReleased, []() { 
+			EGameEngine::QuitGame(); 
+		});
+	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());

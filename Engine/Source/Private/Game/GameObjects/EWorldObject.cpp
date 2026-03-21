@@ -12,7 +12,7 @@ TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const TArray<E
     if (!modelRef->HasMaterials()) return modelRef;
 
     // Assign materials once per model
-    bool isDefaultTexture = modelRef->GetMaterials().at(0)->m_baseColourMap->GetImportPath() == "Textures/T_DefaultGrid.png";
+    bool isDefaultTexture = modelRef->GetMaterials().at(0)->m_baseColourMap->GetPath() == "Textures/T_DefaultGrid.png";
     if (isDefaultTexture) {
         // Get static cache
         static std::unordered_map<EString, TShared<ETexture>> textureCache;
@@ -25,18 +25,18 @@ TWeak<EModel> EWorldObject::ImportModel(const EString& modelPath, const TArray<E
             // Create texture if not in cache
             if (!textureCache.count(paths.base)) {
                 auto texBase = TMakeShared<ETexture>();
-                texBase->LoadTexture(modelPath, paths.base);
+                texBase->LoadTexture(paths.base);
                 textureCache[paths.base] = texBase;
 
                 if (!paths.normal.empty()) {
                     auto texNormal = TMakeShared<ETexture>();
-                    texNormal->LoadTexture(modelPath, paths.normal);
+                    texNormal->LoadTexture(paths.normal);
                     textureCache[paths.normal] = texNormal;
                 }
 
                 if (!paths.specular.empty()) {
                     auto texSpecular = TMakeShared<ETexture>();
-                    texSpecular->LoadTexture(modelPath, paths.specular);
+                    texSpecular->LoadTexture(paths.specular);
                     textureCache[paths.specular] = texSpecular;
                 }
             }

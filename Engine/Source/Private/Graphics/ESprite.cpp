@@ -14,7 +14,7 @@ bool ESprite::CreateSprite(const EString& texturePath)
     if (!CreateSprite()) return false;
 
     // Load texture
-    if (!LoadTexture(texturePath, texturePath, false, false)) {
+    if (!LoadTexture(texturePath, false, false)) {
         EDebug::Log("ESprite failed to load texture.", LT_ERROR);
         return false;
     }
@@ -70,7 +70,8 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec2 renderScale = transform.scale * m_renderScale;
-    glm::vec2 center = transform.position + transform.scale * 0.5f;
+    glm::vec2 position = transform.position + m_positionOffset + (transform.scale - renderScale) * 0.5f;
+    glm::vec2 center = position + renderScale * 0.5f;
 
     model = glm::translate(model, glm::vec3(center, 0.0f));
     model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -86,7 +87,7 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     varID = glGetUniformLocation(programID, "model");
     glUniformMatrix4fv(varID, 1, GL_FALSE, glm::value_ptr(model));
 
-    glUniform1i(glGetUniformLocation(programID, "useTexture"), !m_fileName.empty() ? 1 : 0);
+    glUniform1i(glGetUniformLocation(programID, "useTexture"), !m_path.empty() ? 1 : 0);
 
     glUniform4f(glGetUniformLocation(programID, "color"), 
         m_renderColor.r, m_renderColor.g, m_renderColor.b, m_renderColor.a);
@@ -102,24 +103,35 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
     glBindVertexArray(0);
 }
 
-void ESprite::UpdateTransformScreenPosition(glm::vec2 windowSize)
+void ESprite::UpdateTransform(glm::vec2 windowSize)
 {
-    // Calculate offset from center (0.5) and scale that by aspect ratio
-    float aspectRatio = windowSize.x / windowSize.y;
-    glm::vec2 screenPositionRatio = GetScreenPositionRatio();
+    float slateUnit = windowSize.y / SLATE_UNIT_SCALAR;
+    glm::vec2 pixelSize = m_doScale ? CalcPixelSize(slateUnit) : CalcPixelSize(1.0f);
+    
+    glm::vec2 anchorPos = m_anchor * windowSize;
+    glm::vec2 pixelPos = anchorPos - pixelSize * m_alignment;
 
-    float centerOffsetX = (screenPositionRatio.x - 0.5f);
-    glm::vec2 newPosition{
-        (0.5f + centerOffsetX) * windowSize.x + m_positionOffset.x,
-        screenPositionRatio.y * windowSize.y + m_positionOffset.y
-    };
-
-    // Set new position
-    GetTransform().position = newPosition;
-    OnUpdateTransformScreenPosition();
+    m_transform.position = pixelPos;
+    m_transform.scale = pixelSize;
 }
 
-void ESprite::UpdateTransformScreenPosition()
+glm::vec2 ESprite::CalcPixelSize(float slateUnit) const
+{
+    if (m_sizeInUnits.x != 0.0f && m_sizeInUnits.y == 0.0f) {
+        float x = m_sizeInUnits.x * slateUnit;
+        return { x, x / m_width * m_height };
+    }
+    if (m_sizeInUnits.y != 0.0f && m_sizeInUnits.x == 0.0f) {
+        float y = m_sizeInUnits.y * slateUnit;
+        return { y / m_height * m_width, y };
+    }
+    return {
+        m_sizeInUnits.x == 0.0f ? (float)m_width * slateUnit : m_sizeInUnits.x * slateUnit,
+        m_sizeInUnits.y == 0.0f ? (float)m_height * slateUnit : m_sizeInUnits.y * slateUnit
+    };
+}
+
+void ESprite::UpdateTransform()
 {
     auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
     if (!window) {
@@ -128,5 +140,5 @@ void ESprite::UpdateTransformScreenPosition()
     }
 
     glm::vec2 windowSize = window->GetCurrentSize();
-    UpdateTransformScreenPosition(windowSize);
+    UpdateTransform(windowSize);
 }

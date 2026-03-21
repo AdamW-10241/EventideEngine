@@ -6,6 +6,8 @@
 class EGraphicsEngine;
 class EInput;
 
+#define SLATE_UNIT_SCALAR 1080.0f
+
 struct ESWindowParams {
 	// Default constructor
 	ESWindowParams() {
@@ -94,6 +96,9 @@ public:
 		glm::vec2 currentSize = GetCurrentSize();
 		return currentSize.x / currentSize.y;
 	}
+
+	// Get slate unit
+	float GetSlateUnit() { return GetCurrentSize().y / SLATE_UNIT_SCALAR; }
 
 	// Get bounds of the display window is in
 	SDL_Rect GetDisplayBounds();

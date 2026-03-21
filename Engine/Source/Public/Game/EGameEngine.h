@@ -42,6 +42,9 @@ public:
 	// Get or create a game engine if one does not exist
 	static EGameEngine* GetGameEngine();
 
+	// Quit the game
+	static void QuitGame();
+
 	// Destroy the game engine
 	static void DestroyEngine();
 

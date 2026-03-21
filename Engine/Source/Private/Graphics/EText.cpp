@@ -1,22 +1,26 @@
 #include "Graphics/EText.h"
+#include "Game/EGameEngine.h"
+
 #include <GLEW/glew.h>
 #include <STB_IMAGE/stb_image.h>
 #include <SDL/SDL_ttf.h>
 
 #define Super ESprite
 
-EText::EText(const ESAddSpriteConfig config) : ESprite(config)
+EText::EText(const ESAddTextConfig& config) : Super(config)
 {
 	m_font = nullptr;
-	m_surfaceData = nullptr;
-	m_textColor = new SDL_Color({ 255, 255, 255, 255 });
-	m_text = "Text";
-	SetDefaultFontSize(16);
+	m_textColor = new SDL_Color{ 255, 255, 255, 255 };
+	SetDefaultFontSize(config.fontSize);
+	m_text = config.text;
 	m_repeat = false;
 	m_linear = false;
 
 	// Load texture
-	LoadTexture(config.texturePath, config.texturePath, m_repeat, m_linear);
+	if (!m_text.empty())
+		LoadTexture(config.path, m_repeat, m_linear);
+
+	UpdateFont();
 }
 
 EText::~EText()
@@ -29,10 +33,9 @@ EText::~EText()
 	}
 }
 
-bool EText::LoadTexture(const EString& fileName, const EString& path, bool repeat, bool linear)
+bool EText::LoadTexture(const EString& path, bool repeat, bool linear)
 {
 	// Assign the file name and path
-	m_fileName = fileName;
 	m_repeat = repeat;
 	m_linear = linear;
 	
@@ -44,7 +47,7 @@ bool EText::LoadTexture(const EString& fileName, const EString& path, bool repea
 		m_font = TTF_OpenFont(m_path.c_str(), m_fontSize);
 
 		if (m_font == nullptr) {
-			EDebug::Log("Failed to load font - " + m_fileName + ": " + EString(TTF_GetError()), LT_ERROR);
+			EDebug::Log("Failed to load font - " + m_path + ": " + EString(TTF_GetError()), LT_ERROR);
 			return false;
 		}
 	}
@@ -56,13 +59,13 @@ bool EText::LoadTexture(const EString& fileName, const EString& path, bool repea
 	SDL_FreeSurface(surf);
 	surf = converted;
 
-	// Set dimensions so SetScaleToTextureSize works correctly
+	// Set dimensions
 	m_width = surf->w;
 	m_height = surf->h;
 	
 	// Check if the import failed
 	if (surf == nullptr) {
-		EString errorMsg = "Failed to convert font to surface - " + m_fileName + ": " + EString(TTF_GetError());
+		EString errorMsg = "Failed to convert font to surface - " + m_path + ": " + EString(TTF_GetError());
 		EDebug::Log(errorMsg, LT_ERROR);
 		// Clear Surface Image data
 		CleanupSurface(surf);
@@ -70,13 +73,17 @@ bool EText::LoadTexture(const EString& fileName, const EString& path, bool repea
 	}
 	//SDL_SaveBMP(surf, "debug_text.bmp");
 
-	// Generate the texture ID in OpenGL
+	// Delete old texture if exists
+	if (m_ID > 0) {
+		glDeleteTextures(1, &m_ID);
+		m_ID = 0;
+	}
 	glGenTextures(1, &m_ID);
 
 	// Test if the generate failed
 	if (m_ID == 0) {
 		EString error = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
-		EString errorMsg = "Failed to generate texture ID - " + m_fileName + ": " + error;
+		EString errorMsg = "Failed to generate texture ID - " + m_path + ": " + error;
 		EDebug::Log(errorMsg, LT_ERROR);
 		// Clear Surface Image data
 		CleanupSurface(surf);
@@ -128,6 +135,33 @@ bool EText::LoadTexture(const EString& fileName, const EString& path, bool repea
 	CleanupSurface(surf);
 
 	return true;
+}
+
+void EText::UpdateTransform(glm::vec2 windowSize)
+{
+	float slateUnit = windowSize.y / SLATE_UNIT_SCALAR;
+
+	// Only scale font size if m_doScale is true
+	int newSize = m_doScale
+		? (int)(m_defaultFontSize * slateUnit)
+		: m_defaultFontSize;
+
+	if (newSize != m_fontSize) {
+		m_fontSize = newSize;
+		CleanupFont();
+		LoadTexture(m_path, m_repeat, m_linear);
+	}
+
+	glm::vec2 flippedAnchor = { m_anchor.x, 1.0f - m_anchor.y };
+	glm::vec2 anchorPos = flippedAnchor * windowSize;
+
+	glm::vec2 pixelSize = m_sizeInUnits != glm::vec2(0.0f)
+		? CalcPixelSize(m_doScale ? slateUnit : 1.0f)
+		: CalcPixelSize(1.0f);
+
+	glm::vec2 pixelPos = anchorPos - pixelSize * m_alignment;
+	m_transform.position = pixelPos;
+	m_transform.scale = pixelSize;
 }
 
 void EText::CleanupSurface(SDL_Surface* surface)
@@ -193,12 +227,16 @@ void EText::SetFontColor(SDL_Color color)
 void EText::UpdateFont()
 {
 	if (m_path.empty()) return;
+	auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+	if (!window) return;
+
+	int newSize = (int)(m_defaultFontSize * window->GetSlateUnit());
+	if (newSize != m_fontSize) {
+		m_fontSize = newSize;
+		CleanupFont();
+	}
 
 	// Load new texture
-	LoadTexture(m_fileName, m_path, m_repeat, m_linear);
-
-	// Adjust scale
-	if (m_transform.scale != glm::vec2(0.0f)) {
-		SetScaleToTextureSize();
-	}
+	LoadTexture(m_path, m_repeat, m_linear);
+	Super::UpdateTransform();
 }
