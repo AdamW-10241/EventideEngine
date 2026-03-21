@@ -76,19 +76,37 @@ void Player::OnStart()
 		return;
 	}
 
-	// Add crosshair
-	if (auto crosshair = hud->AddScreenObject<EScreenObject>().lock()) {
-		if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
-			// Add sprite
-			ESAddSpriteConfig config;
-			config.path = "Sprites/Crosshairs/crosshair009.png";
-			config.doScale = false;
-			config.sizeInUnits = { 40.0f, 40.0f };
-			crosshair->AddSprite(config);
+	// Create Health HUD text
+	if (auto healthObj = hud->AddScreenObject<EScreenObject>(1).lock()) {
+		// Add text
+		ESAddTextConfig config;
+		config.path = FONT_PRESS_START;
+		config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		config.anchor = { 0.08f, 0.1f };
+		config.alignment = { 0.0f, 0.0f };
+		healthObj->AddSprite(config);
 
-			// Add to player
-			AddCrosshair(crosshair);
-		}
+		// Add text binding for tick
+		auto weakRef = GetWeakRef<Player>();
+		healthObj->AddTextBindingTick([weakRef] {
+			// Set text
+			if (auto player = weakRef.lock()) {
+				int healthPercent = (int)ceil(player->GetHealthRatio() * 100.0f);
+				return EString("HP - " + toEString(healthPercent) + "%");
+			}
+			return EString("");
+		});
+	}
+
+	// Add crosshair
+	if (auto crosshair = hud->AddScreenObject<EScreenObject>(1).lock()) {
+		// Add sprite
+		ESAddSpriteConfig config;
+		config.path = "Sprites/Crosshairs/crosshair009.png";
+		config.doScale = false;
+		config.sizeInUnits = { 40.0f, 40.0f };
+		crosshair->AddSprite(config);
+		m_crosshair = crosshair;
 	}
 }
 
@@ -150,11 +168,6 @@ void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 			if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
 				soundManager->PlaySound(EE_SOUND_HIT_PLAYER);
 			}
-
-			// Debug HIT notif
-			//EString text = "Player Hit!";
-			//glm::vec4 color = { 1.0f, 0.0f, 0.0f, 1.0f };
-			//EGameEngine::GetGameEngine()->AddTextNotif(text, color);
 		}
 	}
 }
@@ -205,6 +218,45 @@ void Player::OnPostTick(float deltaTime)
 
 	// Store old position (old for next loop)
 	m_oldPosition = GetTransform().position;
+}
+
+void Player::OnTakeDamage(float damage)
+{
+	// Get HUD
+	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
+	if (!hud) {
+		EDebug::Log("Game HUD could not be locked.\n");
+		return;
+	}
+	
+	// If overlay exists extend lifetime
+	float lifeTime = 0.5f;
+	if (auto hitOverlay = m_hitOverlay.lock()) {
+		hitOverlay->SetLifeTime(lifeTime);
+		return;
+	}
+
+	// Else add overlay
+	if (auto hitOverlay = hud->AddScreenObject<EScreenObject>(0).lock()) {
+		// Set lifetime
+		hitOverlay->SetLifeTime(lifeTime);
+		
+		// Add sprite
+		ESAddSpriteConfig config;
+		config.path = "Sprites/Overlays/Hit.png";
+		config.doFill = true;
+		hitOverlay->AddSprite(config);
+		m_hitOverlay = hitOverlay;
+
+		// Add alpha binding
+		BIND_EVENT_SELF(hitOverlay, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
+			if (auto hitOverlay = TCast<EScreenObject>(obj)) {
+				if (auto sprite = hitOverlay->GetSprite(0).lock()) {
+					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
+				}
+			}
+		});
+	}
 }
 
 void Player::OnDeath()

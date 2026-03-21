@@ -25,7 +25,9 @@ public:
         return {};
     }
 
-	// Run every frame, passes in deltaTime
+protected:
+	virtual void OnStart() override;
+
 	virtual void OnTick(float deltaTime) override;
 
 protected:

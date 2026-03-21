@@ -139,6 +139,12 @@ bool EText::LoadTexture(const EString& path, bool repeat, bool linear)
 
 void EText::UpdateTransform(glm::vec2 windowSize)
 {
+	if (m_doFill) {
+		m_transform.position = { 0.0f, 0.0f };
+		m_transform.scale = windowSize;
+		return;
+	}
+	
 	float slateUnit = windowSize.y / SLATE_UNIT_SCALAR;
 
 	// Only scale font size if m_doScale is true
@@ -154,12 +160,11 @@ void EText::UpdateTransform(glm::vec2 windowSize)
 
 	glm::vec2 flippedAnchor = { m_anchor.x, 1.0f - m_anchor.y };
 	glm::vec2 anchorPos = flippedAnchor * windowSize;
-
 	glm::vec2 pixelSize = m_sizeInUnits != glm::vec2(0.0f)
 		? CalcPixelSize(m_doScale ? slateUnit : 1.0f)
 		: CalcPixelSize(1.0f);
-
 	glm::vec2 pixelPos = anchorPos - pixelSize * m_alignment;
+
 	m_transform.position = pixelPos;
 	m_transform.scale = pixelSize;
 }

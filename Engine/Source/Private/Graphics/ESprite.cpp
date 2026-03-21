@@ -105,9 +105,14 @@ void ESprite::Render(const TShared<EShaderProgram>& shader, ESTransform2D& trans
 
 void ESprite::UpdateTransform(glm::vec2 windowSize)
 {
+    if (m_doFill) {
+        m_transform.position = { 0.0f, 0.0f };
+        m_transform.scale = windowSize;
+        return;
+    }
+    
     float slateUnit = windowSize.y / SLATE_UNIT_SCALAR;
     glm::vec2 pixelSize = m_doScale ? CalcPixelSize(slateUnit) : CalcPixelSize(1.0f);
-    
     glm::vec2 anchorPos = m_anchor * windowSize;
     glm::vec2 pixelPos = anchorPos - pixelSize * m_alignment;
 

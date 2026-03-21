@@ -130,7 +130,6 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		// Toggle cursor visibility
 		if (key == SDL_SCANCODE_PERIOD) {
 			m_input->ShowCursor(m_input->IsCursorHidden());
-
 			m_inputMode = !m_input->IsCursorHidden();
 		}
 		// Toggle camera vertical status
@@ -302,13 +301,17 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 		}
 	});
 
-	m_input->OnMousePressed->Bind([this](const EUi8& button) {
+	m_input->OnMousePressed->Bind([this, m_input](const EUi8& button) {
 		if (!m_inputMode) {
 			if (button == SDL_BUTTON_RIGHT) {
 				m_canZoom = true;
 			}
 			if (button == SDL_BUTTON_LEFT) {
 				m_canAdjustTextureDepth = true;
+			}
+			if (button == SDL_BUTTON_MIDDLE) {
+				m_input->ShowCursor(m_input->IsCursorHidden());
+				m_inputMode = !m_input->IsCursorHidden();
 			}
 		}
 	});

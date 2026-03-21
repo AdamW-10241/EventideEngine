@@ -13,16 +13,19 @@ struct ESAddSpriteConfigBase {
 	glm::vec2 alignment = glm::vec2(0.5f);   // 0 = top left, 0.5 = center, 1 = bottom right
 	glm::vec2 sizeInUnits = glm::vec2(0.0f); // 0 = use natural size
 	bool doScale = true;
+	bool doFill = false;
 	ESTransform2D transform;
 
-	T& SetPath(EString& _path) { path = _path; return static_cast<T&>(*this); }
-	T& SetRenderOrder(EUi32& _renderOrder) { renderOrder = _renderOrder; return static_cast<T&>(*this); }
-	T& SetRenderColor(glm::vec4& _renderColor) { renderColor = _renderColor; return static_cast<T&>(*this); }
-	T& SetAnchor(glm::vec2& _anchor) { anchor = _anchor; return static_cast<T&>(*this); }
-	T& SetAlignment(glm::vec2& _alignment) { anchor = _alignment; return static_cast<T&>(*this); }
-	T& SetSizeInUnits(glm::vec2& _sizeInUnits) { sizeInUnits = _sizeInUnits; return static_cast<T&>(*this); }
-	T& SetDoScale(bool& _doScale) { doScale = _doScale; return static_cast<T&>(*this); }
-	T& SetTransform(ESTransform2D& _transform) { transform = _transform; return static_cast<T&>(*this); }
+	T& SetPath(EString& _path)					{ path = _path;					return static_cast<T&>(*this); }
+	T& SetRenderOrder(EUi32& _renderOrder)		{ renderOrder = _renderOrder;	return static_cast<T&>(*this); }
+	T& SetRenderColor(glm::vec4& _renderColor)	{ renderColor = _renderColor;	return static_cast<T&>(*this); }
+	T& SetRenderColorAlpha(float _renderAlpha)	{ renderColor.a = _renderAlpha;	return static_cast<T&>(*this); }
+	T& SetAnchor(glm::vec2& _anchor)			{ anchor = _anchor;				return static_cast<T&>(*this); }
+	T& SetAlignment(glm::vec2& _alignment)		{ alignment = _alignment;		return static_cast<T&>(*this); }
+	T& SetSizeInUnits(glm::vec2& _sizeInUnits)	{ sizeInUnits = _sizeInUnits;	return static_cast<T&>(*this); }
+	T& SetDoScale(bool _doScale)				{ doScale = _doScale;			return static_cast<T&>(*this); }
+	T& SetDoFill(bool _doFill)					{ doFill = _doFill;				return static_cast<T&>(*this); }
+	T& SetTransform(ESTransform2D& _transform)	{ transform = _transform;		return static_cast<T&>(*this); }
 };
 
 struct ESAddSpriteConfig : public ESAddSpriteConfigBase<ESAddSpriteConfig> {};
@@ -39,8 +42,9 @@ public:
 		m_alignment = config.alignment;
 		m_sizeInUnits = config.sizeInUnits;
 		m_doScale = config.doScale;
+		m_doFill = config.doFill;
+		m_transform = config.transform;
 		m_positionOffset = glm::vec2(0.0f);
-		SetTransform(config.transform);
 	}
 
 	// Create sprite
@@ -107,5 +111,9 @@ protected:
 
 	glm::vec2 m_renderScale = glm::vec2(1.0f);
 
+	// If the sprite will scale with aspect ratio
 	bool m_doScale;
+
+	// If the sprite will fill the screen entirely
+	bool m_doFill;
 };

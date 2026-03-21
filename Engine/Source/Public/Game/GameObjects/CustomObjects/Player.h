@@ -9,9 +9,6 @@ class Player : public Character {
 public:
 	Player(glm::vec3 spawnLocation);
 
-	// Add a crosshair to the character
-	void AddCrosshair(TShared<EScreenObject> crosshair) { m_crosshair = crosshair; }
-
 protected:
 	virtual void OnStart() override;
 
@@ -23,6 +20,8 @@ protected:
 		const TShared<ESCollision>& otherCol) override;
 
 	virtual void OnPostTick(float deltaTime) override;
+
+	virtual void OnTakeDamage(float damage) override;
 
 	virtual void OnDeath() override;
 
@@ -45,6 +44,7 @@ private:
 	// Store the spotlight attached to the player
 	TShared<ESSpotLight> m_light;
 
-	// Store the crosshair attached to the player
+	// Store the screenObjects attached to the player
 	TWeak<EScreenObject> m_crosshair;
+	TWeak<EScreenObject> m_hitOverlay;
 };

@@ -219,10 +219,6 @@ void EGameEngine::Start()
 	// Register the window inputs
 	m_window->RegisterInput(m_input);
 
-	// Get HUD
-	auto hud = m_gameHUD.lock();
-	if (!hud) { EDebug::Log("Game HUD could not be locked.\n"); }
-
 	// Spawn Skybox
 	CreateObject<Skybox>();
 
@@ -238,31 +234,8 @@ void EGameEngine::Start()
 	// Spawn Player
 	glm::vec3 spawnLocation = { 0.0f, 20.0f, 0.0f };
 	if (auto player = CreateObject<Player>(spawnLocation).lock()) {
-		auto playerWeak = player->GetWeakRef<Player>();
-
 		// Spawn Enemies
 		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
-
-		// Create Health HUD text
-		if (auto healthObj = hud->AddScreenObject<EScreenObject>().lock()) {
-			// Add text
-			ESAddTextConfig config;
-			config.path = FONT_PRESS_START;
-			config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-			config.anchor = { 0.08f, 0.1f };
-			config.alignment = { 0.0f, 0.0f };
-			healthObj->AddSprite(config);
-
-			// Add text binding for tick
-			healthObj->AddTextBindingTick([playerWeak] {
-				// Set text
-				if (auto player = playerWeak.lock()) {
-					int healthPercent = (int)ceil(player->GetHealthRatio() * 100.0f);
-					return EString("HP - " + toEString(healthPercent) + "%");
-				}
-				return EString("");
-			});
-		}
 	}
 
 	// Spawn Grass
@@ -270,67 +243,6 @@ void EGameEngine::Start()
 
 	// Load Coin Model
 	CreateObject<Coin>().lock()->Destroy();
-
-	// Create Points HUD text
-	if (auto pointsObj = hud->AddScreenObject<EScreenObject>().lock()) {
-		// Add text
-		ESAddTextConfig config;
-		config.path = FONT_PRESS_START;
-		config.renderColor = { 1.0f, 1.0f, 0.0f, 1.0f };
-		config.anchor = { 0.08f, 0.15f };
-		config.alignment = { 0.0f, 0.0f };
-		pointsObj->AddSprite(config);
-
-		// Add text binding for tick
-		pointsObj->AddTextBindingTick([] {
-			// Set text
-			return EString("Points - " + toEString(EGameEngine::GetGameEngine()->GetPoints()));
-		});
-	}
-
-	// Create FPS HUD text
-	if (auto fpsObj = hud->AddScreenObject<EScreenObject>().lock()) {
-		// Add text
-		ESAddTextConfig config;
-		config.path = FONT_PRESS_START;
-		config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		config.anchor = { 0.08f, 0.9f };
-		config.alignment = { 0.0f, 0.0f };
-
-		fpsObj->AddSprite(config);
-
-		// Add text binding for tick
-		fpsObj->AddTextBindingTick([] {
-			// Set text
-			return EString("FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime())));
-		});
-	}
-
-	// DEBUG GUI Buttons
-	if (auto buttonObj = hud->AddScreenObject<GUIButton>(1).lock()) {
-		glm::vec2 anchor{ 0.8f, 0.1f };
-		// Add base sprite
-		ESAddSpriteConfig spriteConfig;
-		spriteConfig.path = "Sprites/Button/QuitButton.png";
-		spriteConfig.anchor = anchor;
-		spriteConfig.sizeInUnits = glm::vec2(230.0f, 0.0f);
-		buttonObj->AddSprite(spriteConfig);
-
-		// Add text
-		//ESAddTextConfig textConfig;
-		//textConfig.path = FONT_PRESS_START;
-		//textConfig.anchor = anchor;
-		//textConfig.text = "QUIT";
-		//textConfig.fontSize = 40;
-		//buttonObj->AddSprite(textConfig);
-
-		// Add bindings
-		buttonObj->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
-		buttonObj->AddPressAndReleaseScaling();
-		BIND_EVENT_RAW(buttonObj, OnReleased, []() { 
-			EGameEngine::QuitGame(); 
-		});
-	}
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
