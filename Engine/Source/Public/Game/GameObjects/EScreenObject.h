@@ -15,6 +15,9 @@ public:
     EScreenObject() { m_renderOrder = 0; }
     EScreenObject(EUi32 renderOrder) { m_renderOrder = renderOrder; }
 
+    // Button Lambda bindings
+    std::function<void()> OnUpdateTransform;
+
     template<typename T>
         requires IsSpriteConfig<T>
     TWeak<ESprite> AddSprite(const T& config);

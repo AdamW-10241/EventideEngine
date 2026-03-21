@@ -61,7 +61,21 @@ void GUIHUD::OnStart()
 		buttonObj->AddPressAndReleaseScaling();
 		BIND_EVENT_RAW(buttonObj, OnReleased, []() {
 			EGameEngine::QuitGame();
-			});
+		});
+	}
+
+	// Points text
+	if (auto pausedObj = AddScreenObject<EScreenObject>(1).lock()) {
+		// Add text
+		ESAddTextConfig config;
+		config.text = "PAUSED";
+		config.fontSize = 50;
+		config.anchor = { 0.5f, 0.4f };
+		pausedObj->AddSprite(config);
+		BIND_EVENT_SELF(pausedObj, OnUpdateTransform, [](const TShared<EScreenObject>& obj) {
+			float alpha = (EGameEngine::GetGameEngine()->GetGameState() == EEGameState::PAUSED) ? 1.0f : 0.0f;
+			obj->SetSpritesRenderColors({1.0f, 1.0f, 1.0f, alpha });
+		});
 	}
 }
 
@@ -84,6 +98,7 @@ void GUIHUD::OnTick(float deltaTime)
                     spriteRef->UpdateTransform(windowSize);
                 }
             }
+			if (objRef->OnUpdateTransform) objRef->OnUpdateTransform();
         }
     }
 }

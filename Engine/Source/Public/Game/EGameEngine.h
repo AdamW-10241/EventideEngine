@@ -17,22 +17,21 @@ class EObject;
 class EWorldObject;
 class GUIHUD;
 
-enum EGameState {
-	NONE,
+enum EEGameState {
 	GAME,
+	PAUSED,
 	MENU,
-	PAUSE
 };
 
-struct EGridCell {
+struct ESGridCell {
 	int x, y;
-	bool operator==(const EGridCell& other) const {
+	bool operator==(const ESGridCell& other) const {
 		return x == other.x && y == other.y;
 	}
 };
 
-struct EGridCellHash {
-	size_t operator()(const EGridCell& cell) const {
+struct ESGridCellHash {
+	size_t operator()(const ESGridCell& cell) const {
 		return std::hash<int>()(cell.x) ^ (std::hash<int>()(cell.y) << 16);
 	}
 };
@@ -115,6 +114,12 @@ public:
 
 	// Get game HUD
 	TWeak<GUIHUD> GetGameHUD() { return m_gameHUD; }
+	
+	// Get game state
+	EEGameState GetGameState() const { return m_gameState; }
+
+	// Set game state
+	void SetGameState(EEGameState gameState) { m_gameState = gameState; }
 
 	// Find an object of type T from the object stack
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EObject, T>>>
@@ -183,14 +188,17 @@ private:
 	void PostLoop();
 
 	// Collision processing
-	EGridCell GetCell(const glm::vec3& position) const { 
+	ESGridCell GetCell(const glm::vec3& position) const { 
 		return { (int)floor(position.x / m_cellSize), (int)floor(position.z / m_cellSize) };
 	}
 
-	TArray<EGridCell> GetOccupiedCells(const TShared<EWorldObject>& wo) const;
+	// Get cells occupied by world object
+	TArray<ESGridCell> GetOccupiedCells(const TShared<EWorldObject>& wo) const;
 
+	// Rebuild spatial grid
 	void RebuildSpatialGrid();
 
+	// Test object collisions
 	void TestCollisions();
 
 private:
@@ -230,12 +238,12 @@ private:
 	double m_timeToLoad;
 
 	// Store if game paused
-	EGameState m_gameState;
+	EEGameState m_gameState;
 
 	// Store the games points
 	int m_points;
 
 	// Collision grid cell values
 	float m_cellSize = 40.0f;
-	std::unordered_map<EGridCell, TArray<TShared<EWorldObject>>, EGridCellHash> m_spatialGrid;
+	std::unordered_map<ESGridCell, TArray<TShared<EWorldObject>>, ESGridCellHash> m_spatialGrid;
 };

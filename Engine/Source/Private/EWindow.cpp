@@ -1,9 +1,9 @@
 #include "EWindow.h"
+#include "Game/EGameEngine.h"
 #include "Graphics/EGraphicsEngine.h"
 #include "Debug/EDebug.h"
 #include "Listeners/EInput.h"
 #include "Graphics/ESCamera.h"
-#include "Game/EGameEngine.h"
 #include "Graphics/EShaderProgram.h"
 
 // External Libs
@@ -14,11 +14,9 @@ EWindow::EWindow()
 {
 	m_sdlWindow = nullptr;
 	m_shouldClose = false;
-	m_cameraDirection = glm::vec3(0.0f);
 	m_cameraRotation = glm::vec3(0.0f);
 
 	m_canZoom = false;
-	m_inputMode = false;
 	m_doubleCameraSpeed = false;
 	m_randomlyChangeBrightness = false;
 
@@ -92,67 +90,18 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 	m_input->ShowCursor(false);
 
 	m_input->OnKeyPressed->Bind([this, m_input](const SDL_Scancode& key) {
-		// Set background color to default
-		if (key == SDL_SCANCODE_1) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_DEFAULT);
-		}
-		// Set background color to red
-		if (key == SDL_SCANCODE_2) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_RED);
-		}
-		// Set background color to green
-		if (key == SDL_SCANCODE_3) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_GREEN);
-		}
-		// Set background color to blue
-		if (key == SDL_SCANCODE_4) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_BLUE);
-		}
-		// Set background color to white
-		if (key == SDL_SCANCODE_5) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_WHITE);
-		}
-		// Set background color to black
-		if (key == SDL_SCANCODE_6) {
-			if (m_graphicsEngine)
-				m_graphicsEngine->SetBackgroundColor(BC_BLACK);
-		}
-
-		// Quick exit button for debug
-		if (key == SDL_SCANCODE_ESCAPE) {
-			CloseWindow();
-		}
-		// Toggle cursor visibility
+		// Toggle pause
 		if (key == SDL_SCANCODE_PERIOD) {
 			m_input->ShowCursor(m_input->IsCursorHidden());
-			m_inputMode = !m_input->IsCursorHidden();
-		}
-		// Toggle camera vertical status
-		if (key == SDL_SCANCODE_COMMA) {
-			// Get and toggle the status
-			bool& status = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()->GetVerticalMovementStatus();
-			status = !status;
-
-			// Debug logs
-			if (status) {
-				EDebug::Log("Can move vertically.");
+			if (m_input->IsCursorHidden()) {
+				EGameEngine::GetGameEngine()->SetGameState(EEGameState::GAME);
 			}
 			else {
-				EDebug::Log("Can no longer move vertically.");
+				EGameEngine::GetGameEngine()->SetGameState(EEGameState::PAUSED);
 			}
-		}
-		// Double camera speed
-		if (key == SDL_SCANCODE_LSHIFT) {
-			m_doubleCameraSpeed = true;
 		}
 		// Toggle fullscreen
 		if (key == SDL_SCANCODE_TAB) {
-			// Get window sizes
 			auto bounds = GetDisplayBounds(); // Display Size
 			glm::vec2 defaultSize = GetDefaultSize(); // Default Size
 			glm::vec2 currentSize = GetCurrentSize(); // Current Size
@@ -163,62 +112,42 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 				position -= (defaultSize / 2.0f);
 				SDL_SetWindowPosition(m_sdlWindow, position.x, position.y);
 				m_params.fullscreen = false;
-			}	
+			}
 			else {
 				SDL_SetWindowSize(m_sdlWindow, bounds.w, bounds.h);
 				SDL_SetWindowPosition(m_sdlWindow, 0, 0);
 				m_params.fullscreen = true;
 			}
 		}
+		// Quick exit button for debug
+		if (key == SDL_SCANCODE_ESCAPE) {
+			CloseWindow();
+		}
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+
+		// Toggle camera vertical status
+		if (key == SDL_SCANCODE_COMMA) {
+			// Get and toggle the status
+			bool& status = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()->GetVerticalMovementStatus();
+			status = !status;
+
+			// Debug logs
+			if (status) { EDebug::Log("Can move vertically."); }
+			else { EDebug::Log("Can no longer move vertically."); }
+		}
+		// Double camera speed
+		if (key == SDL_SCANCODE_LSHIFT) {
+			m_doubleCameraSpeed = true;
+		}
 		// Set flag to randomly change brightness
 		if (key == SDL_SCANCODE_LCTRL) {
 			m_randomlyChangeBrightness = true;
 		}
-
-		// Rotate camera up
-		if (key == SDL_SCANCODE_UP) {
-			m_cameraRotation.x += -1.0f;
-		}
-		// Rotate camera down
-		if (key == SDL_SCANCODE_DOWN) {
-			m_cameraRotation.x += 1.0f;
-		}
-		// Rotate camera left
-		if (key == SDL_SCANCODE_RIGHT) {
-			m_cameraRotation.y += -1.0f;
-		}
-		// Rotate camera right
-		if (key == SDL_SCANCODE_LEFT) {
-			m_cameraRotation.y += 1.0f;
-		}
-
-		// Move forward
-		if (key == SDL_SCANCODE_W) {
-			m_cameraDirection.z += 1.0f;
-		}
-		// Move backward
-		if (key == SDL_SCANCODE_S) {
-			m_cameraDirection.z += -1.0f;
-		}
-		// Move left
-		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += -1.0f;
-		}
-		// Move right
-		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += 1.0f;
-		}
-		// Move up
-		if (key == SDL_SCANCODE_Q) {
-			m_cameraDirection.y += -1.0f;
-		}
-		// Move down
-		if (key == SDL_SCANCODE_E) {
-			m_cameraDirection.y += 1.0f;
-		}
 	});
 
-	m_input->OnKeyReleased->Bind([this](const SDL_Scancode& key) {
+	m_input->OnKeyReleased->Bind([this, m_input](const SDL_Scancode& key) {
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+
 		// Double camera speed
 		if (key == SDL_SCANCODE_LSHIFT) {
 			m_doubleCameraSpeed = false;
@@ -233,119 +162,94 @@ void EWindow::RegisterInput(const TShared<EInput>& m_input)
 			// Reset to default 1.0f
 			EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetShader().lock()->SetBrightness(1.0f);
 		}
-		
-		// Rotate camera up
-		if (key == SDL_SCANCODE_UP) {
-			m_cameraRotation.x += 1.0f;
-		}
-		// Rotate camera down
-		if (key == SDL_SCANCODE_DOWN) {
-			m_cameraRotation.x += -1.0f;
-		}
-		// Rotate camera left
-		if (key == SDL_SCANCODE_RIGHT) {
-			m_cameraRotation.y += 1.0f;
-		}
-		// Rotate camera right
-		if (key == SDL_SCANCODE_LEFT) {
-			m_cameraRotation.y += -1.0f;
-		}
-
-		// Move forward
-		if (key == SDL_SCANCODE_W) {
-			m_cameraDirection.z += -1.0f;
-		}
-		// Move backward
-		if (key == SDL_SCANCODE_S) {
-			m_cameraDirection.z += 1.0f;
-		}
-		// Move left
-		if (key == SDL_SCANCODE_A) {
-			m_cameraDirection.x += 1.0f;
-		}
-		// Move right
-		if (key == SDL_SCANCODE_D) {
-			m_cameraDirection.x += -1.0f;
-		}
-		// Move up
-		if (key == SDL_SCANCODE_Q) {
-			m_cameraDirection.y += 1.0f;
-		}
-		// Move down
-		if (key == SDL_SCANCODE_E) {
-			m_cameraDirection.y += -1.0f;
-		}
 	});
 
 	// On mouse move rotate the camera
-	m_input->OnMouseMoved->Bind([this](const float& x, const float& y,
+	m_input->OnMouseMoved->Bind([this, m_input](const float& x, const float& y,
 		const float& xrel, const float& yrel) {
+			if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+
 			m_cameraRotation.y += -xrel;
 			m_cameraRotation.x += yrel;
 	});
 
 	// On mouse scroll
-	m_input->OnMouseScrolled->Bind([this](const float& delta) {
-		if (!m_inputMode) {
-			// Zoom camera
-			if (m_canZoom) {
-				if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-					camRef->Zoom(delta);
-				}
+	m_input->OnMouseScrolled->Bind([this, m_input](const float& delta) {
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+
+		// Zoom camera
+		if (m_canZoom) {
+			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+				camRef->Zoom(delta);
 			}
-			// Adjust the texture depth
-			if (m_canAdjustTextureDepth) {
-				if (m_graphicsEngine)
-					m_graphicsEngine->AdjustTextureDepth(delta * 0.05f);
-			}
+		}
+		// Adjust the texture depth
+		if (m_canAdjustTextureDepth) {
+			if (m_graphicsEngine)
+				m_graphicsEngine->AdjustTextureDepth(delta * 0.05f);
 		}
 	});
 
 	m_input->OnMousePressed->Bind([this, m_input](const EUi8& button) {
-		if (!m_inputMode) {
-			if (button == SDL_BUTTON_RIGHT) {
-				m_canZoom = true;
+		// Toggle pause
+		if (button == SDL_BUTTON_MIDDLE) {
+			m_input->ShowCursor(m_input->IsCursorHidden());
+			if (m_input->IsCursorHidden()) {
+				EGameEngine::GetGameEngine()->SetGameState(EEGameState::GAME);
 			}
-			if (button == SDL_BUTTON_LEFT) {
-				m_canAdjustTextureDepth = true;
+			else {
+				EGameEngine::GetGameEngine()->SetGameState(EEGameState::PAUSED);
 			}
-			if (button == SDL_BUTTON_MIDDLE) {
-				m_input->ShowCursor(m_input->IsCursorHidden());
-				m_inputMode = !m_input->IsCursorHidden();
-			}
+		}
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+		
+		if (button == SDL_BUTTON_RIGHT) {
+			m_canZoom = true;
+		}
+		if (button == SDL_BUTTON_LEFT) {
+			m_canAdjustTextureDepth = true;
 		}
 	});
 
-	m_input->OnMouseReleased->Bind([this](const EUi8& button) {
-		if (!m_inputMode) {
-			if (button == SDL_BUTTON_RIGHT) {
-				m_canZoom = false;
-				if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
-					camRef->ResetZoom();
-				}
+	m_input->OnMouseReleased->Bind([this, m_input](const EUi8& button) {
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+
+		if (button == SDL_BUTTON_RIGHT) {
+			m_canZoom = false;
+			if (const auto& camRef = m_graphicsEngine->GetCamera().lock()) {
+				camRef->ResetZoom();
 			}
-			if (button == SDL_BUTTON_LEFT) {
-				m_canAdjustTextureDepth = false;
-				if (m_graphicsEngine)
-					m_graphicsEngine->ResetTextureDepth();
-			}
+		}
+		if (button == SDL_BUTTON_LEFT) {
+			m_canAdjustTextureDepth = false;
+			if (m_graphicsEngine)
+				m_graphicsEngine->ResetTextureDepth();
 		}
 	});
 }
 
 void EWindow::MoveCamera()
 {
-	// Test if there is a camera
+	if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
+	
+	// Get live inputs
+	const Uint8* keyState = SDL_GetKeyboardState(nullptr);
+	glm::vec3 cameraDirection = glm::vec3(0.0f);
+	if (keyState[SDL_SCANCODE_W]) cameraDirection.z += 1.0f;
+	if (keyState[SDL_SCANCODE_S]) cameraDirection.z -= 1.0f;
+	if (keyState[SDL_SCANCODE_A]) cameraDirection.x -= 1.0f;
+	if (keyState[SDL_SCANCODE_D]) cameraDirection.x += 1.0f;
+	if (keyState[SDL_SCANCODE_Q]) cameraDirection.y -= 1.0f;
+	if (keyState[SDL_SCANCODE_E]) cameraDirection.y += 1.0f;
+
+	// Get camera
 	if (const auto& camRef = GetGraphicsEngine()->GetCamera().lock()) {
-		if (!m_inputMode) {
-			// Translate the camera based on input direction
-			camRef->Translate(m_cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2.0f : 1.0f));
-			// Rotate the camera based on input direction
-			camRef->Rotate(m_cameraRotation);
-			// Reset rotations
-			m_cameraRotation.x = 0.0f;
-			m_cameraRotation.y = 0.0f;
-		}
+		// Move camera
+		camRef->Translate(cameraDirection, glm::vec3(m_doubleCameraSpeed ? 2.0f : 1.0f));
+		camRef->Rotate(m_cameraRotation);
+
+		// Reset movement
+		m_cameraRotation = glm::vec3(0.0f);
 	}
 }
 

@@ -66,9 +66,6 @@ public:
 	// Render the graphics engine to the window
 	void Render();
 
-	// Get the input mode
-	bool GetInputMode() const { return m_inputMode; }
-
 	// Get a weak reference to the graphics engine
 	TUnique<EGraphicsEngine>& GetGraphicsEngine() { return m_graphicsEngine; }
 
@@ -120,17 +117,11 @@ private:
 	// Store the graphics engine
 	TUnique<EGraphicsEngine> m_graphicsEngine;
 
-	// Direction to move the camera
-	glm::vec3 m_cameraDirection;
-
 	// Amount to rotate the camera
 	glm::vec3 m_cameraRotation;
 
 	// Can zoom
 	bool m_canZoom;
-
-	// Is the user in input mode
-	bool m_inputMode;
 
 	// Double camera speed
 	bool m_doubleCameraSpeed;

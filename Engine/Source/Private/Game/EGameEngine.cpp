@@ -139,7 +139,7 @@ EGameEngine::EGameEngine()
 	m_frameRate = m_defaultFrameRate;
 
 	m_timeToLoad = 0.0f;
-	m_gameState = EGameState::NONE;
+	m_gameState = EEGameState::GAME;
 
 	m_points = 0;
 
@@ -246,9 +246,6 @@ void EGameEngine::Start()
 
 	// Get the time to load
 	m_timeToLoad = static_cast<double>(SDL_GetTicks64());
-
-	// Set game state
-	m_gameState = EGameState::GAME;
 }
 
 void EGameEngine::GameLoop()
@@ -276,11 +273,7 @@ void EGameEngine::GameLoop()
 		// We must detect input, react with logic and then render based on logic
 		PreLoop();
 		ProcessInput();
-
-		// Process all engine tick functions
-		if (m_gameState == EGameState::GAME)
-			Tick();
-
+		Tick();
 		Render();
 		PostLoop();
 	}
@@ -304,21 +297,22 @@ void EGameEngine::Cleanup()
 
 void EGameEngine::Tick()
 {
-	// Randomly change brightness if flag set (LEFT CTRL)
-	if (m_window->m_randomlyChangeBrightness) {
-		float randBrightness = GetRandomFloatRange(0.5f, 1.5f);
-		m_window->GetGraphicsEngine()->GetShader().lock()->SetBrightness(randBrightness);
-	}
-	
-	// Move Camera
-	// Player is an addon to camera currently - this movement should be made part of player?
-	if (m_window)
-		m_window->MoveCamera();
-
 	// Tick all objects first
 	for (const auto& obj : m_objectStack) {
-		obj->Tick(DeltaTimeF());
+		if (m_gameState == EEGameState::GAME) {
+			obj->Tick(DeltaTimeF());
+		}
+		else if (auto hud = TCast<GUIHUD>(obj)) {
+			hud->Tick(DeltaTimeF());
+		}
 	}
+	
+	// Skip rest if paused
+	if (m_gameState != EEGameState::GAME) return;
+
+	// Move Camera
+	if (m_window)
+		m_window->MoveCamera();
 
 	// Build grid for testing collisions after ticking for updated positions
 	RebuildSpatialGrid();
@@ -425,7 +419,7 @@ void EGameEngine::TestCollisions()
 		const auto& wo = TCast<EWorldObject>(obj);
 		if (!wo || !wo->HasCollisions()) continue;
 
-		EGridCell center = GetCell(wo->GetTransform().position);
+		ESGridCell center = GetCell(wo->GetTransform().position);
 
 		// Iterate cell and neighbours
 		for (int dx = -1; dx <= 1; dx++) {
@@ -453,17 +447,17 @@ void EGameEngine::TestCollisions()
 	}
 }
 
-TArray<EGridCell> EGameEngine::GetOccupiedCells(const TShared<EWorldObject>& wo) const
+TArray<ESGridCell> EGameEngine::GetOccupiedCells(const TShared<EWorldObject>& wo) const
 {
-	TArray<EGridCell> cells;
+	TArray<ESGridCell> cells;
 	
 	// Iterate collisions
 	auto collisions = wo->GetCollisions();
 	for (auto col : collisions) {
 		if (const auto& colRef = col.lock()) {
 			// Compute min/max cell extents
-			EGridCell minCell = GetCell(col.lock()->box.GetMin());
-			EGridCell maxCell = GetCell(col.lock()->box.GetMax());
+			ESGridCell minCell = GetCell(col.lock()->box.GetMin());
+			ESGridCell maxCell = GetCell(col.lock()->box.GetMax());
 
 			// Add overlapping cells
 			for (int x = minCell.x; x <= maxCell.x; x++) {

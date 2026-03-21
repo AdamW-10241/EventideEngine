@@ -5,12 +5,12 @@ class GUIButton : public EScreenObject {
 public:
 	using EScreenObject::EScreenObject;
 
-	float GetTimeHeld() const { return m_timeHeld; }
-
 	// Button Lambda bindings
 	std::function<void()> OnPressed;
 	std::function<void(float, float)> OnHeld;
 	std::function<void()> OnReleased;
+
+	float GetTimeHeld() const { return m_timeHeld; }
 
 	// Set pressed colors
 	void SetSpritePressedColor(const glm::vec4 pressed, std::optional<glm::vec4> released = std::nullopt) {

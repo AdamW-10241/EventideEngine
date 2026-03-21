@@ -119,6 +119,8 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = true;
+
+			if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
 			if (auto crosshair = m_crosshair.lock()) crosshair->SetDoRender(false);
 		}
 	});
@@ -130,6 +132,8 @@ void Player::OnRegisterInputs(const TShared<EInput>& m_input)
 		}
 		if (button == SDL_BUTTON_RIGHT) {
 			m_rightMouseHeld = false;
+
+			if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::GAME) return;
 			if (auto crosshair = m_crosshair.lock()) crosshair->SetDoRender(true);
 		}
 	});
