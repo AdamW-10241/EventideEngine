@@ -5,6 +5,7 @@
 #include <GLM/vec3.hpp>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 // Internal Libs
 #include "EngineTypes.h"
@@ -18,36 +19,48 @@ enum EELogType : uint8_t {
 
 class EDebug {
 public:
-	// Log a message to the console based on log type
-	static void Log(const std::string& msg, const EELogType& logType = LT_LOG) {
-		std::cout << msg << std::endl;
-	}
+    template<typename... Args>
+    static void Log(const EELogType logType, Args&&... args) {
+        std::ostringstream oss;
+        (oss << ... << Format(args)); // Formats each arg and passes into stream
 
-	// Log a message to the console based on log type as a uInt
-	static void Log(const unsigned int& uIntMsg, const EELogType& logType = LT_LOG) {
-		std::cout << std::to_string(uIntMsg) << std::endl;
-	}
+        switch (logType) {
+            case LT_WARNING: std::cout << "[WARNING] "; break;
+            case LT_ERROR:   std::cerr << "[ERROR] ";   break;
+            case LT_SUCCESS: std::cout << "[SUCCESS] "; break;
+            default:         std::cout << "[LOG] ";     break;
+        }
 
-	// Log a message to the console based on log type as an int
-	static void Log(const int& intMsg, const EELogType& logType = LT_LOG) {
-		std::cout << std::to_string(intMsg) << std::endl;
-	}
-	
-	// Log a message to the console based on log type as a float
-	static void Log(const float& floatMsg, const EELogType& logType = LT_LOG) {
-		std::cout << std::to_string(floatMsg) << std::endl;
-	}
+        auto& stream = (logType == LT_ERROR) ? std::cerr : std::cout;
+        stream << oss.str() << "\n";
+    }
 
-	// Log a message to the console based on log type as a vec2
-	static void Log(const glm::vec2& vec2Msg, const EELogType& logType = LT_LOG) {
-		std::cout << std::to_string(vec2Msg.x) << ", "
-				  << std::to_string(vec2Msg.y) << std::endl;
-	}
+    template<typename... Args>
+    static void Log(Args&&... args) {
+        Log(LT_LOG, std::forward<Args>(args)...);
+    }
 
-	// Log a message to the console based on log type as a vec3
-	static void Log(const glm::vec3& vec3Msg, const EELogType& logType = LT_LOG) {
-		std::cout << std::to_string(vec3Msg.x) << ", "
-				  << std::to_string(vec3Msg.y) << ", " 
-			      << std::to_string(vec3Msg.z) << std::endl;
-	}
+private:
+    static std::string Format(const glm::vec2& v) {
+        return "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ")";
+    }
+    static std::string Format(const glm::vec3& v) {
+        return "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
+    }
+    template<typename T>
+    static std::string Format(const T& val) {
+        if constexpr (std::is_arithmetic_v<T>) {
+            return std::to_string(val);
+        }
+        else if constexpr (std::is_convertible_v<T, std::string_view>) {
+            // Handles string types
+            return std::string(std::string_view(val));
+        }
+        else {
+            // Pass as string stream
+            std::ostringstream tmp;
+            tmp << val;
+            return tmp.str();
+        }
+    }
 };

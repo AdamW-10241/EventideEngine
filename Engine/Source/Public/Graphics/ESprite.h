@@ -96,6 +96,34 @@ public:
 	// Get render scale
 	glm::vec2& GetRenderScale() { return m_renderScale; }
 
+	// Set anchor based on screen position
+	void SetAnchorScreenPosition(glm::vec2 screenPosition) { 
+		m_anchor = GetScreenPositionAsAnchor(screenPosition);
+		EDebug::Log("New Anchor: ", m_anchor);
+	}
+
+	// Get screen position as normalised screen anchor for placement
+	glm::vec2 GetScreenPositionAsAnchor(glm::vec2 screenPosition);
+
+	// Get array of sprite corner anchors
+	TArray<glm::vec2> GetSpriteCornerAnchors();
+
+	// Get array of sprite edge anchors
+	TArray<glm::vec2> GetSpriteEdgeAnchors();
+
+	// Set new anchor
+	void SetAnchor(glm::vec2 anchor) { m_anchor = anchor; }
+
+	// Get anchor
+	glm::vec2 GetAnchor() const { return m_anchor; }
+
+	// Set size in units
+	void SetSizeInUnits(glm::vec2 sizeInUnits) { m_sizeInUnits = sizeInUnits; }
+	glm::vec2& GetSizeInUnits() { return m_sizeInUnits; }
+
+	// Get visual position
+	virtual glm::vec2 GetVisualPosition() const { return m_transform.position; }
+
 protected:
 	ESTransform2D m_transform;
 

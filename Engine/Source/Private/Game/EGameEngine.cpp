@@ -101,7 +101,7 @@ void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
 			if (auto screenObj = TCast<EScreenObject>(obj)) {
 				if (auto sprite = screenObj->GetSprite(0).lock()) {
 					if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
-						sprite->GetPositionOffset().y += (SLATE_UNIT_SCALAR / 15.0f) * window->GetSlateUnit() * deltaTime;
+						sprite->GetPositionOffset().y += (SLATE_UNIT_SCALAR / 15.0f) * window->GetSlateUnitY() * deltaTime;
 					}
 					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
 				}
@@ -301,6 +301,9 @@ void EGameEngine::Tick()
 	for (const auto& obj : m_objectStack) {
 		if (m_gameState == EEGameState::GAME) {
 			obj->Tick(DeltaTimeF());
+		}
+		else if (auto btn = TCast<GUIButton>(obj)) {
+			btn->Tick(DeltaTimeF());
 		}
 		else if (auto hud = TCast<GUIHUD>(obj)) {
 			hud->Tick(DeltaTimeF());

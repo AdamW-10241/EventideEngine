@@ -54,7 +54,9 @@ public:
 	void SetFontColor(SDL_Color color);
 
 	SDL_Color* GetFontColor() const { return m_textColor; }
-	
+
+	// Get visual position
+	virtual glm::vec2 GetVisualPosition() const override;
 
 protected:
 	void UpdateFont();

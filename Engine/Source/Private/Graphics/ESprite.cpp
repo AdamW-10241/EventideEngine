@@ -136,6 +136,51 @@ glm::vec2 ESprite::CalcPixelSize(float slateUnit) const
     };
 }
 
+glm::vec2 ESprite::GetScreenPositionAsAnchor(glm::vec2 screenPosition)
+{
+    auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+    if (!window) {
+        EDebug::Log("Window could not be locked.\n");
+        return glm::vec2(0.0f);
+    }
+    glm::vec2 windowSize = window->GetCurrentSize();
+    float slateUnit = window->GetSlateUnitY();
+
+    // Use CalcPixelSize to get the true pixel size
+    glm::vec2 pixelSize = CalcPixelSize(slateUnit);
+    return (screenPosition + pixelSize * m_alignment) / windowSize;
+}
+
+TArray<glm::vec2> ESprite::GetSpriteCornerAnchors()
+{
+    auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+    if (!window) return {};
+    float slateUnit = window->GetSlateUnitY();
+    glm::vec2 normalisedSize = CalcPixelSize(slateUnit) / window->GetCurrentSize();
+
+    TArray<glm::vec2> cornerAnchors;
+    cornerAnchors.push_back({ m_anchor.x - normalisedSize.x / 2.0f, m_anchor.y - normalisedSize.y / 2.0f }); // Top Left
+    cornerAnchors.push_back({ m_anchor.x + normalisedSize.x / 2.0f, m_anchor.y - normalisedSize.y / 2.0f }); // Top Right
+    cornerAnchors.push_back({ m_anchor.x - normalisedSize.x / 2.0f, m_anchor.y + normalisedSize.y / 2.0f }); // Bottom Left
+    cornerAnchors.push_back({ m_anchor.x + normalisedSize.x / 2.0f, m_anchor.y + normalisedSize.y / 2.0f }); // Bottom Right
+    return cornerAnchors;
+}
+
+TArray<glm::vec2> ESprite::GetSpriteEdgeAnchors()
+{
+    auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+    if (!window) return {};
+    float slateUnit = window->GetSlateUnitY();
+    glm::vec2 normalisedSize = CalcPixelSize(slateUnit) / window->GetCurrentSize();
+
+    TArray<glm::vec2> cornerAnchors;
+    cornerAnchors.push_back({ m_anchor.x, m_anchor.y - normalisedSize.y / 2.0f }); // Top 
+    cornerAnchors.push_back({ m_anchor.x - normalisedSize.x / 2.0f, m_anchor.y }); // Left
+    cornerAnchors.push_back({ m_anchor.x + normalisedSize.x / 2.0f, m_anchor.y }); // Right
+    cornerAnchors.push_back({ m_anchor.x, m_anchor.y + normalisedSize.y / 2.0f }); // Bottom
+    return cornerAnchors;
+}
+
 void ESprite::UpdateTransform()
 {
     auto window = EGameEngine::GetGameEngine()->GetWindow().lock();

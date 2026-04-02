@@ -95,7 +95,10 @@ public:
 	}
 
 	// Get slate unit
-	float GetSlateUnit() { return GetCurrentSize().y / SLATE_UNIT_SCALAR; }
+	glm::vec2 GetSlateUnits() { return GetCurrentSize() / SLATE_UNIT_SCALAR; }
+
+	float GetSlateUnitX() { return GetSlateUnits().x; }
+	float GetSlateUnitY() { return GetSlateUnits().y; }
 
 	// Get bounds of the display window is in
 	SDL_Rect GetDisplayBounds();

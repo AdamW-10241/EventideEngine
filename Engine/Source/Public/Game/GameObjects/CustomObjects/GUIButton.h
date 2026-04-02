@@ -44,6 +44,18 @@ public:
 		});
 	}
 
+	// Set sprite anchor based on mouse
+	void SetSpriteAnchorMouse(int index = 0);
+
+	// Get if button is held
+	bool GetButtonHeld() const { return m_buttonHeld; }
+
+	// Set if held until released
+	void SetHeldUntilReleased(bool heldUntilReleased = true) { m_heldUntilReleased = heldUntilReleased; }
+
+	// Get grab offset
+	glm::vec2 GetGrabOffset() const { return m_grabOffset; }
+
 protected:
 	virtual void OnRegisterInputs(const TShared<EInput>& m_input) override;
 
@@ -63,11 +75,15 @@ protected:
 	// Store state
 	TWeak<EInput> m_inputWeak;
 
+	TArray<EUi8> m_inputBindings;
+
 	bool m_buttonHeld = false;
 
 	float m_timeHeld = 0.0f;
 
-	TArray<EUi8> m_inputBindings;
+	bool m_heldUntilReleased = false;
+
+	glm::vec2 m_grabOffset = glm::vec2(0.0f);
 
 private:
 	const bool IsMouseOnButton(const TShared<EInput>& input);

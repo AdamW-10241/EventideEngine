@@ -28,14 +28,13 @@ void GUIHUD::OnStart()
 		config.renderColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		config.anchor = { 0.08f, 0.9f };
 		config.alignment = { 0.0f, 0.0f };
-
 		fpsObj->AddSprite(config);
+		fpsObj->AttachDraggableButton(EESpriteButtonSide::BOTTOM);
 
 		// Add text binding for tick
 		fpsObj->AddTextBindingTick([] {
-			// Set text
 			return EString("FPS - " + toEString((int)floor(1 / EGameEngine::GetGameEngine()->DeltaTime())));
-			});
+		});
 	}
 
 	// Quit button
@@ -47,14 +46,6 @@ void GUIHUD::OnStart()
 		spriteConfig.anchor = anchor;
 		spriteConfig.sizeInUnits = glm::vec2(230.0f, 0.0f);
 		buttonObj->AddSprite(spriteConfig);
-
-		// Add text
-		//ESAddTextConfig textConfig;
-		//textConfig.path = FONT_PRESS_START;
-		//textConfig.anchor = anchor;
-		//textConfig.text = "QUIT";
-		//textConfig.fontSize = 40;
-		//buttonObj->AddSprite(textConfig);
 
 		// Add bindings
 		buttonObj->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
@@ -77,6 +68,22 @@ void GUIHUD::OnStart()
 			obj->SetSpritesRenderColors({1.0f, 1.0f, 1.0f, alpha });
 		});
 	}
+
+	// TEST - Scalable sprite
+	if (auto scalableObj = AddScreenObject<GUIButton>(2).lock()) {
+		glm::vec2 anchor{ 0.8f, 0.2f };
+		// Add base sprite
+		ESAddSpriteConfig baseConfig;
+		baseConfig.path = "Sprites/Button/PlayButton.png";
+		baseConfig.anchor = anchor;
+		baseConfig.sizeInUnits = glm::vec2(230.0f, 0.0f);
+		auto baseSpr = scalableObj->AddSprite(baseConfig).lock();
+		if (!baseSpr) return;
+		scalableObj->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+		scalableObj->AddPressAndReleaseScaling();
+		scalableObj->AttachScalingCornerButtons();
+		scalableObj->AttachDraggableButton(EESpriteButtonSide::LEFT);
+	}
 }
 
 void GUIHUD::OnTick(float deltaTime)
@@ -91,13 +98,13 @@ void GUIHUD::OnTick(float deltaTime)
 
     // Iterate screen objects
     for (auto obj : m_screenObjects) {
-        if (auto objRef = obj.lock()) {
-            // Reposition sprites
-            for (auto sprite : objRef->GetSprites()) {
-                if (auto spriteRef = sprite.lock()) {
-                    spriteRef->UpdateTransform(windowSize);
-                }
-            }
+		if (auto objRef = obj.lock()) {
+			// Reposition sprites
+			for (auto sprite : objRef->GetSprites()) {
+				if (auto spriteRef = sprite.lock()) {
+					spriteRef->UpdateTransform(windowSize);
+				}
+			}
 			if (objRef->OnUpdateTransform) objRef->OnUpdateTransform();
         }
     }

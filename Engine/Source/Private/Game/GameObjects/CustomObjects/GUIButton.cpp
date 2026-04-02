@@ -4,6 +4,26 @@
 
 #define Super EScreenObject
 
+void GUIButton::SetSpriteAnchorMouse(int index)
+{
+	auto input = m_inputWeak.lock();
+	if (!input) return;
+
+	// Get mouse position
+	SDL_MouseMotionEvent& mouseLastMotion = input->GetMouseLastMotion(); 
+	glm::vec2 mousePos = glm::vec2(mouseLastMotion.x, mouseLastMotion.y);
+
+	// Set anchor to match mouse screen position
+	auto spr = GetSprite(index).lock();
+	if (!spr) {
+		EDebug::Log("Sprite does not exist at index: " + toEString(index));
+		return;
+	}
+
+	// Subtract grab offset so sprite moves from where it was grabbed
+	spr->SetAnchorScreenPosition(mousePos - m_grabOffset);
+}
+
 void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 {
 	Super::OnRegisterInputs(m_input);
@@ -16,6 +36,14 @@ void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 			// Button pressed
 			m_buttonHeld = true;
 			m_timeHeld = 0.0f;
+
+			// Store offset between mouse and sprite top-left on press
+			SDL_MouseMotionEvent& motion = m_input->GetMouseLastMotion();
+			glm::vec2 mousePos = glm::vec2(motion.x, motion.y);
+			if (auto spr = GetSprite(0).lock()) {
+				m_grabOffset = mousePos - spr->GetTransform().position;
+			}
+
 			OnButtonPressed();
 		}
 	});
@@ -41,12 +69,14 @@ void GUIButton::OnTick(float deltaTime)
 void GUIButton::OnButtonHeld(float deltaTime)
 {
 	// Check still held
-	if (const auto& inputRef = m_inputWeak.lock()) {
-		if (!IsMouseOnButton(inputRef)) {
-			m_buttonHeld = false;
-			m_timeHeld = 0.0f;
-			OnButtonReleased();
-			return;
+	if (!m_heldUntilReleased) {
+		if (const auto& inputRef = m_inputWeak.lock()) {
+			if (!IsMouseOnButton(inputRef)) {
+				m_buttonHeld = false;
+				m_timeHeld = 0.0f;
+				OnButtonReleased();
+				return;
+			}
 		}
 	}
 	

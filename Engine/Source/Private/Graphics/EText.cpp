@@ -229,13 +229,21 @@ void EText::SetFontColor(SDL_Color color)
 	UpdateFont();
 }
 
+glm::vec2 EText::GetVisualPosition() const
+{
+	auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+	if (!window) return m_transform.position;
+	// Flip Y
+	return { m_transform.position.x, window->GetCurrentSize().y - m_transform.position.y };
+}
+
 void EText::UpdateFont()
 {
 	if (m_path.empty()) return;
 	auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
 	if (!window) return;
 
-	int newSize = (int)(m_defaultFontSize * window->GetSlateUnit());
+	int newSize = (int)(m_defaultFontSize * window->GetSlateUnitY());
 	if (newSize != m_fontSize) {
 		m_fontSize = newSize;
 		CleanupFont();

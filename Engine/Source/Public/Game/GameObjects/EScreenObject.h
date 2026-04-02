@@ -5,6 +5,24 @@
 
 #define DEFAULT_FONT_SIZE_MULTI 1.2f
 
+enum EESpriteButtonCorner {
+    TOP_LEFT = 0,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
+    // MAX
+    CORNER_MAX
+};
+
+enum EESpriteButtonSide {
+    TOP = 0,
+    LEFT,
+    RIGHT,
+    BOTTOM,
+    // MAX
+    SIDE_MAX
+};
+
 template<typename T>
 concept IsSpriteConfig = requires(T t) {
     static_cast<ESAddSpriteConfigBase<T>&>(t);
@@ -49,7 +67,7 @@ public:
 
     TWeak<ESprite> GetSprite(const EString& texturePath);
 
-    TWeak<ESprite> GetSprite(const int index) {
+    TWeak<ESprite> GetSprite(const int index = 0) {
         if ((int)m_sprites.size() > index) {
             return m_sprites.at(index);
         }
@@ -74,6 +92,15 @@ public:
     void SetSpritesRenderScales(const float renderScale) { 
         SetSpritesRenderScales(glm::vec2(renderScale));
     }
+
+    // Attach scaling corner buttons to manipulate sprite
+    void AttachScalingCornerButtons(const int spriteIndex = 0);
+
+    // Attach scaling corner button to corner
+    void AttachScalingCornerButton(const EESpriteButtonCorner corner = EESpriteButtonCorner::TOP_LEFT, const int spriteIndex = 0);
+
+    // Attach draggable button to move sprite
+    void AttachDraggableButton(const EESpriteButtonSide sideIndex = EESpriteButtonSide::TOP, const int spriteIndex = 0);
 
 protected:
     TArray<TShared<ESprite>> m_sprites;
