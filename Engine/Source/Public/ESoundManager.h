@@ -7,6 +7,7 @@ enum EESoundType {
     EE_SOUND_HIT,
     EE_SOUND_HIT_PLAYER,
     EE_SOUND_COIN,
+    EE_SOUND_SHOOT,
     // Sound Type Number
     EE_SOUND_NUM
 };
@@ -29,11 +30,9 @@ public:
     void Shutdown();
 
 private:
-    Mix_Chunk* LoadSound(EString path, EESoundType soundType);
+    Mix_Chunk* LoadSound(EESoundType soundType, EString path);
 
-    Mix_Music* LoadMusic(EString path, EEMusicType musicType);
-
-    void PrimeSound(EESoundType soundType, int volume = 0);
+    Mix_Music* LoadMusic(EEMusicType musicType, EString path);
 
 private:
     // Sounds

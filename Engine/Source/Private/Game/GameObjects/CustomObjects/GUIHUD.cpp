@@ -29,7 +29,6 @@ void GUIHUD::OnStart()
 		config.anchor = { 0.08f, 0.9f };
 		config.alignment = { 0.0f, 0.0f };
 		fpsObj->AddSprite(config);
-		fpsObj->AttachDraggableButton(EESpriteButtonSide::BOTTOM);
 
 		// Add text binding for tick
 		fpsObj->AddTextBindingTick([] {
@@ -63,6 +62,7 @@ void GUIHUD::OnStart()
 		config.fontSize = 50;
 		config.anchor = { 0.5f, 0.4f };
 		pausedObj->AddSprite(config);
+
 		BIND_EVENT_SELF(pausedObj, OnUpdateTransform, [](const TShared<EScreenObject>& obj) {
 			float alpha = (EGameEngine::GetGameEngine()->GetGameState() == EEGameState::PAUSED) ? 1.0f : 0.0f;
 			obj->SetSpritesRenderColors({1.0f, 1.0f, 1.0f, alpha });
@@ -81,8 +81,7 @@ void GUIHUD::OnStart()
 		if (!baseSpr) return;
 		scalableObj->SetSpritePressedColor(0, glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
 		scalableObj->AddPressAndReleaseScaling();
-		scalableObj->AttachScalingCornerButtons();
-		scalableObj->AttachDraggableButton(EESpriteButtonSide::LEFT);
+		scalableObj->AttachAllMovementButtons(EESpriteButtonSide::LEFT);
 	}
 }
 
@@ -91,7 +90,7 @@ void GUIHUD::OnTick(float deltaTime)
     // Get window
     auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
     if (!window) {
-        EDebug::Log("Window could not be locked.", LT_ERROR);
+        EDebug::Log(LT_WARNING, "Window could not be locked.");
         return;
     }
     glm::vec2 windowSize = window->GetCurrentSize();

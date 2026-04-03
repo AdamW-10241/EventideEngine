@@ -20,7 +20,7 @@ public:
 		// Validate sprite
 		auto spriteRef = GetSprite(index);
 		if (!spriteRef.lock()) {
-			EDebug::Log("GUIButton - Sprite at index " + toEString(index) + " does not exist.", LT_ERROR);
+			EDebug::Log(LT_ERROR, "GUIButton - Sprite at index " + toEString(index) + " does not exist.");
 			return;
 		}
 

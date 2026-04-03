@@ -16,8 +16,6 @@ ETexture::~ETexture()
     // If ID was generated, delete the texture
     if (m_ID > 0)
         glDeleteTextures(1, &m_ID);
-
-    // EDebug::Log("Texture destroyed: " + m_fileName);
 }
 
 bool ETexture::LoadTexture(const EString& path, bool repeat, bool linear)
@@ -37,19 +35,16 @@ bool ETexture::LoadTexture(const EString& path, bool repeat, bool linear)
         0   // Limit of required amount of channels (0 = no limit)
     );
 
-    // Log channels
-    //EDebug::Log("Texture: " + fileName + " | Channels: " + std::to_string(m_channels));
-
     // Test if the data imported correctly
     if (data == nullptr) {
         EString errorMsg = "Failed to load texture - " + m_path + ": " + stbi_failure_reason();
-        EDebug::Log(errorMsg, LT_ERROR);
+        EDebug::Log(LT_ERROR, errorMsg);
         return false;
     }
 
     // Test the amount of channels
     if (m_channels > 4 || m_channels < 3) {
-        EDebug::Log("Failed to import texture - " + m_path
+        EDebug::Log(LT_ERROR, "Failed to import texture - " + m_path
             + ": Incorrect number of channels, must have 3 or 4 channels");
         return false;
     }
@@ -61,7 +56,7 @@ bool ETexture::LoadTexture(const EString& path, bool repeat, bool linear)
     if (m_ID == 0) {
         EString error = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
         EString errorMsg = "Failed to generate texture ID - " + m_path + ": " + error;
-        EDebug::Log(errorMsg, LT_ERROR);
+        EDebug::Log(LT_ERROR, errorMsg);
         return false;
     }
     
@@ -123,9 +118,6 @@ bool ETexture::LoadTexture(const EString& path, bool repeat, bool linear)
 
     // Clear STBI Image data
     stbi_image_free(data);
-
-    // Log the success of the import
-    // EDebug::Log("Successfully imported texture - " + m_fileName, LT_SUCCESS);
 
     return true;
 }

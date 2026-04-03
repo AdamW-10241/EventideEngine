@@ -144,6 +144,19 @@ void EWorldObject::PlaceOnFloorRandomly(TShared<Floor> floor, float placementSca
     }
 }
 
+void EWorldObject::ApplyRandomPositionOffsetsXYZ(glm::vec3 maxOffsets)
+{
+    GetTransform().position.x += EGameEngine::GetGameEngine()->GetRandomFloatRange(-maxOffsets.x, maxOffsets.x);
+    GetTransform().position.y += EGameEngine::GetGameEngine()->GetRandomFloatRange(-maxOffsets.y, maxOffsets.y);
+    GetTransform().position.z += EGameEngine::GetGameEngine()->GetRandomFloatRange(-maxOffsets.z, maxOffsets.z);
+}
+
+void EWorldObject::ApplyRandomPositionOffsetsXZ(glm::vec2 maxOffsets)
+{
+    GetTransform().position.x += EGameEngine::GetGameEngine()->GetRandomFloatRange(-maxOffsets.x, maxOffsets.x);
+    GetTransform().position.z += EGameEngine::GetGameEngine()->GetRandomFloatRange(-maxOffsets.y, maxOffsets.y);
+}
+
 void EWorldObject::OnPostTick(float deltaTime)
 {
     Super::OnPostTick(deltaTime);

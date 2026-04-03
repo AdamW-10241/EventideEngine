@@ -100,7 +100,13 @@ public:
     void AttachScalingCornerButton(const EESpriteButtonCorner corner = EESpriteButtonCorner::TOP_LEFT, const int spriteIndex = 0);
 
     // Attach draggable button to move sprite
-    void AttachDraggableButton(const EESpriteButtonSide sideIndex = EESpriteButtonSide::TOP, const int spriteIndex = 0);
+    void AttachDraggableButton(const EESpriteButtonSide movementButtonSide = EESpriteButtonSide::TOP, const int spriteIndex = 0);
+
+    // Attach draggable button and scaling corner buttons
+    void AttachAllMovementButtons(const EESpriteButtonSide movementButtonSide = EESpriteButtonSide::TOP, const int spriteIndex = 0);
+
+    // Add lifetime fade to delete object
+    void AddLifetimeFadeTick(const float lifetime, const int spriteIndex = 0);
 
 protected:
     TArray<TShared<ESprite>> m_sprites;

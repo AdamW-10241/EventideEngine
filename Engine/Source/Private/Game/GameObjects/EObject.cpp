@@ -6,13 +6,6 @@ EObject::EObject()
 	m_lifeTime = 0.0f;
 	m_lifeTimeTimer = 0.0f;
 	m_doRender = true;
-	
-	// EDebug::Log("EObject created");
-}
-
-EObject::~EObject()
-{
-	// EDebug::Log("EObject destroyed");
 }
 
 void EObject::Start()

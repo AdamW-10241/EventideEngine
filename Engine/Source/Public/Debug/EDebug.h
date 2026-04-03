@@ -10,25 +10,32 @@
 // Internal Libs
 #include "EngineTypes.h"
 
+#define SHOW_LOGS true
+#define SHOW_DEBUG true
+
 enum EELogType : uint8_t {
 	LT_LOG = 0U,
 	LT_WARNING,
 	LT_ERROR,
-	LT_SUCCESS
+	LT_SUCCESS,
+    LT_DEBUG
 };
 
 class EDebug {
 public:
     template<typename... Args>
     static void Log(const EELogType logType, Args&&... args) {
+        if (!SHOW_LOGS || logType == LT_DEBUG && !SHOW_DEBUG) return;
+
         std::ostringstream oss;
         (oss << ... << Format(args)); // Formats each arg and passes into stream
 
         switch (logType) {
-            case LT_WARNING: std::cout << "[WARNING] "; break;
-            case LT_ERROR:   std::cerr << "[ERROR] ";   break;
-            case LT_SUCCESS: std::cout << "[SUCCESS] "; break;
-            default:         std::cout << "[LOG] ";     break;
+            case LT_WARNING:    std::cout << "[WARNING] ";  break;
+            case LT_ERROR:      std::cerr << "[ERROR] ";    break;
+            case LT_SUCCESS:    std::cout << "[SUCCESS] ";  break;
+            case LT_DEBUG:      std::cout << "[DEBUG] ";    break;
+            default:            std::cout << "[LOG] ";      break;
         }
 
         auto& stream = (logType == LT_ERROR) ? std::cerr : std::cout;

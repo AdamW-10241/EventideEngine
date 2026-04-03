@@ -46,8 +46,8 @@ EGraphicsEngine::EGraphicsEngine()
 bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 {
 	if (sdlWindow == nullptr) {
-		EDebug::Log("SDL window was null.", LT_ERROR);
-		EDebug::Log("Graphics Engine failed to initialise.", LT_ERROR);
+		EDebug::Log(LT_ERROR, "SDL window was null.");
+		EDebug::Log(LT_ERROR, "Graphics Engine failed to initialise.");
 		return false;
 	}
 
@@ -56,16 +56,16 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 
 	// Test if the context failed
 	if (m_sdlGLContext == nullptr) {
-		EDebug::Log("SDL failed to create GL context: " + std::string(SDL_GetError()), LT_ERROR);
-		EDebug::Log("Graphics Engine failed to initialise.", LT_ERROR);
+		EDebug::Log(LT_ERROR, "SDL failed to create GL context: " + std::string(SDL_GetError()));
+		EDebug::Log(LT_ERROR, "Graphics Engine failed to initialise.");
 		return false;
 	}
 
 	// Make the current context active for the SDL window
 	// Test if it failed
 	if (SDL_GL_MakeCurrent(sdlWindow, m_sdlGLContext) != 0) {
-		EDebug::Log("SDL failed to make GL context current: " + std::string(SDL_GetError()), LT_ERROR);
-		EDebug::Log("Graphics Engine failed to initialise.", LT_ERROR);
+		EDebug::Log(LT_ERROR, "SDL failed to make GL context current: " + std::string(SDL_GetError()));
+		EDebug::Log(LT_ERROR, "Graphics Engine failed to initialise.");
 		return false;
 	}
 
@@ -74,9 +74,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		if (SDL_GL_SetSwapInterval(-1) != 0) {
 			// Try enable standard vsync and test if it failed
 			if (SDL_GL_SetSwapInterval(1) != 0) {
-				EDebug::Log(
-					"Graphics Engine failed to initialise vsync: " + std::string(SDL_GetError()),
-					LT_WARNING);
+				EDebug::Log(LT_ERROR, "Graphics Engine failed to initialise vsync: " + std::string(SDL_GetError()));
 				return false;
 			}
 		}
@@ -88,7 +86,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Test if glew failed
 	if (glewResult != GLEW_OK) {
 		EString errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glewResult));
-		EDebug::Log("Graphics Engine failed to initialise glew: " + errorMsg);
+		EDebug::Log(LT_ERROR, "Graphics Engine failed to initialise glew: " + errorMsg);
 		return false;
 	}
 
@@ -103,7 +101,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		"Shaders/SimpleShader/SimpleShader.vertex",
 		"Shaders/SimpleShader/SimpleShader.frag"
 	)) {
-		EDebug::Log("Graphics engine failed to initialise due to simple shader failure.");
+		EDebug::Log(LT_ERROR, "Graphics engine failed to initialise due to simple shader failure.");
 		return false;
 	}
 
@@ -115,7 +113,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		"Shaders/Wireframe/Wireframe.vertex",
 		"Shaders/Wireframe/Wireframe.frag"
 	)) {
-		EDebug::Log("Graphics engine failed to initialise due to wire shader failure.");
+		EDebug::Log(LT_ERROR, "Graphics engine failed to initialise due to wire shader failure.");
 		return false;
 	}
 
@@ -127,7 +125,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 		"Shaders/SpriteShader/SpriteShader.vertex",
 		"Shaders/SpriteShader/SpriteShader.frag"
 	)) {
-		EDebug::Log("Graphics engine failed to initialise due to sprite shader failure.");
+		EDebug::Log(LT_ERROR, "Graphics engine failed to initialise due to sprite shader failure.");
 		return false;
 	}
 
@@ -139,7 +137,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	// Create the default texture object
 	TShared<ETexture> defaultTexture = TMakeShared<ETexture>();
 	if (!defaultTexture->LoadTexture("Textures/T_DefaultGrid.png")) {
-		EDebug::Log("Graphics engine default texture did not load.", LT_ERROR);
+		EDebug::Log(LT_ERROR, "Graphics engine default texture did not load.");
 	}
 
 	// Init a default material for all models
@@ -147,7 +145,7 @@ bool EGraphicsEngine::InitEngine(SDL_Window* sdlWindow, const bool& vsync)
 	m_defaultMaterial->m_baseColourMap = defaultTexture;
 
 	// Log the success of the graphics engine initialisation
-	EDebug::Log("Successfully initialised Graphics Engine.\n", LT_SUCCESS);
+	EDebug::Log("Initialised Graphics Engine.");
 
 	// ----------- LIGHTS
 	// Create the dir light

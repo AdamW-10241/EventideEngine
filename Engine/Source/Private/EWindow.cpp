@@ -66,7 +66,7 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 
 	// Check if SDL window was created
 	if (!m_sdlWindow) {
-		EDebug::Log("SDL failed to create window: " + EString(SDL_GetError()), LT_ERROR);
+		EDebug::Log(LT_WARNING, "SDL failed to create window: " + EString(SDL_GetError()));
 		CloseWindow();
 		return false;
 	}
@@ -76,7 +76,7 @@ bool EWindow::CreateWindow(const ESWindowParams& params)
 
 	// Initialise the graphics engine and test if it failed
 	if (!m_graphicsEngine->InitEngine(m_sdlWindow, m_params.vsync)) {
-		EDebug::Log("Window failed to initialise Graphics Engine.", LT_ERROR);
+		EDebug::Log(LT_WARNING, "Window failed to initialise Graphics Engine.");
 		m_graphicsEngine = nullptr;
 		return false;
 	}

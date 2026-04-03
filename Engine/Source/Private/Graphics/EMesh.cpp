@@ -40,7 +40,7 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	if (m_vao == 0) {
 		// Convert the error into a readable string
 		std::string errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
-		EDebug::Log("Mesh failed to create VAO: " + errorMsg, LT_WARNING);
+		EDebug::Log(LT_WARNING, "Mesh failed to create VAO: " + errorMsg);
 		return false;
 	}
 
@@ -55,7 +55,7 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	if (m_vbo == 0) {
 		// Convert the error into a readable string
 		std::string errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
-		EDebug::Log("Mesh failed to create VBO: " + errorMsg, LT_WARNING);
+		EDebug::Log(LT_WARNING, "Mesh failed to create VBO: " + errorMsg);
 		return false;
 	}
 
@@ -69,7 +69,7 @@ bool EMesh::CreateMesh(const std::vector<ESVertexData>& vertices, const std::vec
 	if (m_eao == 0) {
 		// Convert the error into a readable string
 		std::string errorMsg = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
-		EDebug::Log("Mesh failed to create EAO: " + errorMsg, LT_WARNING);
+		EDebug::Log(LT_WARNING, "Mesh failed to create EAO: " + errorMsg);
 		return false;
 	}
 

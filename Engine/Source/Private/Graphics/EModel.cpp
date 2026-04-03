@@ -15,11 +15,6 @@ EModel::EModel(unsigned int spawnID, EString path)
 	m_offset.scale = glm::vec3(0.0f);
 }
 
-EModel::~EModel()
-{
-	// EDebug::Log("Model destroyed: " + m_path);
-}
-
 void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& defaultMaterial)
 {
 	// Create an ASSIMP model importer
@@ -36,8 +31,7 @@ void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& def
 	// FLAGS_INCOMPLETE is checking if the import failed
 	// rootNode is checking if the model has a mesh at all
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		EDebug::Log("Error importing model from - " + filePath + ": " + importer.GetErrorString(),
-			LT_ERROR);
+		EDebug::Log(LT_WARNING, "Error importing model from - " + filePath + ": " + importer.GetErrorString());
 		return;
 	}
 
@@ -54,7 +48,7 @@ void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& def
 
 	// Find all the meshes in the scene and fail in any of them fail
 	if (!FindAndImportMeshes(*scene->mRootNode, *scene, sceneTransform, &meshesCreated)) {
-		EDebug::Log("Model failed to convert ASSIMP scene: " + filePath, LT_ERROR);
+		EDebug::Log(LT_WARNING, "Model failed to convert ASSIMP scene: " + filePath);
 		return;
 	}
 
@@ -65,10 +59,6 @@ void EModel::ImportModel(const EString& filePath, const TShared<ESMaterial>& def
 	for (auto& materialRef : m_materialStack) {
 		materialRef = defaultMaterial;
 	}
-
-	// Log the success of the model
-	//EDebug::Log("Model successfully imported with (" + std::to_string(meshesCreated) + ") meshes: " + 
-	//	filePath, LT_SUCCESS);
 }
 
 void EModel::Render(const ESTransform& transform, const TShared<EShaderProgram>& shader, const TArray<TShared<ESLight>>& lights)
@@ -82,7 +72,7 @@ void EModel::SetMaterialBySlot(unsigned int slot, const TShared<ESMaterial>& mat
 {
 	// Ensure that the material slot exists
 	if (slot >= m_materialStack.size()) {
-		EDebug::Log("No material slot exists at index: " + std::to_string(slot), LT_WARNING);
+		EDebug::Log(LT_WARNING, "No material slot exists at index: " + std::to_string(slot));
 		return;
 	}
 
@@ -150,7 +140,7 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene,
 		// The GPU requires a minimum of 3 vertices to render
 		// Fail if there are less than 3
 		if (meshVertices.size() < 3) {
-			EDebug::Log("Mesh had less than 3 vertices", LT_ERROR);
+			EDebug::Log(LT_WARNING, "Mesh had less than 3 vertices");
 			return false;
 		}
 
@@ -171,7 +161,7 @@ bool EModel::FindAndImportMeshes(const aiNode& node, const aiScene& scene,
 
 		// Test if the mesh failed to create
 		if (!eMesh->CreateMesh(meshVertices, meshIndicies)) {
-			EDebug::Log("Mesh failed to convert from aMesh to eMesh", LT_ERROR);
+			EDebug::Log(LT_WARNING, "Mesh failed to convert from aMesh to eMesh");
 			return false;
 		}
 

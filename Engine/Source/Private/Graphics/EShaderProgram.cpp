@@ -41,13 +41,13 @@ bool EShaderProgram::InitShader(const EString& vShaderPath, const EString& fShad
 	// Test if the create program failed
 	if (m_programID == 0) {
 		const EString errorMsg = EGET_GLEW_ERROR;
-		EDebug::Log("Shader program failed to initialise, could not create program: " + errorMsg);
+		EDebug::Log(LT_WARNING, "Shader program failed to initialise, could not create program: " + errorMsg);
 		return false;
 	}
 
 	// If either of the shaders fail to import then fail the whole program
 	if (!ImportShaderByType(vShaderPath, ST_VERTEX) || !ImportShaderByType(fShaderPath, ST_FRAGMENT)) {
-		EDebug::Log("Shader program failed to initalise, could not import shaders.");
+		EDebug::Log(LT_WARNING, "Shader program failed to initalise, could not import shaders.");
 		return false;
 	}
 	
@@ -491,7 +491,7 @@ bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType sh
 	
 	// Make sure there is a string path
 	if (shaderStr.empty()) {
-		EDebug::Log("Shader failed to import.", LT_ERROR);
+		EDebug::Log(LT_WARNING, "Shader failed to import.");
 		return false;
 	}
 
@@ -511,7 +511,7 @@ bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType sh
 	// Make sure there was a shader ID assigned
 	if (m_shaderIDs[shaderType] == 0) {
 		const EString errorMsg = EGET_GLEW_ERROR;
-		EDebug::Log("Shader program could not assign shader ID: " + errorMsg, LT_ERROR);
+		EDebug::Log(LT_WARNING, "Shader program could not assign shader ID: " + errorMsg);
 		return false;
 	}
 
@@ -530,7 +530,7 @@ bool EShaderProgram::ImportShaderByType(const EString& filePath, EEShaderType sh
 		// Fill the log with info from GL about what happened
 		glGetShaderInfoLog(m_shaderIDs[shaderType], 512, nullptr, infoLog);
 		// Log info
-		EDebug::Log("Shader compilation error: " + EString(infoLog), LT_ERROR);
+		EDebug::Log(LT_WARNING, "Shader compilation error: " + EString(infoLog));
 		return false;
 	}
 
@@ -547,7 +547,7 @@ EString EShaderProgram::ConvertFileToString(const EString& filePath)
 
 	// Test if we can open the file
 	if (!shaderSource.is_open()) {
-		EDebug::Log("Failed to open the file: " + filePath, LT_ERROR);
+		EDebug::Log(LT_WARNING, "Failed to open the file: " + filePath);
 		return {};
 	}
 	
@@ -579,11 +579,11 @@ bool EShaderProgram::LinkToGPU()
 		// Fill the log with info from GL about what happened
 		glGetShaderInfoLog(m_programID, 512, nullptr, infoLog);
 		// Log info
-		EDebug::Log("Shader link error: " + EString(infoLog), LT_ERROR);
+		EDebug::Log(LT_WARNING, "Shader link error: " + EString(infoLog));
 		return false;
 	}
 
-	EDebug::Log("Shader successfully initialised and linked at index " + std::to_string(m_programID));
+	EDebug::Log("Shader initialised and linked at index " + std::to_string(m_programID));
 
 	return true;
 }

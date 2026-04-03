@@ -33,7 +33,7 @@ void EScreenObject::AddTextBindingTick(std::function<EString()> text, const int 
                 EString string = text();
                 if (!string.empty()) textRef->SetText(string);
             }
-            else EDebug::Log("Could not create tick text binding.\n", LT_ERROR);
+            else EDebug::Log(LT_WARNING, "Could not create tick text binding.");
         }
     };
 
@@ -147,7 +147,7 @@ void EScreenObject::AttachScalingCornerButton(const EESpriteButtonCorner corner,
 	}
 }
 
-void EScreenObject::AttachDraggableButton(const EESpriteButtonSide side, const int spriteIndex)
+void EScreenObject::AttachDraggableButton(const EESpriteButtonSide movementButtonSide, const int spriteIndex)
 {
 	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
 	if (!hud) return;
@@ -159,7 +159,7 @@ void EScreenObject::AttachDraggableButton(const EESpriteButtonSide side, const i
 		// Add base sprite
 		ESAddSpriteConfig dragConfig;
 		dragConfig.path = "Sprites/Button/Drag.png";
-		dragConfig.anchor = spr->GetSpriteEdgeAnchors().at((int)side);
+		dragConfig.anchor = spr->GetSpriteEdgeAnchors().at((int)movementButtonSide);
 		dragObj->AddSprite(dragConfig);
 		dragObj->SetHeldUntilReleased();
 
@@ -186,12 +186,37 @@ void EScreenObject::AttachDraggableButton(const EESpriteButtonSide side, const i
 		});
 
 		// Adjust button to match expected screen object corner position
-		BIND_EVENT_EXT(dragObj, OnUpdateTransform, GetSharedRef<EScreenObject>(), [spriteIndex, side](const TShared<EScreenObject>& drag, const TShared<EScreenObject>& base) {
+		BIND_EVENT_EXT(dragObj, OnUpdateTransform, GetSharedRef<EScreenObject>(), [spriteIndex, movementButtonSide](const TShared<EScreenObject>& drag, const TShared<EScreenObject>& base) {
 			auto baseSpr = base->GetSprite(spriteIndex).lock();
 			if (!baseSpr) return;
 			auto dragSpr = drag->GetSprite().lock();
 			if (!dragSpr) return;
-			dragSpr->SetAnchor(baseSpr->GetSpriteEdgeAnchors().at((int)side));
+			dragSpr->SetAnchor(baseSpr->GetSpriteEdgeAnchors().at((int)movementButtonSide));
 		});
 	}
+}
+
+void EScreenObject::AttachAllMovementButtons(const EESpriteButtonSide movementButtonSide, const int spriteIndex)
+{
+	AttachDraggableButton(movementButtonSide, spriteIndex);
+	AttachScalingCornerButtons(spriteIndex);
+}
+
+void EScreenObject::AddLifetimeFadeTick(const float lifetime, const int spriteIndex)
+{
+	SetLifeTime(lifetime);
+
+	// Add movement binding
+	BIND_EVENT_SELF(GetSharedRef<EObject>(), OnTicked, [spriteIndex](const TShared<EObject>& obj, float deltaTime) {
+		auto screenObj = TCast<EScreenObject>(obj);
+		if (!screenObj) return;
+		auto spr = screenObj->GetSprite(spriteIndex).lock();
+		if (!spr) return;
+		auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
+		if (!window) return;
+
+		constexpr float FLOAT_SPEED = 15.0f;
+		spr->GetPositionOffset().y += (SLATE_UNIT_SCALAR / FLOAT_SPEED) * window->GetSlateUnitY() * deltaTime;
+		spr->SetRenderColorAlpha(screenObj->GetLifeTimeRatio());
+	});
 }

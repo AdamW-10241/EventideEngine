@@ -16,6 +16,7 @@
 class EObject;
 class EWorldObject;
 class GUIHUD;
+class Player;
 
 enum EEGameState {
 	GAME,
@@ -118,6 +119,9 @@ public:
 	// Get game state
 	EEGameState GetGameState() const { return m_gameState; }
 
+	// Get player weak reference
+	TWeak<Player> GetPlayer() { return m_player; }
+
 	// Set game state
 	void SetGameState(EEGameState gameState) { m_gameState = gameState; }
 
@@ -213,6 +217,9 @@ private:
 	
 	// Store reference to HUD object
 	TWeak<GUIHUD> m_gameHUD;
+
+	// Store reference to player object
+	TWeak<Player> m_player;
 
 	// Last time ticked
 	double m_lastTickTime;

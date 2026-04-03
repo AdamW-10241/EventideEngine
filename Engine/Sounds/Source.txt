@@ -6,4 +6,7 @@ Player - https://pixabay.com/users/freesound_community-46691455/
 Enemy - https://freesound.org/people/LeMudCrab/sounds/163453/
 
 Coin:
-https://freesound.org/people/Mateusz_Chenc/sounds/512216/
+https://freesound.org/people/Mateusz_Chenc/sounds/512216/\
+
+Shoot:
+Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=81545">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=81545">Pixabay</a>

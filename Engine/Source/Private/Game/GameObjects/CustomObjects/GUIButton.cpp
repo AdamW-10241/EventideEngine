@@ -16,7 +16,7 @@ void GUIButton::SetSpriteAnchorMouse(int index)
 	// Set anchor to match mouse screen position
 	auto spr = GetSprite(index).lock();
 	if (!spr) {
-		EDebug::Log("Sprite does not exist at index: " + toEString(index));
+		EDebug::Log(LT_WARNING, "Sprite does not exist at index: " + toEString(index));
 		return;
 	}
 
@@ -32,6 +32,7 @@ void GUIButton::OnRegisterInputs(const TShared<EInput>& m_input)
 
 	// Bind mouse events
 	SetInputBinding(m_input, &EInput::OnMousePressed, [this, m_input](const EUi8& button) {
+		if (EGameEngine::GetGameEngine()->GetGameState() != EEGameState::PAUSED) return;
 		if (button == SDL_BUTTON_LEFT && IsMouseOnButton(m_input)) {
 			// Button pressed
 			m_buttonHeld = true;

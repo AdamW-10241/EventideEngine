@@ -16,7 +16,6 @@ struct ESMaterial;
 class EModel {
 public:
 	EModel(unsigned int spawnID, EString path);
-	~EModel();
 
 	// Import a 3D model from file
 	// Uses the ASSIMP import library, check docs to know which file types are accepted

@@ -1,6 +1,7 @@
 #include "Game/GameObjects/CustomObjects/Weapon.h"
 #include "Game/GameObjects/CustomObjects/Bullet.h"
 #include "Graphics/EGraphicsEngine.h"
+#include "Game/GameObjects/CustomObjects/Player.h"
 
 #define Super EWorldObject
 
@@ -22,18 +23,20 @@ Weapon::Weapon(TWeak<Character> owner, bool addModel, float damage, float moveSp
 	m_reserveAmmo = 64;
 }
 
-void Weapon::TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
+bool Weapon::TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
 {
-	// If timer expired,
+	bool fired = false;
+
+	// If timer expired
 	if (m_attackTimer <= 0.0f) {
-		// Fire gun
-		Fire(bulletCollisionType, shootDirection);
-		// Reset timer
+		fired = Fire(bulletCollisionType, shootDirection);
 		m_attackTimer = m_attackCooldownTime;
 	}
+
+	return fired;
 }
 
-void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
+bool Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
 {
 	glm::vec3 spawnPos = GetTransform().position + shootDirection * m_barrelLength;
 	float pitch = glm::degrees(asin(shootDirection.y));
@@ -41,7 +44,23 @@ void Weapon::Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection)
 	glm::vec3 spawnRot = glm::vec3(-pitch, yaw, 0.0f);
 	float lifetime = 3.0f;
 
-	EGameEngine::GetGameEngine()->CreateObject<Bullet>(bulletCollisionType, glm::vec3(0, 0, 1), m_bulletDamage, m_bulletMoveSpeed, lifetime, spawnPos, spawnRot);
+	auto bullet = EGameEngine::GetGameEngine()->CreateObject<Bullet>(bulletCollisionType, glm::vec3(0, 0, 1), m_bulletDamage, m_bulletMoveSpeed, lifetime, spawnPos, spawnRot);
+	bool fired = !bullet.expired();
+
+	//auto player = EGameEngine::GetGameEngine()->GetPlayer().lock();
+	//if (!player) {
+	//	EDebug::Log(LT_WARNING, "Player does not exist to scale fired bullet audio.");
+	//	return fired;
+	//}
+
+	//// Distance scale audio
+	//if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
+	//	float distance = glm::distance(spawnPos, player->GetTransform().position);
+	//	int volume = 50 - int(distance / 5);
+	//	soundManager->PlaySound(EE_SOUND_SHOOT, volume);
+	//}
+
+	return fired;
 }
 
 void Weapon::Reload()

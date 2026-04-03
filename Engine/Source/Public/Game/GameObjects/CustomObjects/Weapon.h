@@ -7,7 +7,7 @@ public:
 	Weapon(TWeak<Character> owner, bool addModel = true, float damage = 1.0f, float moveSpeed = 0.1f, float attackCooldownTime = 1.0f, bool unlimitedAmmo = false);
 
 	// Try to fire
-	void TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
+	bool TryFire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
 
 	// Reload the weapon and adjust ammo stocks
 	void Reload();
@@ -25,7 +25,7 @@ protected:
 
 private:
 	// Fire the gun to spawn and bullet
-	void Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
+	bool Fire(EECollisionType bulletCollisionType, glm::vec3 shootDirection);
 
 private:
 	// Weapon owner

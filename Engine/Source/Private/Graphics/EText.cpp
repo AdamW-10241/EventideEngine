@@ -47,7 +47,7 @@ bool EText::LoadTexture(const EString& path, bool repeat, bool linear)
 		m_font = TTF_OpenFont(m_path.c_str(), m_fontSize);
 
 		if (m_font == nullptr) {
-			EDebug::Log("Failed to load font - " + m_path + ": " + EString(TTF_GetError()), LT_ERROR);
+			EDebug::Log(LT_WARNING, "Failed to load font - " + m_path + ": " + EString(TTF_GetError()));
 			return false;
 		}
 	}
@@ -66,7 +66,7 @@ bool EText::LoadTexture(const EString& path, bool repeat, bool linear)
 	// Check if the import failed
 	if (surf == nullptr) {
 		EString errorMsg = "Failed to convert font to surface - " + m_path + ": " + EString(TTF_GetError());
-		EDebug::Log(errorMsg, LT_ERROR);
+		EDebug::Log(LT_WARNING, errorMsg);
 		// Clear Surface Image data
 		CleanupSurface(surf);
 		return false;
@@ -84,7 +84,7 @@ bool EText::LoadTexture(const EString& path, bool repeat, bool linear)
 	if (m_ID == 0) {
 		EString error = reinterpret_cast<const char*>(glewGetErrorString(glGetError()));
 		EString errorMsg = "Failed to generate texture ID - " + m_path + ": " + error;
-		EDebug::Log(errorMsg, LT_ERROR);
+		EDebug::Log(LT_ERROR, errorMsg);
 		// Clear Surface Image data
 		CleanupSurface(surf);
 		return false;

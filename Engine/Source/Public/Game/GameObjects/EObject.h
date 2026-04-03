@@ -7,7 +7,7 @@ class Floor;
 class EObject : public std::enable_shared_from_this<EObject> {
 public:
 	EObject();
-	virtual ~EObject();
+	virtual ~EObject() {}
 
 	// Lambda bindings
 	std::function<void(float)> OnTicked;

@@ -71,6 +71,14 @@ public:
 	// Place on a random vertex of a floor
 	void PlaceOnFloorRandomly(TShared<Floor> floor, float placementScale);
 
+	// Apply random position offsets for XYZ
+	void ApplyRandomPositionOffsetsXYZ(glm::vec3 maxOffsets);
+	void ApplyRandomPositionOffsetsXYZ(float maxOffset) { ApplyRandomPositionOffsetsXYZ({ maxOffset, maxOffset, maxOffset }); }
+
+	// Apply random position offsets for XZ
+	void ApplyRandomPositionOffsetsXZ(glm::vec2 maxOffsets);
+	void ApplyRandomPositionOffsetsXZ(float maxOffset) { ApplyRandomPositionOffsetsXZ({ maxOffset, maxOffset }); }
+
 protected:
 	virtual void OnPostTick(float deltaTime) override;
 

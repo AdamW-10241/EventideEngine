@@ -99,7 +99,7 @@ public:
 	// Set anchor based on screen position
 	void SetAnchorScreenPosition(glm::vec2 screenPosition) { 
 		m_anchor = GetScreenPositionAsAnchor(screenPosition);
-		EDebug::Log("New Anchor: ", m_anchor);
+		EDebug::Log(LT_DEBUG, "New Anchor: ", m_anchor);
 	}
 
 	// Get screen position as normalised screen anchor for placement

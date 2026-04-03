@@ -7,7 +7,7 @@ class EScreenObject;
 
 class Player : public Character {
 public:
-	Player(glm::vec3 spawnLocation);
+	Player(const glm::vec3 spawnLocation);
 
 protected:
 	virtual void OnStart() override;
@@ -34,6 +34,8 @@ private:
 
 	// Store the old position to restore the camera and object
 	glm::vec3 m_oldPosition;
+
+	TArray<glm::vec3> m_collisionNormals;
 
 	// Store if the player is currently pressing left mouse
 	bool m_leftMouseHeld;

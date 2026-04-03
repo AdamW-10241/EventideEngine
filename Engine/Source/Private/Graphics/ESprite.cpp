@@ -15,7 +15,7 @@ bool ESprite::CreateSprite(const EString& texturePath)
 
     // Load texture
     if (!LoadTexture(texturePath, false, false)) {
-        EDebug::Log("ESprite failed to load texture.", LT_ERROR);
+        EDebug::Log(LT_WARNING, "ESprite failed to load texture.");
         return false;
     }
 
@@ -40,7 +40,7 @@ bool ESprite::CreateSprite()
 
     // Create mesh
     if (!CreateMesh(vertices, indices)) {
-        EDebug::Log("ESprite failed to create mesh.", LT_ERROR);
+        EDebug::Log(LT_WARNING, "ESprite failed to create mesh.");
         return false;
     }
 
@@ -140,7 +140,7 @@ glm::vec2 ESprite::GetScreenPositionAsAnchor(glm::vec2 screenPosition)
 {
     auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
     if (!window) {
-        EDebug::Log("Window could not be locked.\n");
+        EDebug::Log(LT_WARNING, "Window could not be locked.");
         return glm::vec2(0.0f);
     }
     glm::vec2 windowSize = window->GetCurrentSize();
@@ -185,7 +185,7 @@ void ESprite::UpdateTransform()
 {
     auto window = EGameEngine::GetGameEngine()->GetWindow().lock();
     if (!window) {
-        EDebug::Log("Window could not be locked.\n");
+        EDebug::Log(LT_WARNING, "Window could not be locked.");
         return;
     }
 

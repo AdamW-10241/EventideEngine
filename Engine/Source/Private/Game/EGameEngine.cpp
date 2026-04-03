@@ -49,7 +49,7 @@ void EGameEngine::DestroyEngine()
 bool EGameEngine::Run()
 {
 	if (!Init()) {
-		EDebug::Log(("Game Engine failed to initialise."), LT_ERROR);
+		EDebug::Log(LT_WARNING, "Game Engine failed to initialise.");
 		return false;
 	}
 
@@ -78,15 +78,12 @@ void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
 	// Get HUD
 	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
 	if (!hud) {
-		EDebug::Log("Game HUD could not be locked.\n");
+		EDebug::Log(LT_WARNING, "Game HUD could not be locked.");
 		return;
 	}
 	
 	// Create HUD text
 	if (auto screenObj = hud->AddScreenObject<EScreenObject>().lock()) {
-		// Set lifetime
-		screenObj->SetLifeTime(1.5f);
-
 		// Add text
 		ESAddTextConfig config;
 		config.path = FONT_PRESS_START;
@@ -95,18 +92,7 @@ void EGameEngine::AddTextNotif(EString text, glm::vec4 color)
 		config.SetRenderColor(color);
 		config.SetText(text);
 		screenObj->AddSprite(config);
-
-		// Add movement binding
-		BIND_EVENT_SELF(screenObj, OnTicked, [](const TShared<EObject>& obj, float deltaTime) {
-			if (auto screenObj = TCast<EScreenObject>(obj)) {
-				if (auto sprite = screenObj->GetSprite(0).lock()) {
-					if (auto window = EGameEngine::GetGameEngine()->GetWindow().lock()) {
-						sprite->GetPositionOffset().y += (SLATE_UNIT_SCALAR / 15.0f) * window->GetSlateUnitY() * deltaTime;
-					}
-					sprite->SetRenderColorAlpha(obj->GetLifeTimeRatio());
-				}
-			}
-		});
+		screenObj->AddLifetimeFadeTick(1.5f);
 	}
 }
 
@@ -160,17 +146,17 @@ bool EGameEngine::Init()
 {
 	// Initialise the components of SDL that we need
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0) {
-		EDebug::Log("Failed to init SDL: " + EString(SDL_GetError()), LT_ERROR);
+		EDebug::Log(LT_ERROR, "Failed to init SDL: " + EString(SDL_GetError()));
 		return false;
 	}
 
 	if (TTF_Init() != 0) {
-		EDebug::Log("Failed to init SDL TTF: " + EString(TTF_GetError()), LT_ERROR);
+		EDebug::Log(LT_ERROR, "Failed to init SDL TTF: " + EString(TTF_GetError()));
 		return false;
 	}
 
 	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, NULL) != 0) {
-		EDebug::Log("Failed to init SDL Mixer: "+ EString(Mix_GetError()), LT_ERROR);
+		EDebug::Log(LT_ERROR, "Failed to init SDL Mixer: "+ EString(Mix_GetError()));
 		return false;
 	}
 
@@ -208,6 +194,10 @@ bool EGameEngine::Init()
 	// Create game HUD
 	m_gameHUD = CreateObject<GUIHUD>();
 
+	// Create player
+	glm::vec3 spawnLocation = { 0.0f, 20.0f, 0.0f };
+	m_player = CreateObject<Player>(spawnLocation);
+
 	return true;
 }
 
@@ -231,15 +221,13 @@ void EGameEngine::Start()
 	// Spawn Walls
 	for (EUi32 i = 0; i < 15; i++) CreateObject<Wall>();
 
-	// Spawn Player
-	glm::vec3 spawnLocation = { 0.0f, 20.0f, 0.0f };
-	if (auto player = CreateObject<Player>(spawnLocation).lock()) {
-		// Spawn Enemies
+	// Spawn Enemies
+	if (auto player = m_player.lock()) {
 		for (EUi32 i = 0; i < 8; i++) Enemy::SpawnEnemy(player);
 	}
 
 	// Spawn Grass
-	for (EUi32 i = 0; i < 30; i++) CreateObject<Grass>();
+	for (EUi32 i = 0; i < 50; i++) CreateObject<Grass>();
 
 	// Load Coin Model
 	CreateObject<Coin>().lock()->Destroy();

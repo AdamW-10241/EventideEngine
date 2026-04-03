@@ -18,7 +18,12 @@ void Grass::OnStart()
 	auto model = LoadModel(modelPath, materials);
 
 	// Place grass randomly on floor mesh
-	if (const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock()) {
-		PlaceOnFloorRandomly(floor, 25.0f);
+	const auto& floor = EGameEngine::GetGameEngine()->FindObjectOfType<Floor>().lock();
+	if (!floor) {
+		EDebug::Log(LT_WARNING, "No floor exists to position grass.");
+		Destroy();
+		return;
 	}
+	PlaceOnFloorRandomly(floor, 25.0f);
+	ApplyRandomPositionOffsetsXZ(50.0f);
 }

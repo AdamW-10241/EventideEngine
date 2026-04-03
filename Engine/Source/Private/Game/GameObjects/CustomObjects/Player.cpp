@@ -39,7 +39,7 @@ void Player::OnStart()
 {
 	Super::OnStart();
 
-	// If camera exists,
+	// If camera exists
 	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
 		// Move to camera
 		GetTransform().position = camRef->transform.position;
@@ -72,7 +72,7 @@ void Player::OnStart()
 	// Get HUD
 	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
 	if (!hud) { 
-		EDebug::Log("Game HUD could not be locked.\n");
+		EDebug::Log(LT_WARNING, "Game HUD could not be locked.");
 		return;
 	}
 
@@ -153,6 +153,7 @@ void Player::OnTick(float deltaTime)
 
 	// Reset collide flag
 	m_collided = false;
+	m_collisionNormals.clear();
 
 	// Move to camera
 	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
@@ -165,8 +166,21 @@ void Player::OnOverlap(const TShared<EWorldObject>& other, const TShared<ESColli
 	Super::OnOverlap(other, col, otherCol);
 
 	if (otherCol->type != EECollisionType::BULLET_PLAYER) {
-		// Set collide flag
 		m_collided = true;
+
+		// Get overlaps
+		glm::vec3 delta = col->box.position - otherCol->box.position;
+		glm::vec3 overlap = (col->box.halfSize + otherCol->box.halfSize) - glm::abs(delta);
+
+		// Add wall normal based on movement direction
+		glm::vec3 normal;
+		if (overlap.x < overlap.y && overlap.x < overlap.z)
+			normal = glm::vec3(glm::sign(delta.x), 0.0f, 0.0f);
+		else if (overlap.z < overlap.y && overlap.z < overlap.x)
+			normal = glm::vec3(0.0f, 0.0f, glm::sign(delta.z));
+		else
+			normal = glm::vec3(0.0f, glm::sign(delta.y), 0.0f);
+		m_collisionNormals.push_back(normal);
 
 		if (otherCol->type == EECollisionType::BULLET_ENEMY) {
 			if (auto soundManager = EGameEngine::GetGameEngine()->GetSoundManager().lock()) {
@@ -183,44 +197,52 @@ void Player::OnPostTick(float deltaTime)
 	// Toggle ADS
 	m_toBeWeaponOffset = m_rightMouseHeld ? m_weaponADSOffset : m_weaponBaseOffset;
 
-	// Move to camera, or reverse frame camera movement, based on collisions
-	if (auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock()) {
-		if (m_collided) {
-			// Reset camera position to before collision
-			camRef->transform.position = m_oldPosition;
-			// Reset player position to before collision
-			GetTransform().position = m_oldPosition;
-		}
+	// Get camera
+	auto camRef = EGameEngine::GetGameEngine()->GetGraphicsEngine()->GetCamera().lock();
+	if (!camRef) return;
 
-		// Update weapon
-		if (auto weapon = m_weapon.lock()) {
-			// Move with player
-			glm::vec3 forward = camRef->transform.Forward();
-			glm::vec3 right = camRef->transform.Right();
-			glm::vec3 up = camRef->transform.Up();
+	// Process collisions
+	if (m_collided && !m_collisionNormals.empty()) {
+		glm::vec3 frameMovement = camRef->transform.position - m_oldPosition;
 
-			glm::vec3 rotatedWeaponOffset =
-				forward * m_weaponOffset.z +
-				right * m_weaponOffset.x +
-				up * m_weaponOffset.y;
-
-			weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
-			weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
-
-			// Fire weapon if holding left mouse
-			if (auto weapon = m_weapon.lock()) {
-				if (m_leftMouseHeld) {
-					weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
-				}
+		// Block movement going into the wall for each normal
+		for (const auto& normal : m_collisionNormals) {
+			float penetration = glm::dot(frameMovement, normal);
+			if (penetration < 0.0f) {
+				frameMovement -= penetration * normal;
 			}
 		}
 
-		// Adjust light relative to player
-		m_light->position = camRef->transform.position + camRef->transform.Forward() * 5.0f;
-		m_light->direction = camRef->transform.Forward();
+		camRef->transform.position = m_oldPosition + frameMovement;
+		GetTransform().position = camRef->transform.position;
 	}
 
-	// Store old position (old for next loop)
+	// Update weapon
+	if (auto weapon = m_weapon.lock()) {
+		// Move with player
+		glm::vec3 forward = camRef->transform.Forward();
+		glm::vec3 right = camRef->transform.Right();
+		glm::vec3 up = camRef->transform.Up();
+
+		glm::vec3 rotatedWeaponOffset =
+			forward * m_weaponOffset.z +
+			right * m_weaponOffset.x +
+			up * m_weaponOffset.y;
+
+		weapon->GetTransform().position = camRef->transform.position + rotatedWeaponOffset;
+		weapon->GetTransform().rotation = glm::vec3(camRef->transform.rotation.x, camRef->transform.rotation.y, 0.0f);
+
+		// Fire weapon if holding left mouse
+		if (m_leftMouseHeld) {
+			weapon->TryFire(EECollisionType::BULLET_PLAYER, camRef->transform.Forward());
+		}
+	}
+
+	// Adjust light relative to player
+	m_light->position = camRef->transform.position + camRef->transform.Forward() * 5.0f;
+	m_light->direction = camRef->transform.Forward();
+
+	// Store position (old for next loop)
 	m_oldPosition = GetTransform().position;
 }
 
@@ -229,7 +251,7 @@ void Player::OnTakeDamage(float damage)
 	// Get HUD
 	auto hud = EGameEngine::GetGameEngine()->GetGameHUD().lock();
 	if (!hud) {
-		EDebug::Log("Game HUD could not be locked.\n");
+		EDebug::Log(LT_WARNING, "Game HUD could not be locked.");
 		return;
 	}
 	
